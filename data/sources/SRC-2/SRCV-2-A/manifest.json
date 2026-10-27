@@ -1,0 +1,21 @@
+{
+  "source_id": "SRCV-2-A",
+  "title": "§ 95b SGB IV — Systemprüfung (Einzelnorm, Sozialgesetzbuch Viertes Buch (IV))",
+  "issuing_body": "Bundesministerium der Justiz in Verbindung mit der juris GmbH — gesetze-im-internet.de",
+  "source_type": "law",
+  "official_uri_or_origin": "https://www.gesetze-im-internet.de/sgb_4/__95b.html",
+  "retrieved_at": "2026-10-26",
+  "published_or_issued_at": "Artikel I des Gesetzes vom 23. Dezember 1976, BGBl. I S. 3845 (as stated on the retrieved page); current-amendment date of the retrieved § 95b wording not shown on the page and not guessed",
+  "edition_or_version": "",
+  "valid_from": null,
+  "valid_to": null,
+  "language": "de",
+  "checksum": "fc6fcd0c7aad47adcea7b183dac61eda32db9d0b41e0f5f847f4ff31609914b8",
+  "supersedes": null,
+  "status": "candidate",
+  "reviewer": null,
+  "notes": "Official federal statute text (legal anchor of the Systemprüfung the prototype serves). Verified 2026-10-26 (T10-035): the norm has exactly five Absätze and prescribes NO template, form, or format for any Prüfbericht/Testbericht/Zertifikat; its only formatting duty is version-identifiability of the software (Abs. 2 sentence 4). Procedural detail (Pflichtenheft, Prüfmitteilung, SP-Richtlinien) lives in GKV-Spitzenverband/ITSG administrative rules, not in the statute. Verbatim derived text in sgb4_95b_verbatim.txt (original HTML is iso-8859-1). G0: fetch/registration is not acceptance — human owner must verify origin/version and accept before retrieval uses it.",
+  "intake_paths": [
+    "data/sources/SRC-2/SRCV-2-A/sgb4_95b.html"
+  ]
+}

@@ -1,0 +1,29 @@
+# Runtime dependencies for the segmentation stage (T10-005, adopted core).
+# The skeleton and its tests import and run on the standard library only;
+# these are imported lazily inside the extractor modules.
+pymupdf>=1.24
+python-docx>=1.1
+
+# T10-031: the adopted teammate segmenter (src/chunking.py) writes YAML
+# frontmatter and needs PyMuPDF; both are exercised only on the PDF path.
+PyYAML>=6.0
+
+# Adopted teammate tooling wired into the stack (T10-043 merge):
+# run_review.py / orchestrator import langfuse only when env keys are set;
+# Merge_graph_neo.py needs neo4j; retrieval/comparator modules need the rest.
+langfuse>=3,<4
+neo4j>=5
+requests
+python-frontmatter
+pydantic>=2
+python-dotenv
+
+# T10-043: Lisa's orchestrator (orchestrator/graph.py, llm.py) — LangGraph drives the
+# two graphs; the LLM calls speak the Anthropic SDK natively (env-driven models,
+# see orchestrator/llm.py). Both were missing from her branch's requirements.
+langgraph>=0.2
+anthropic>=0.40
+
+# Development (optional): the test suite also runs without it via
+#   python3 -m unittest discover -s tests
+pytest>=8

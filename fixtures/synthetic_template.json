@@ -1,0 +1,11 @@
+{
+  "template_id": "TPL-SYNTH-1",
+  "warning": "SYNTHETIC TEMPLATE - NOT an official ITSG form. No legal or template compliance claim may be derived from it (plan.md, architecture.md section 8).",
+  "official_form_id": null,
+  "version": "synthetic-0.1",
+  "valid_from": null,
+  "output_type": "json",
+  "required_fields": ["case_id", "criterion_id", "result_status", "reason", "evidence_links"],
+  "field_order": ["case_id", "criterion_id", "result_status", "reason", "evidence_links"],
+  "status": "needs_review"
+}

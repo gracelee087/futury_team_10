@@ -1,0 +1,1208 @@
+/* SÜSIE prototype — i18n (DE/EN), settings, backend bridge, human decisions remain outside this demo. */
+(() => {
+ 'use strict';
+ const q = selector => document.querySelector(selector);
+ const qa = selector => [...document.querySelectorAll(selector)];
+ const ROOT = document.documentElement;
+
+ /* ---------------------------------- i18n --------------------------------- */
+ const I18N = {
+  de: {
+   'document.title': 'SÜSIE · Prüfakte',
+   'skip': 'Zum Prüfbereich springen',
+   'brand.sub': 'Systemüberprüfung sozialversicherungsrechtlicher IT-Ergebnisse',
+   'nav.aria': 'Prüfbereiche',
+   'nav.cases': 'Prüffälle', 'nav.stories': 'Story-Suiten', 'nav.sources': 'Quellen & Kriterien', 'nav.report': 'Prüfbericht', 'nav.audit': 'Verlauf',
+   'story.1': 'Arbeitsunfall/Reha statt Krankheit', 'story.3': 'Kurze Krankheitstage ohne Bescheinigung',
+   'story.4': 'Antwort der Kasse (61) auf die 41', 'story.6': 'Storno und Korrektur einer 01',
+   'stories.title': 'Story-Suiten', 'stories.subtitle': 'Szenariobasierte Prüffälle nach Story und Kategorie.',
+   'stories.offlineNote': 'Story-Suiten sind nur mit Backend-Verbindung verfügbar.',
+   'stories.categoriesTitle': 'Kategorien',
+   'stories.story': 'Story', 'stories.category': 'Kategorie', 'stories.count': 'Anzahl', 'stories.mustFlag': 'Soll-Kennzeichnung',
+   'stories.search': 'Suitenfälle suchen', 'stories.searchPlaceholder': 'Prüffall oder Kategorie eingeben',
+   'stories.filterAria': 'Nach Story filtern', 'stories.filterAll': 'Alle Stories', 'stories.storyLabel': 'Story {n}',
+   'stories.defectsOnly': 'nur Fehlerfälle',
+   'stories.tableAria': 'Story-Prüffälle, seitlich scrollbar',
+   'stories.caption': 'Story-Prüffälle mit Soll-Zusammenfassung und Soll-Kennzeichnung',
+   'stories.empty': 'Keine passenden Story-Prüffälle. Suchbegriff oder Filter ändern.',
+   'stories.detailAria': 'Ausgewählter Story-Prüffall', 'stories.scenarioTitle': 'Szenario', 'stories.expectedTitle': 'Soll-Datensatz',
+   'stories.currentAu': 'Aktuelle AU', 'stories.priorAu': 'Vorherige AU', 'stories.priorCertified': 'davon bescheinigt',
+   'stories.today': 'Heute', 'stories.cert': 'bescheinigt', 'stories.uncert': 'nicht bescheinigt',
+   'stories.insurance': 'Versicherung', 'stories.reason': 'Grund', 'stories.yes': 'ja', 'stories.no': 'nein', 'stories.none': 'keine',
+   'stories.observedKind': 'Ist-Verhalten',
+   'report.runs.title': 'Prüfläufe (Backend)',
+   'report.runs.offlineNote': 'Prüfläufe sind nur mit Backend-Verbindung verfügbar.',
+   'report.runs.cases': 'Fälle', 'report.runs.correct': 'Korrekt', 'report.runs.falseAlarms': 'Fehlalarme',
+   'report.runs.detected': 'Erkannt', 'report.runs.mustFlagCases': 'Kennzeichnungspflichtig',
+   'report.runs.reportsTitle': 'Neueste Prüfberichte', 'report.runs.noReports': 'Noch keine Prüfberichte.',
+   'report.runs.findingsTitle': 'Befunde · {id}', 'report.runs.thRule': 'Regel',
+   'report.runs.generate': 'Neuen Prüfbericht erzeugen (offline)', 'report.runs.running': 'Wird erzeugt …',
+   'report.runs.done': 'Prüfbericht erzeugt: {id}.', 'report.runs.failed': 'Prüfbericht-Generierung fehlgeschlagen: {error}',
+   'themeCycle.aria': 'Darstellung wechseln',
+   'themeCycle.title': 'Darstellung wechseln ({next})',
+   'settings.title': 'Einstellungen', 'settings.language': 'Sprache',
+   'appearance.theme': 'Lesethema', 'theme.casual': 'Casual', 'theme.contrast': 'Hoher Kontrast',
+   'appearance.mode': 'Farbmodus', 'mode.light': 'Hell', 'mode.dark': 'Dunkel',
+   'appearance.status': '{theme} · {mode} · {lang}',
+   'settings.api': 'API',
+   'api.endpoint': 'Backend-URL',
+   'api.endpointPlaceholder': 'http://127.0.0.1:8766',
+   'api.endpointHelp': 'Leer lassen, um denselben Ursprung wie diese Seite zu verwenden.',
+   'api.check': 'Verbindung prüfen', 'api.runOffline': 'Demo neu ausführen (offline)', 'api.runLive': 'Demo neu ausführen (Live-LLM)',
+   'api.checking': 'Verbindung wird geprüft …',
+   'api.status.connected': 'Verbunden · {store} ({events} Ereignisse)',
+   'api.status.offline': 'Nicht verbunden – synthetische Demodaten.',
+   'api.run.running': 'Demo wird ausgeführt …', 'api.run.done': 'Demo neu ausgeführt ({events} Ereignisse).', 'api.run.failed': 'Ausführung fehlgeschlagen: {error}',
+   'api.run.liveConfirm': 'Wirklich ausführen? Live-Anfragen gehen an das LLM-Gateway.',
+   'api.privacy': 'Zugangsdaten bleiben serverseitig im verschlüsselten Speicher und werden nie an den Browser übertragen.',
+   'footer.org': 'Arbeitsbereich ITSG', 'footer.view': 'Prüferansicht · Konzeptdemo',
+   'topline.path': 'Prüfungen / DTA EEL / Prüffälle',
+   'backend.connected': 'Backend verbunden', 'backend.offline': 'Backend nicht verbunden · synthetische Demodaten',
+   'cases.title': 'Prüfung DTA EEL', 'cases.subtitle': 'Demo-Abrechnungssoftware · Prüfzyklus 2027 · Entgeltersatzleistungen',
+   'cases.prepare': 'Bericht vorbereiten', 'cases.akte': 'Prüfakte EEL-DEMO-2027', 'cases.badge': 'Fachprüfung offen',
+   'cases.meta': '{n} Prüffälle · {m} Klärungspunkte',
+   'cases.openFindings': '{m} Klärungspunkte klären',
+   'cases.search': 'Prüffälle suchen', 'cases.searchPlaceholder': 'Prüffall oder Feld eingeben',
+   'cases.result': 'Ergebnis', 'cases.filterAria': 'Ergebnis filtern',
+   'filter.all': 'Alle Ergebnisse', 'filter.pass': 'Übereinstimmung', 'filter.mismatch': 'Abweichung', 'filter.noteval': 'Nicht auswertbar',
+   'cases.tableAria': 'Prüfergebnisse, seitlich scrollbar',
+   'cases.caption': 'Prüffälle mit Sollwert, Istwert und Vergleichsergebnis',
+   'th.case': 'Prüffall', 'th.field': 'Feld', 'th.expected': 'Soll', 'th.observed': 'Ist', 'th.result': 'Ergebnis',
+   'sort.case': 'Nach Prüffall sortieren', 'sort.field': 'Nach Feld sortieren', 'sort.expected': 'Nach Soll sortieren', 'sort.observed': 'Nach Ist sortieren', 'sort.result': 'Nach Ergebnis sortieren',
+   'cases.empty': 'Keine passenden Prüffälle. Suchbegriff oder Ergebnisfilter ändern.', 'cases.reset': 'Filter zurücksetzen',
+   'cases.count': '{n} Prüffälle', 'cases.count.one': '{n} Prüffall',
+   'detail.aria': 'Ausgewählter Prüffall', 'trace.aria': 'Belegkette des ausgewählten Prüffalls',
+   'trace.source': 'Quellreferenz', 'trace.basis': 'Sollgrundlage', 'trace.case': 'Prüffall', 'trace.output': 'Ausgabe',
+   'detail.expectedLabel': 'Sollwert · {field}', 'detail.observedLabel': 'Istwert · {field}',
+   'detail.noValue': '—', 'detail.missing': 'Nicht vorhanden', 'detail.required': 'Erforderlich',
+   'detail.citeSource': 'Quelle ansehen', 'detail.run': 'Prüflauf · {run}', 'detail.basis': 'Sollgrundlage', 'detail.buildUnknown': 'Build unbekannt',
+   'detail.review': 'Prüfnotiz erfassen', 'detail.evidence': 'Ausgabebeleg ansehen',
+   'note.label': 'Prüfnotiz', 'note.placeholder': 'Beobachtung und nächsten Schritt dokumentieren …',
+   'note.help': 'Notizen und Entwürfe werden in diesem Browser-Tab zwischengespeichert. Strg/⌘+Enter speichert direkt. Keine fachliche Freigabe.',
+   'note.helpNoStorage': 'Browser-Speicherung nicht verfügbar. Notizen bleiben nur bis zum Neuladen erhalten. Zur Sicherung den Demo-Bericht herunterladen.',
+   'note.chars': 'Zeichen', 'note.save': 'Notiz zum Prüffall speichern',
+   'note.error.empty': 'Bitte eine Beobachtung oder den nächsten Prüfschritt eingeben.', 'note.error.long': 'Bitte die Notiz auf höchstens 2.000 Zeichen kürzen.',
+   'toast.saved': '{id}: Prüfnotiz gespeichert. Der Prüffall bleibt fachlich unverändert.',
+   'toast.limit': '100 Notizen erreicht. Bitte den Demo-Bericht zur Sicherung herunterladen.',
+   'toast.deleted': 'Prüfnotiz gelöscht. Der Prüffall bleibt fachlich unverändert.',
+   'runEvidence.aria': 'Ausgabebeleg', 'runEvidence.title': 'Ausgabebeleg',
+   'runEvidence.note': 'Der dargestellte Ausgabebeleg stammt aus der verbundenen Demo-Pipeline bzw. wurde für diesen Prototyp erstellt.',
+   'sources.title': 'Quellen & Kriterien', 'sources.subtitle': 'Jedes Prüfergebnis bleibt mit seiner Grundlage verbunden.',
+   'sources.pending': 'Fachliche Freigabe ausstehend', 'sources.approved': 'fachlich freigegeben (G0)',
+   'sources.demoRef': 'Version {version} · Demo-Referenz', 'sources.backendRef': 'Version {version} · gültig ab {valid} · {issuer}',
+   'sources.s31.title': '§ 3.1 · Gehaltsempfänger ohne Besonderheiten',
+   'sources.s31.body': 'Quellverweis: S. 9–11. Die ursprüngliche Quelle muss für eine fachliche Prüfung im Original geprüft werden.',
+   'sources.fixture': 'Referenzfelder aus dem Repo-Fixture: BRUTTO-1 = 00200000; NETTO-1 = 00135384.',
+   'sources.crit.body': 'Der Vergleich prüft die Übereinstimmung zwischen hinterlegtem Sollwert und synthetischer Ausgabe. Er trifft keine rechtliche Entscheidung.',
+   'sources.criteriaTitle': 'Kriterien (Backend)', 'sources.checksum': 'SHA-256 des Originals verifiziert',
+   'report.title': 'Prüfbericht vorbereiten', 'report.subtitle': 'Belege, Ergebnisse und offene Punkte in einer Ansicht.',
+   'report.heading': 'Prüfung DTA EEL · Demo', 'report.headingBackend': 'Prüfung DTA EEL · Backend-Lauf',
+   'report.meta': '{n} Prüffälle · {p} Übereinstimmung(en) · {m} Abweichung(en) · {w} nicht auswertbar',
+   'report.blocked': 'Freigabe blockiert',
+   'report.next.mismatch': 'Abweichung in {id} fachlich klären.', 'report.next.noteval': 'Fehlende Eingabe für {id} ergänzen.', 'report.next.template': 'Offizielle Berichtsvorlage und Version verifizieren.',
+   'report.blocker': 'Freigabe gesperrt: offene Prüfpunkte und eine unverifizierte Berichtsvorlage. Diese Demo trifft keine Konformitäts- oder Zertifizierungsaussage.',
+   'report.conformance': 'Konformitätsprüfung: {status}',
+   'report.notesTitle': 'Prüfnotizen und Entwürfe', 'report.notesEmpty': 'Keine Prüfnotizen oder Entwürfe in dieser Sitzung.',
+   'report.delete': 'Löschen', 'report.deleteConfirm': 'Wirklich löschen?',
+   'report.draftMark': 'Entwurf vorhanden',
+   'report.export': 'Demo-Bericht als JSON herunterladen', 'report.release': 'Bericht freigeben',
+   'toast.exported': 'Demo-Bericht heruntergeladen. Enthält Prüfnotizen und noch offene Entwürfe.',
+   'toast.exportFailed': 'Download nicht möglich. Bitte erneut versuchen; Ihre Notizen bleiben in dieser Sitzung erhalten.',
+   'audit.title': 'Prüfverlauf', 'audit.subtitle': 'Nachvollziehbare Ereignisse für diese Demo-Sitzung.',
+   'audit.seed1': 'Synthetische Ausgabe eingelesen.', 'audit.seed2': 'Drei Prüffälle verglichen.', 'audit.seed3': 'TC-002: Abweichung festgestellt.',
+   'audit.backendSeed': 'Backend-Speicher: {events} Ereignisse, {gates} Gate-Entscheidungen, {runs} Agent-Läufe.',
+   'audit.demo': 'Demo',
+   'noscript': 'JavaScript ist ausgeschaltet. Die angezeigten Prüffälle können gelesen werden; Filter, Notizen, Sprach- und Themenwechsel benötigen JavaScript.',
+   'disclaimer': 'SÜSIE unterstützt die Prüfung. Fachliche Entscheidungen und Freigaben bleiben beim Menschen.',
+   'kind.normal': 'Normalfall', 'kind.boundary': 'Abweichungsfall', 'kind.invalid': 'Fehlende Eingabe', 'kind.vorerkrankung': 'Vorerkrankungsfall',
+   'status.pass': 'Übereinstimmung', 'status.mismatch': 'Abweichung', 'status.noteval': 'Nicht auswertbar',
+   'reason.tc1': 'Soll- und Istwert stimmen im synthetischen Beispiel überein. Die fachliche Freigabe steht noch aus.',
+   'reason.tc2': 'Der Istwert liegt 0,36 € unter dem Sollwert. Abweichung anhand der Quelle fachlich prüfen.',
+   'reason.tc3': 'DATUM-AB fehlt. Eingabe ergänzen, bevor dieser Prüffall ausgewertet werden kann.',
+   'src.tc1.a': 'Beispielpapier DTA EEL · V13.3', 'src.tc1.b': '§ 3.1, S. 9–11',
+   'src.tc2.a': 'Synthetischer Abweichungsfall · Referenzwert', 'src.tc2.b': 'Beispielpapier V13.3, § 3.1, S. 9–11',
+   'src.tc3.a': 'Synthetischer Negativfall · Eingabeprüfung', 'src.tc3.b': 'Keine fachlich freigegebene Sollgrundlage',
+   'detail.demosoftware': 'Demo-Abrechnungssoftware · Build unbekannt',
+  },
+  en: {
+   'document.title': 'SÜSIE · Review file',
+   'skip': 'Skip to the review area',
+   'brand.sub': 'Systematic review of social-insurance IT results',
+   'nav.aria': 'Review areas',
+   'nav.cases': 'Cases', 'nav.stories': 'Story suites', 'nav.sources': 'Sources & criteria', 'nav.report': 'Report', 'nav.audit': 'History',
+   'story.1': 'Work accident or rehab instead of illness', 'story.3': 'Short sick days without a certificate',
+   'story.4': "The insurer's reply (61) to the 41", 'story.6': 'Cancel and correct a 01',
+   'stories.title': 'Story suites', 'stories.subtitle': 'Scenario-based cases grouped by story and category.',
+   'stories.offlineNote': 'Story suites are only available with a backend connection.',
+   'stories.categoriesTitle': 'Categories',
+   'stories.story': 'Story', 'stories.category': 'Category', 'stories.count': 'Count', 'stories.mustFlag': 'Must flag',
+   'stories.search': 'Search suite cases', 'stories.searchPlaceholder': 'Enter case or category',
+   'stories.filterAria': 'Filter by story', 'stories.filterAll': 'All stories', 'stories.storyLabel': 'Story {n}',
+   'stories.defectsOnly': 'defects only',
+   'stories.tableAria': 'Story cases, horizontally scrollable',
+   'stories.caption': 'Story cases with expected summary and must-flag',
+   'stories.empty': 'No matching story cases. Change the search term or filters.',
+   'stories.detailAria': 'Selected story case', 'stories.scenarioTitle': 'Scenario', 'stories.expectedTitle': 'Expected record',
+   'stories.currentAu': 'Current AU', 'stories.priorAu': 'Prior AU', 'stories.priorCertified': 'of them certified',
+   'stories.today': 'Today', 'stories.cert': 'certified', 'stories.uncert': 'not certified',
+   'stories.insurance': 'Insurance', 'stories.reason': 'Reason', 'stories.yes': 'yes', 'stories.no': 'no', 'stories.none': 'none',
+   'stories.observedKind': 'Observed behaviour',
+   'report.runs.title': 'Review runs (backend)',
+   'report.runs.offlineNote': 'Review runs are only available with a backend connection.',
+   'report.runs.cases': 'Cases', 'report.runs.correct': 'Correct', 'report.runs.falseAlarms': 'False alarms',
+   'report.runs.detected': 'Detected', 'report.runs.mustFlagCases': 'Must-flag cases',
+   'report.runs.reportsTitle': 'Latest review reports', 'report.runs.noReports': 'No review reports yet.',
+   'report.runs.findingsTitle': 'Findings · {id}', 'report.runs.thRule': 'Rule',
+   'report.runs.generate': 'Generate new review report (offline)', 'report.runs.running': 'Generating …',
+   'report.runs.done': 'Review report generated: {id}.', 'report.runs.failed': 'Failed to generate review report: {error}',
+   'themeCycle.aria': 'Cycle appearance',
+   'themeCycle.title': 'Cycle appearance ({next})',
+   'settings.title': 'Settings', 'settings.language': 'Language',
+   'appearance.theme': 'Reading theme', 'theme.casual': 'Casual', 'theme.contrast': 'High contrast',
+   'appearance.mode': 'Colour mode', 'mode.light': 'Light', 'mode.dark': 'Dark',
+   'appearance.status': '{theme} · {mode} · {lang}',
+   'settings.api': 'API',
+   'api.endpoint': 'Backend URL',
+   'api.endpointPlaceholder': 'http://127.0.0.1:8766',
+   'api.endpointHelp': 'Leave empty to use the same origin as this page.',
+   'api.check': 'Test connection', 'api.runOffline': 'Re-run demo (offline)', 'api.runLive': 'Re-run demo (live LLM)',
+   'api.checking': 'Checking connection …',
+   'api.status.connected': 'Connected · {store} ({events} events)',
+   'api.status.offline': 'Not connected – synthetic demo data.',
+   'api.run.running': 'Running demo …', 'api.run.done': 'Demo re-run ({events} events).', 'api.run.failed': 'Run failed: {error}',
+   'api.run.liveConfirm': 'Really run? Live calls go to the LLM gateway.',
+   'api.privacy': 'Credentials stay server-side in the encrypted store and are never sent to the browser.',
+   'footer.org': 'ITSG working group', 'footer.view': 'Reviewer view · concept demo',
+   'topline.path': 'Reviews / DTA EEL / Cases',
+   'backend.connected': 'Backend connected', 'backend.offline': 'Backend not connected · synthetic demo data',
+   'cases.title': 'DTA EEL review', 'cases.subtitle': 'Demo payroll software · cycle 2027 · income replacement benefits',
+   'cases.prepare': 'Prepare report', 'cases.akte': 'Review file EEL-DEMO-2027', 'cases.badge': 'Expert review open',
+   'cases.meta': '{n} cases · {m} clarification points',
+   'cases.openFindings': 'Clarify {m} points',
+   'cases.search': 'Search cases', 'cases.searchPlaceholder': 'Enter case or field',
+   'cases.result': 'Result', 'cases.filterAria': 'Filter by result',
+   'filter.all': 'All results', 'filter.pass': 'Match', 'filter.mismatch': 'Deviation', 'filter.noteval': 'Not evaluable',
+   'cases.tableAria': 'Review results, horizontally scrollable',
+   'cases.caption': 'Cases with expected value, observed value and comparison result',
+   'th.case': 'Case', 'th.field': 'Field', 'th.expected': 'Expected', 'th.observed': 'Observed', 'th.result': 'Result',
+   'sort.case': 'Sort by case', 'sort.field': 'Sort by field', 'sort.expected': 'Sort by expected', 'sort.observed': 'Sort by observed', 'sort.result': 'Sort by result',
+   'cases.empty': 'No matching cases. Change the search term or result filter.', 'cases.reset': 'Reset filters',
+   'cases.count': '{n} cases', 'cases.count.one': '{n} case',
+   'detail.aria': 'Selected case', 'trace.aria': 'Evidence chain of the selected case',
+   'trace.source': 'Source reference', 'trace.basis': 'Expected basis', 'trace.case': 'Case', 'trace.output': 'Output',
+   'detail.expectedLabel': 'Expected · {field}', 'detail.observedLabel': 'Observed · {field}',
+   'detail.noValue': '—', 'detail.missing': 'Not present', 'detail.required': 'Required',
+   'detail.citeSource': 'View source', 'detail.run': 'Run · {run}', 'detail.basis': 'Expected basis', 'detail.buildUnknown': 'build unknown',
+   'detail.review': 'Record review note', 'detail.evidence': 'View output evidence',
+   'note.label': 'Review note', 'note.placeholder': 'Document observation and next step …',
+   'note.help': 'Notes and drafts are cached in this browser tab. Ctrl/⌘+Enter saves directly. No expert approval.',
+   'note.helpNoStorage': 'Browser storage unavailable. Notes survive only until reload. Use the demo report export to keep them.',
+   'note.chars': 'characters', 'note.save': 'Save note for this case',
+   'note.error.empty': 'Please enter an observation or the next review step.', 'note.error.long': 'Please shorten the note to at most 2,000 characters.',
+   'toast.saved': '{id}: note saved. The case remains technically unchanged.',
+   'toast.limit': '100 notes reached. Please download the demo report to keep them.',
+   'toast.deleted': 'Note deleted. The case remains technically unchanged.',
+   'runEvidence.aria': 'Output evidence', 'runEvidence.title': 'Output evidence',
+   'runEvidence.note': 'The output evidence shown comes from the connected demo pipeline or was created for this prototype.',
+   'sources.title': 'Sources & criteria', 'sources.subtitle': 'Every result stays connected to its basis.',
+   'sources.pending': 'Expert approval pending', 'sources.approved': 'expert-approved (G0)',
+   'sources.demoRef': 'Version {version} · demo reference', 'sources.backendRef': 'Version {version} · valid from {valid} · {issuer}',
+   'sources.s31.title': '§ 3.1 · Salaried employee without particularities',
+   'sources.s31.body': 'Source reference: pp. 9–11. The original source must be checked in the original for an expert review.',
+   'sources.fixture': 'Reference fields from the repo fixture: BRUTTO-1 = 00200000; NETTO-1 = 00135384.',
+   'sources.crit.body': 'The comparison checks agreement between the stored expected value and the synthetic output. It makes no legal decision.',
+   'sources.criteriaTitle': 'Criteria (backend)', 'sources.checksum': 'SHA-256 of the original verified',
+   'report.title': 'Prepare report', 'report.subtitle': 'Evidence, results and open points in one view.',
+   'report.heading': 'DTA EEL review · demo', 'report.headingBackend': 'DTA EEL review · backend run',
+   'report.meta': '{n} cases · {p} match(es) · {m} deviation(s) · {w} not evaluable',
+   'report.blocked': 'Release blocked',
+   'report.next.mismatch': 'Clarify the deviation in {id} with the domain expert.', 'report.next.noteval': 'Complete the missing input for {id}.', 'report.next.template': 'Verify the official report template and version.',
+   'report.blocker': 'Release locked: open review points and an unverified report template. This demo makes no conformance or certification claim.',
+   'report.conformance': 'Conformance check: {status}',
+   'report.notesTitle': 'Review notes and drafts', 'report.notesEmpty': 'No review notes or drafts in this session.',
+   'report.delete': 'Delete', 'report.deleteConfirm': 'Really delete?',
+   'report.draftMark': 'Draft available',
+   'report.export': 'Download demo report as JSON', 'report.release': 'Release report',
+   'toast.exported': 'Demo report downloaded. Contains review notes and open drafts.',
+   'toast.exportFailed': 'Download not possible. Please try again; your notes remain in this session.',
+   'audit.title': 'Review history', 'audit.subtitle': 'Traceable events for this demo session.',
+   'audit.seed1': 'Synthetic output ingested.', 'audit.seed2': 'Three cases compared.', 'audit.seed3': 'TC-002: deviation detected.',
+   'audit.backendSeed': 'Backend store: {events} events, {gates} gate decisions, {runs} agent runs.',
+   'audit.demo': 'Demo',
+   'noscript': 'JavaScript is disabled. The displayed cases can be read; filters, notes, language and theme switching require JavaScript.',
+   'disclaimer': 'SÜSIE supports the review. Expert decisions and approvals remain with the human.',
+   'kind.normal': 'Standard case', 'kind.boundary': 'Deviation case', 'kind.invalid': 'Missing input', 'kind.vorerkrankung': 'Prior-illness case',
+   'status.pass': 'Match', 'status.mismatch': 'Deviation', 'status.noteval': 'Not evaluable',
+   'reason.tc1': 'Expected and observed values agree in the synthetic example. Expert approval is still outstanding.',
+   'reason.tc2': 'The observed value is €0.36 below the expected value. Review the deviation against the source.',
+   'reason.tc3': 'DATUM-AB is missing. Complete the input before this case can be evaluated.',
+   'src.tc1.a': 'Beispielpapier DTA EEL · V13.3', 'src.tc1.b': '§ 3.1, pp. 9–11',
+   'src.tc2.a': 'Synthetic deviation case · reference value', 'src.tc2.b': 'Beispielpapier V13.3, § 3.1, pp. 9–11',
+   'src.tc3.a': 'Synthetic negative case · input check', 'src.tc3.b': 'No expert-approved expected basis',
+   'detail.demosoftware': 'Demo payroll software · build unknown',
+  },
+ };
+
+ const langNames = {de: 'Deutsch', en: 'English'};
+ let lang = ROOT.dataset.lang === 'en' ? 'en' : 'de';
+ const t = (key, vars) => {
+  let text = (I18N[lang] && I18N[lang][key]) ?? I18N.de[key] ?? key;
+  if (vars) for (const [name, value] of Object.entries(vars)) text = text.split('{' + name + '}').join(String(value));
+  return text;
+ };
+
+ /* --------------------------------- helpers -------------------------------- */
+ let toastTimer;
+ let activeAnimations = [];
+ const motionPreference = matchMedia('(prefers-reduced-motion: reduce)');
+ const prefersReducedMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+ const cancelMotion = () => {activeAnimations.forEach(animation => animation.cancel());activeAnimations = [];};
+ if (motionPreference.addEventListener) motionPreference.addEventListener('change', cancelMotion);
+ document.addEventListener('visibilitychange', () => {if (document.hidden) cancelMotion();});
+ function motion(element) {
+  activeAnimations.forEach(animation => animation.cancel());activeAnimations = [];
+  if (!element || prefersReducedMotion() || !element.animate) return;
+  const animation = element.animate([{opacity: .72, transform: 'translateY(4px)'}, {opacity: 1, transform: 'translateY(0)'}],
+   {duration: 160, easing: 'cubic-bezier(.16,1,.3,1)'});
+  activeAnimations = [animation];animation.onfinish = () => {activeAnimations = [];};
+ }
+ function announce(text) {
+  let node = q('.toast');if (!node) {node = document.createElement('div');node.className = 'toast';node.setAttribute('role', 'status');document.body.append(node);}
+  node.textContent = text;clearTimeout(toastTimer);toastTimer = setTimeout(() => node.remove(), 5000);
+ }
+ const literal = (parent, tagName, className, text) => {
+  const node = document.createElement(tagName);if (className) node.className = className;node.textContent = text;parent.append(node);return node;
+ };
+
+ /* ------------------------------- appearance ------------------------------- */
+ const APPEARANCE_ORDER = [['casual', 'light'], ['casual', 'dark'], ['contrast', 'dark'], ['contrast', 'light']];
+ const STORAGE_KEY = 'susie-review-tab-v1';
+ let storageAvailable = true;
+ function persistAppearance(patch) {
+  try {
+   const saved = JSON.parse(localStorage.getItem('susie-appearance') || '{}') || {};
+   localStorage.setItem('susie-appearance', JSON.stringify({...saved, ...patch}));
+  } catch {}
+ }
+ function syncAppearance() {
+  const theme = ROOT.dataset.theme, mode = ROOT.dataset.mode;
+  qa('[data-set-theme]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.setTheme === theme)));
+  qa('[data-set-mode]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.setMode === mode)));
+  qa('[data-set-lang]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.setLang === lang)));
+  const status = t('appearance.status', {theme: t('theme.' + theme), mode: t('mode.' + mode), lang: langNames[lang]});
+  const statusNode = q('#appearance-status');if (statusNode) statusNode.textContent = status;
+  const index = APPEARANCE_ORDER.findIndex(([th, mo]) => th === theme && mo === mode);
+  const next = APPEARANCE_ORDER[(index + 1) % APPEARANCE_ORDER.length];
+  const cycle = q('#theme-cycle');
+  if (cycle) {
+   const nextLabel = t('theme.' + next[0]) + ' · ' + t('mode.' + next[1]);
+   cycle.setAttribute('title', t('themeCycle.title', {next: nextLabel}));
+   cycle.setAttribute('aria-label', t('themeCycle.title', {next: nextLabel}));
+  }
+ }
+ function setAppearance(theme, mode) {
+  if (theme) ROOT.dataset.theme = theme;
+  if (mode) ROOT.dataset.mode = mode;
+  persistAppearance({theme: ROOT.dataset.theme, mode: ROOT.dataset.mode});
+  const url = new URL(location.href);
+  url.searchParams.set('theme', ROOT.dataset.theme);url.searchParams.set('mode', ROOT.dataset.mode);
+  history.replaceState(history.state, '', url);
+  syncAppearance();
+ }
+ function setLanguage(next) {
+  if (!['de', 'en'].includes(next)) return;
+  lang = next;
+  ROOT.dataset.lang = next;ROOT.lang = next;
+  persistAppearance({lang: next});
+  const url = new URL(location.href);
+  url.searchParams.set('lang', next);
+  history.replaceState(history.state, '', url);
+  applyI18n();
+  renderAll();
+  syncAppearance();
+ }
+ function applyI18n() {
+  document.title = t('document.title');
+  qa('[data-i18n]').forEach(node => {node.textContent = t(node.dataset.i18n);});
+  qa('[data-i18n-aria-label]').forEach(node => node.setAttribute('aria-label', t(node.dataset.i18nAriaLabel)));
+  qa('[data-i18n-placeholder]').forEach(node => node.setAttribute('placeholder', t(node.dataset.i18nPlaceholder)));
+ }
+
+ /* ---------------------------------- data ---------------------------------- */
+ let state = {connected: false, cases: [], source: null, criteria: [], report: null, backend: null, stories: null, reviews: [], harness: null};
+ let selected = 0, drafts = {}, notes = [], openFindingsOnly = false;
+ let storyState = {search: '', story: '', defectsOnly: false, selected: -1};
+ const STORY_IDS = [1, 3, 4, 6];
+ const allowedViews = ['cases', 'stories', 'sources', 'report', 'audit'];
+ const statusKeyOf = status => status === 'PASS' ? 'pass' : status === 'MISMATCH' ? 'mismatch' : 'noteval';
+ const kindKeyOf = item => item.criterion_id && item.criterion_id.includes('VOER') ? 'vorerkrankung'
+  : ({normal: 'normal', boundary: 'boundary', invalid: 'invalid'}[item.case_type] || 'normal');
+
+ function syntheticState() {
+  const make = (id, kindKey, statusKey, field, expected, observed, reasonKey, srcA, srcB, run) => ({
+   id, kindKey, statusKey, status: {pass: 'PASS', mismatch: 'MISMATCH', noteval: 'NOT_EVALUATED'}[statusKey],
+   reasonKey, reason: null, searchText: '', run,
+   fields: [{key: field, expected, observed, match: expected === observed, primary: true}],
+   sourceLines: [t(srcA), t(srcB)], basis: null,
+   software: null,
+  });
+  const cases = [
+   make('TC-001', 'normal', 'pass', 'BRUTTO-1', '2.000,00 €', '2.000,00 €', 'reason.tc1', 'src.tc1.a', 'src.tc1.b', 'RUN-DEMO-01'),
+   make('TC-002', 'boundary', 'mismatch', 'NETTO-1', '1.353,84 €', '1.353,48 €', 'reason.tc2', 'src.tc2.a', 'src.tc2.b', 'RUN-DEMO-02'),
+   make('TC-003', 'invalid', 'noteval', 'DATUM-AB', t('detail.required'), t('detail.missing'), 'reason.tc3', 'src.tc3.a', 'src.tc3.b', 'RUN-DEMO-03'),
+  ];
+  return {connected: false, cases, source: null, criteria: [], report: null, backend: null, stories: null, reviews: [], harness: null};
+ }
+
+ function backendCase(item) {
+  const expected = item.expected || {};
+  const observed = item.observed || null;
+  const keys = [...new Set([...Object.keys(expected), ...Object.keys(observed || {})])];
+  const fields = keys.map(key => ({
+   key, expected: expected[key] ?? null, observed: observed ? observed[key] ?? null : null,
+   match: observed != null && expected[key] != null && expected[key] === observed[key], primary: false,
+  }));
+  const primary = fields.find(field => !field.match) || fields[0] || null;
+  if (primary) primary.primary = true;
+  const statusKey = statusKeyOf(item.status);
+  return {
+   id: item.id, kindKey: kindKeyOf(item), statusKey, status: item.status,
+   reason: item.reason || '', reasonKey: null,
+   fields, searchText: '',
+   run: item.execution_id || '', basis: item.expected_basis || '',
+   sourceLines: item.expected_basis ? [item.expected_basis] : [],
+   software: item.software || null, evidenceRef: item.evidence_ref || '', inputs: item.inputs || {},
+  };
+ }
+
+ function mapBackendState(payload) {
+  const stories = payload.stories && payload.stories.ok !== false && Array.isArray(payload.stories.cases) ? payload.stories : null;
+  return {
+   connected: true, backend: payload.backend || null,
+   source: payload.source || null, criteria: payload.criteria || [],
+   cases: (payload.cases || []).map(backendCase),
+   report: payload.report || null,
+   stories, reviews: Array.isArray(payload.reviews) ? payload.reviews : [], harness: payload.harness || null,
+  };
+ }
+
+ /* ------------------------------ backend client ---------------------------- */
+ let apiBase = '';
+ try { apiBase = (JSON.parse(localStorage.getItem('susie-api') || '{}').base || '').replace(/\/$/, ''); } catch {}
+ function persistApiBase() {try {localStorage.setItem('susie-api', JSON.stringify({base: apiBase}));} catch {}}
+ async function apiFetch(path, options = {}, timeoutMs = 6000) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+   return await fetch(apiBase + path, {...options, signal: controller.signal});
+  } finally {clearTimeout(timer);}
+ }
+ function setBackendBadge(connected) {
+  const badge = q('#backend-badge');const text = q('#backend-badge-text');
+  if (!badge || !text) return;
+  badge.classList.toggle('offline', !connected);
+  text.textContent = connected ? t('backend.connected') : t('backend.offline');
+ }
+ function setApiStatus(kind, text) {
+  const node = q('#api-status');if (!node) return;
+  node.className = 'api-status' + (kind ? ' ' + kind : '');node.textContent = text;
+ }
+ async function loadBackend({silent} = {}) {
+  try {
+   const response = await apiFetch('/api/state');
+   if (!response.ok) throw new Error('HTTP ' + response.status);
+   const payload = await response.json();
+   if (!payload.ok) throw new Error(payload.error || 'state unavailable');
+   applyState(mapBackendState(payload));
+   setBackendBadge(true);
+   if (!silent) setApiStatus('ok', t('api.status.connected', {store: shortStore(), events: state.backend ? state.backend.events : 0}));
+   return true;
+  } catch {
+   applyState(syntheticState());
+   setBackendBadge(false);
+   if (!silent) setApiStatus('err', t('api.status.offline'));
+   return false;
+  }
+ }
+ function shortStore() {return state.backend ? state.backend.store.split('/').slice(-2).join('/') : '';}
+ async function checkConnection() {
+  setApiStatus('', t('api.checking'));
+  try {
+   const response = await apiFetch('/api/health');
+   const payload = await response.json();
+   setApiStatus('ok', t('api.status.connected', {store: (payload.store || '').split('/').slice(-2).join('/'), events: payload.events}));
+   await loadBackend({silent: true});
+   setBackendBadge(true);
+  } catch {
+   setApiStatus('err', t('api.status.offline'));
+   setBackendBadge(false);
+  }
+ }
+ async function runDemo(live) {
+  const offlineButton = q('#api-run-offline'), liveButton = q('#api-run-live');
+  offlineButton.disabled = liveButton.disabled = true;
+  setApiStatus('', t('api.run.running'));
+  try {
+   const response = await apiFetch('/api/run', {
+    method: 'POST', headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({live}), timeout: live ? 120000 : 60000,
+   }, live ? 180000 : 60000);
+   const payload = await response.json();
+   if (!payload.ok) throw new Error(payload.error || 'run failed');
+   applyState(mapBackendState(payload));
+   setBackendBadge(true);
+   setApiStatus('ok', t('api.run.done', {events: state.backend ? state.backend.events : 0}));
+   announce(t('api.run.done', {events: state.backend ? state.backend.events : 0}));
+  } catch (error) {
+   setApiStatus('err', t('api.run.failed', {error: String(error.message || error)}));
+  } finally {
+   offlineButton.disabled = liveButton.disabled = false;
+  }
+ }
+ function applyState(next) {
+  const previousId = state.cases[selected] && state.cases[selected].id;
+  state = next;
+  state.cases.forEach(item => {
+   item.searchText = [item.id, t('kind.' + item.kindKey), ...item.fields.map(field => field.key + ' ' + (field.expected ?? '') + ' ' + (field.observed ?? '')), t('status.' + item.statusKey)]
+    .join(' ').normalize('NFKC').toLocaleLowerCase('de-DE');
+  });
+  renderTable();
+  const index = state.cases.findIndex(item => item.id === previousId);
+  selected = index >= 0 ? index : state.cases.findIndex(item => item.statusKey !== 'pass');
+  if (selected < 0) selected = 0;
+  renderAll();
+ }
+
+ /* -------------------------------- rendering ------------------------------- */
+ function renderTable() {
+  const tbody = q('#case-rows');tbody.replaceChildren();
+  state.cases.forEach((item, index) => {
+   const row = document.createElement('tr');row.dataset.case = index;
+   const primary = item.fields.find(field => field.primary);
+   const cellCase = document.createElement('td');cellCase.dataset.label = t('th.case');
+   const link = document.createElement('button');link.className = 'case-link';link.dataset.openCase = index;
+   link.textContent = item.id;link.setAttribute('aria-label', t('sort.case') + ': ' + item.id);
+   literal(cellCase, 'small', null, t('kind.' + item.kindKey));
+   const draftMark = literal(cellCase, 'span', 'draft-mark', t('report.draftMark'));draftMark.hidden = true;
+   cellCase.prepend(link);
+   const cellField = document.createElement('td');cellField.dataset.label = t('th.field');cellField.textContent = primary ? primary.key : '—';
+   const cellExpected = document.createElement('td');cellExpected.className = 'num';cellExpected.dataset.label = t('th.expected');
+   cellExpected.textContent = primary ? (primary.expected ?? t('detail.noValue')) : t('detail.noValue');
+   const cellObserved = document.createElement('td');cellObserved.className = 'num';cellObserved.dataset.label = t('th.observed');
+   cellObserved.textContent = primary ? (primary.observed ?? t('detail.missing')) : (item.statusKey === 'noteval' ? t('detail.missing') : t('detail.noValue'));
+   const cellResult = document.createElement('td');cellResult.dataset.label = t('th.result');
+   const badge = literal(cellResult, 'span', 'badge ' + item.statusKey, t('status.' + item.statusKey));
+   row.append(cellCase, cellField, cellExpected, cellObserved, cellResult);
+   row.onclick = () => selectCase(index, {scroll: true});
+   link.onclick = event => {event.stopPropagation();selectCase(index, {focus: true, scroll: true});};
+   tbody.append(row);
+  });
+  updateDraftMarks();
+ }
+ function renderDetail({focus = false, scroll = false, animate = true} = {}) {
+  const item = state.cases[selected];if (!item) return;
+  const title = q('#detail-title');title.textContent = item.id + ' · ' + t('kind.' + item.kindKey);
+  const badge = q('#detail-badge');badge.className = 'badge ' + item.statusKey;badge.textContent = t('status.' + item.statusKey);
+  const primary = item.fields.find(field => field.primary);
+  const expectedLabel = q('#detail-expected-label'), observedLabel = q('#detail-observed-label');
+  expectedLabel.textContent = t('detail.expectedLabel', {field: primary ? primary.key : '—'});
+  observedLabel.textContent = t('detail.observedLabel', {field: primary ? primary.key : '—'});
+  q('#detail-expected-value').textContent = primary ? (primary.expected ?? t('detail.noValue')) : t('detail.noValue');
+  q('#detail-observed-value').textContent = primary
+   ? (primary.observed ?? (item.statusKey === 'noteval' ? t('detail.missing') : t('detail.noValue')))
+   : (item.statusKey === 'noteval' ? t('detail.missing') : t('detail.noValue'));
+  const restRows = (panel, side) => {
+   const container = q(panel);container.replaceChildren();
+   item.fields.filter(field => !field.primary && (field.expected != null || field.observed != null)).forEach(field => {
+    const row = document.createElement('div');row.className = 'kv-row' + (field.match === false ? ' bad' : '');
+    literal(row, 'span', 'k', field.key);
+    literal(row, 'span', 'v', String((side === 'expected' ? field.expected : field.observed) ?? '—'));
+    container.append(row);
+   });
+  };
+  restRows('#detail-expected-rest', 'expected');restRows('#detail-observed-rest', 'observed');
+  const cite = q('#detail-expected-cite');cite.replaceChildren();
+  item.sourceLines.forEach(line => {literal(cite, 'span', null, line);cite.append(document.createElement('br'));});
+  const sourceLink = document.createElement('a');sourceLink.href = '#sources';sourceLink.textContent = t('detail.citeSource');
+  sourceLink.onclick = event => {event.preventDefault();view('sources');};cite.append(sourceLink);
+  const observedCite = q('#detail-observed-cite');observedCite.replaceChildren();
+  literal(observedCite, 'span', null, item.run ? t('detail.run', {run: item.run}) : t('detail.run', {run: '—'}));
+  observedCite.append(document.createElement('br'));
+  literal(observedCite, 'span', null, item.software && (item.software.vendor || item.software.version)
+   ? [item.software.vendor, item.software.version].filter(Boolean).join(' · ') : t('detail.demosoftware'));
+  q('#detail-reason').textContent = item.reason || t(item.reasonKey);
+  q('#detail-reason').dataset.state = item.statusKey;
+  q('textarea').value = drafts[item.id] || '';
+  q('textarea').removeAttribute('aria-invalid');q('#note-error').classList.add('hidden');noteCount();
+  q('.review-editor').classList.add('hidden');q('[data-review]').setAttribute('aria-expanded', 'false');
+  q('#run-evidence').classList.add('hidden');q('[data-run]').setAttribute('aria-expanded', 'false');
+  q('#run-evidence pre').textContent = JSON.stringify({
+   synthetic: !state.connected, test_case_id: item.id, status: item.status,
+   expected: Object.fromEntries(item.fields.map(field => [field.key, field.expected])),
+   observed: Object.fromEntries(item.fields.map(field => [field.key, field.observed])),
+   evidence_ref: item.evidenceRef || undefined, software: item.software || undefined,
+  }, null, 2);
+  const search = new URLSearchParams(location.search);search.set('case', item.id);
+  history.replaceState(null, '', location.pathname + '?' + search.toString() + location.hash);
+  if (focus) {title.focus({preventScroll: true});}
+  if (scroll) {
+   const detail = q('.detail');const top = detail.getBoundingClientRect().top;
+   if (top < 0 || top > innerHeight * 0.5) detail.scrollIntoView({behavior: prefersReducedMotion() ? 'instant' : 'smooth', block: 'start'});
+  }
+  if (animate) motion(q('.evidence'));
+ }
+ function selectCase(index, {focus = false, animate = true, scroll = false} = {}) {
+  if (!Number.isInteger(index) || !state.cases[index]) return;
+  saveDraft();selected = index;
+  qa('[data-case]').forEach(row => row.classList.toggle('selected', +row.dataset.case === index));
+  qa('[data-open-case]').forEach(button => {
+   if (+button.dataset.openCase === index) button.setAttribute('aria-current', 'true');else button.removeAttribute('aria-current');
+  });
+  renderDetail({focus, scroll, animate});
+ }
+ function filter() {
+  const term = q('#case-search').value.trim().normalize('NFKC').toLocaleLowerCase('de-DE');
+  const status = q('#result-filter').value;let count = 0;
+  qa('#case-rows tr').forEach(row => {
+   const item = state.cases[+row.dataset.case];
+   const match = item.searchText.includes(term) && (openFindingsOnly ? item.statusKey !== 'pass' : (!status || item.status === status));
+   row.classList.toggle('hidden', !match);if (match) count++;
+  });
+  q('.count').textContent = count === 1 ? t('cases.count.one', {n: count}) : t('cases.count', {n: count});
+  q('.empty').classList.toggle('hidden', count !== 0);
+  const open = state.cases.filter(item => item.statusKey !== 'pass').length;
+  q('[data-open-findings]').textContent = t('cases.openFindings', {m: open});
+  const meta = q('#akte-meta');
+  meta.textContent = t('cases.meta', {n: state.cases.length, m: open});
+ }
+ function renderSources() {
+  const paper = q('#sources-paper');if (!paper) return;
+  paper.replaceChildren();
+  if (state.connected && state.source) {
+   const source = state.source;
+   const heading = literal(paper, 'h2', null, source.title || '—');
+   heading.after(literal(paper, 'span', 'badge neutral ' + (source.status === 'approved' ? 'good' : 'wait'),
+    source.status === 'approved' ? t('sources.approved') : t('sources.pending')));
+   const block = literal(paper, 'div', 'source');
+   literal(block, 'h3', null, t('sources.checksum'));
+   literal(block, 'p', null, `${source.issuer || ''} · ${t('sources.backendRef', {version: source.version || '—', valid: source.valid_from || '—', issuer: ''})} — ${source.checksum ? source.checksum.slice(0, 16) + '…' : ''}`);
+   literal(block, 'p', null, source.notes || '');
+   if (state.criteria.length) {
+    const criteriaHeading = literal(paper, 'h2', null, t('sources.criteriaTitle'));criteriaHeading.style.marginTop = '24px';
+    state.criteria.forEach(criterion => {
+     const item = literal(paper, 'div', 'source');
+     literal(item, 'h3', null, criterion.id || '—');
+     literal(item, 'p', null, criterion.description || '');
+     literal(item, 'span', 'badge neutral', criterion.review_status || '');
+    });
+   }
+  } else {
+   literal(paper, 'h2', null, 'Beispielpapier DTA EEL');
+   literal(paper, 'span', 'badge neutral', t('sources.demoRef', {version: '13.3'}));
+   const block = literal(paper, 'div', 'source');
+   literal(block, 'h3', null, t('sources.s31.title'));
+   literal(block, 'p', null, t('sources.s31.body'));
+   literal(block, 'p', null, t('sources.fixture'));
+   literal(block, 'span', 'badge wait', t('sources.pending'));
+   const crit = literal(paper, 'div', 'source');
+   literal(crit, 'h3', null, 'CRIT-DEMO-01 · ' + t('th.expected'));
+   literal(crit, 'p', null, t('sources.crit.body'));
+  }
+ }
+ /* ------------------------------ story suites ------------------------------ */
+ const scalarText = value => value === true ? t('stories.yes') : value === false ? t('stories.no')
+  : value == null || value === '' ? t('detail.noValue') : String(value);
+ const periodText = pair => Array.isArray(pair) ? pair.join('–') : scalarText(pair);
+ function expectedSummary(expected) {
+  const parts = [];
+  const walk = (prefix, value) => {
+   if (parts.length >= 4) return;
+   if (value != null && typeof value === 'object') {
+    if (Array.isArray(value)) {
+     if (value.length && value.every(item => Array.isArray(item))) {
+      value.slice(0, 2).forEach((pair, index) => parts.push(prefix + (index ? '+' : '') + ': ' + periodText(pair)));
+      if (value.length > 2 && parts.length < 4) parts.push('…');
+     } else value.forEach((item, index) => walk(prefix + '[' + index + ']', item));
+     return;
+    }
+    for (const [key, item] of Object.entries(value)) walk(prefix ? prefix + '.' + key : key, item);
+    return;
+   }
+   parts.push((prefix || '—') + ': ' + scalarText(value));
+  };
+  walk('', expected && typeof expected === 'object' ? expected : {expected});
+  return parts.join(' · ') || t('detail.noValue');
+ }
+ function expectedRowsInto(container, expected) {
+  if (!container) return;
+  container.replaceChildren();
+  const row = (k, v) => {
+   const r = literal(container, 'div', 'kv-row');
+   literal(r, 'span', 'k', k);literal(r, 'span', 'v', v);
+  };
+  const walk = (prefix, value) => {
+   if (value == null || typeof value !== 'object') {row(prefix, scalarText(value));return;}
+   if (Array.isArray(value)) {
+    if (value.length && value.every(item => Array.isArray(item))) value.forEach(pair => row(prefix, periodText(pair)));
+    else value.forEach((item, index) => walk(prefix + '[' + index + ']', item));
+    return;
+   }
+   for (const [key, item] of Object.entries(value)) walk(prefix ? prefix + '.' + key : key, item);
+  };
+  walk('', expected && typeof expected === 'object' ? expected : {expected});
+ }
+ function storyCaseList() {
+  const data = state.stories;
+  const term = storyState.search.trim().normalize('NFKC').toLocaleLowerCase('de-DE');
+  return (data && Array.isArray(data.cases) ? data.cases : []).filter(item => {
+   if (storyState.story && String(item.story) !== storyState.story) return false;
+   if (storyState.defectsOnly && item.must_flag == null) return false;
+   const haystack = ((item.id || '') + ' ' + (item.category || '')).normalize('NFKC').toLocaleLowerCase('de-DE');
+   return !term || haystack.includes(term);
+  });
+ }
+ function renderStories() {
+  const paper = q('#stories-paper');if (!paper) return;
+  paper.replaceChildren();
+  storyState.selected = -1;
+  const data = state.connected ? state.stories : null;
+  if (!data || data.ok === false || !Array.isArray(data.cases)) {
+   literal(paper, 'p', 'muted', t('stories.offlineNote'));
+   return;
+  }
+  const cards = literal(paper, 'div', 'story-cards');
+  STORY_IDS.forEach(n => {
+   const count = data.by_story ? (data.by_story[n] ?? data.by_story[String(n)]) : null;
+   const card = literal(cards, 'div', 'story-card');
+   literal(card, 'small', null, t('stories.storyLabel', {n}));
+   const name = literal(card, 'h2', 'story-card-name', t('story.' + n));
+   name.id = 'story-card-name-' + n;
+   literal(card, 'div', 'value', count == null ? t('detail.noValue') : String(count));
+  });
+  literal(paper, 'h2', null, t('stories.categoriesTitle'));
+  const catWrap = literal(paper, 'div', 'table-wrap');
+  const catTable = literal(catWrap, 'table', 'case-table');
+  const catHead = catTable.createTHead();const catRow = catHead.insertRow();
+  [t('stories.story'), t('stories.category'), t('stories.count'), t('stories.mustFlag')].forEach(label => {
+   const th = document.createElement('th');th.scope = 'col';th.textContent = label;catRow.append(th);
+  });
+  const catBody = catTable.createTBody();
+  (data.categories || []).forEach(category => {
+   const row = catBody.insertRow();
+   const cellStory = row.insertCell();cellStory.dataset.label = t('stories.story');cellStory.textContent = t('stories.storyLabel', {n: category.story});
+   const cellCat = row.insertCell();cellCat.dataset.label = t('stories.category');cellCat.textContent = category.category || '—';
+   const cellCount = row.insertCell();cellCount.dataset.label = t('stories.count');cellCount.className = 'num';cellCount.textContent = String(category.count ?? 0);
+   const cellFlag = row.insertCell();cellFlag.dataset.label = t('stories.mustFlag');
+   literal(cellFlag, 'span', 'badge ' + (category.must_flag != null ? 'bad' : 'neutral'), category.must_flag != null ? category.must_flag : t('stories.none'));
+  });
+  const bar = literal(paper, 'div', 'bar');
+  const searchLabel = literal(bar, 'label', 'search-field');
+  searchLabel.htmlFor = 'story-search';
+  literal(searchLabel, 'span', null, t('stories.search'));
+  const search = document.createElement('input');
+  search.id = 'story-search';search.type = 'search';search.maxLength = 120;
+  search.setAttribute('aria-label', t('stories.search'));search.placeholder = t('stories.searchPlaceholder');
+  searchLabel.append(search);
+  const filterLabel = literal(bar, 'label', 'status-field');
+  filterLabel.htmlFor = 'story-filter';
+  literal(filterLabel, 'span', null, t('stories.story'));
+  const select = document.createElement('select');
+  select.id = 'story-filter';select.setAttribute('aria-label', t('stories.filterAria'));
+  const allOption = document.createElement('option');allOption.value = '';allOption.textContent = t('stories.filterAll');select.append(allOption);
+  STORY_IDS.forEach(n => {
+   const option = document.createElement('option');option.value = String(n);option.textContent = t('stories.storyLabel', {n});select.append(option);
+  });
+  filterLabel.append(select);
+  const defects = document.createElement('button');
+  defects.type = 'button';defects.id = 'story-defects';
+  defects.setAttribute('aria-pressed', String(storyState.defectsOnly));
+  defects.textContent = t('stories.defectsOnly');
+  bar.append(defects);
+  literal(bar, 'small', 'count story-count', '').id = 'story-count';
+  q('#story-count').setAttribute('role', 'status');q('#story-count').setAttribute('aria-live', 'polite');
+  const wrap = literal(paper, 'div', 'table-wrap');
+  wrap.setAttribute('role', 'region');wrap.setAttribute('aria-label', t('stories.tableAria'));
+  const table = literal(wrap, 'table', 'case-table');
+  const caption = literal(table, 'caption', 'sr-only', t('stories.caption'));
+  const head = table.createTHead();const headRow = head.insertRow();
+  [t('th.case'), t('stories.story'), t('stories.category'), t('stories.mustFlag'), t('th.expected')].forEach(label => {
+   const th = document.createElement('th');th.scope = 'col';th.textContent = label;headRow.append(th);
+  });
+  literal(table, 'tbody', null, '').id = 'story-rows';
+  const empty = literal(paper, 'div', 'empty hidden');
+  empty.id = 'story-empty';empty.setAttribute('role', 'status');
+  literal(empty, 'p', null, t('stories.empty'));
+  const reset = document.createElement('button');
+  reset.type = 'button';reset.dataset.resetStory = 'true';reset.textContent = t('cases.reset');
+  empty.append(reset);
+  const detail = literal(paper, 'section', 'detail hidden');
+  detail.id = 'story-detail';detail.setAttribute('aria-label', t('stories.detailAria'));
+  const detailBar = literal(detail, 'div', 'bar');
+  const title = literal(detailBar, 'h2', null, '');title.id = 'story-detail-title';title.tabIndex = -1;
+  const flag = literal(detailBar, 'span', 'badge', '');flag.id = 'story-detail-flag';
+  const evidence = literal(detail, 'div', 'evidence');
+  const scenarioSection = literal(evidence, 'section', null, '');
+  literal(scenarioSection, 'small', null, t('stories.scenarioTitle'));
+  literal(scenarioSection, 'div', 'kv', '').id = 'story-scenario';
+  const expectedSection = literal(evidence, 'section', null, '');
+  literal(expectedSection, 'small', null, t('stories.expectedTitle'));
+  literal(expectedSection, 'div', 'kv', '').id = 'story-expected';
+  literal(detail, 'p', 'muted story-observed', '').id = 'story-observed';
+  search.value = storyState.search;select.value = storyState.story;
+  renderStoryRows();
+ }
+ function renderStoryRows() {
+  const tbody = q('#story-rows');if (!tbody) return;
+  const list = storyCaseList();
+  tbody.replaceChildren();
+  list.forEach(item => {
+   const row = document.createElement('tr');
+   row.dataset.storyCase = item.id;
+   row.classList.toggle('selected', storyState.selected === item.id);
+   const cellId = document.createElement('td');cellId.dataset.label = t('th.case');
+   const link = document.createElement('button');link.className = 'case-link';link.textContent = item.id || '—';
+   cellId.append(link);row.append(cellId);
+   const cellStory = document.createElement('td');cellStory.dataset.label = t('stories.story');
+   cellStory.textContent = t('stories.storyLabel', {n: item.story});row.append(cellStory);
+   const cellCat = document.createElement('td');cellCat.dataset.label = t('stories.category');
+   cellCat.textContent = item.category || '—';row.append(cellCat);
+   const cellFlag = document.createElement('td');cellFlag.dataset.label = t('stories.mustFlag');
+   literal(cellFlag, 'span', 'badge ' + (item.must_flag != null ? 'bad' : 'neutral'), item.must_flag != null ? item.must_flag : t('stories.none'));
+   row.append(cellFlag);
+   const cellExpected = document.createElement('td');cellExpected.dataset.label = t('th.expected');
+   cellExpected.textContent = expectedSummary(item.expected);row.append(cellExpected);
+   row.onclick = () => selectStoryCase(item.id);
+   tbody.append(row);
+  });
+  const count = q('#story-count');
+  if (count) count.textContent = list.length === 1 ? t('cases.count.one', {n: 1}) : t('cases.count', {n: list.length});
+  const empty = q('#story-empty');
+  if (empty) empty.classList.toggle('hidden', list.length !== 0);
+  if (!list.length) {
+   const detail = q('#story-detail');if (detail) detail.classList.add('hidden');
+  }
+ }
+ function selectStoryCase(id) {
+  const data = state.stories;
+  const item = data && Array.isArray(data.cases) ? data.cases.find(entry => entry.id === id) : null;
+  if (!item) return;
+  storyState.selected = id;
+  qa('#story-rows tr').forEach(row => row.classList.toggle('selected', row.dataset.storyCase === id));
+  renderStoryDetail(item);
+ }
+ function renderStoryDetail(item) {
+  const detail = q('#story-detail');if (!detail) return;
+  detail.classList.remove('hidden');
+  const title = q('#story-detail-title');
+  title.textContent = (item.id || '—') + ' · ' + t('stories.storyLabel', {n: item.story});
+  const flag = q('#story-detail-flag');
+  flag.className = 'badge ' + (item.must_flag != null ? 'bad' : 'neutral');
+  flag.textContent = item.must_flag != null ? item.must_flag : t('stories.none');
+  const scenario = q('#story-scenario');scenario.replaceChildren();
+  const row = (k, v) => {
+   const r = literal(scenario, 'div', 'kv-row');
+   literal(r, 'span', 'k', k);literal(r, 'span', 'v', v);
+  };
+  const summary = item.scenario_summary || {};
+  const current = summary.current || {};
+  row(t('stories.currentAu'), [current.start, current.end].filter(Boolean).join('–') || t('detail.noValue'));
+  if (current.reason != null) row(t('stories.reason'), String(current.reason));
+  if (current.insurance != null) row(t('stories.insurance'), String(current.insurance));
+  if (current.cert != null) row(t('stories.cert'), current.cert ? t('stories.yes') : t('stories.no'));
+  if (Array.isArray(summary.prior)) {
+   summary.prior.forEach((prior, index) => row(t('stories.priorAu') + ' ' + (index + 1),
+    [prior.start, prior.end].filter(Boolean).join('–') + ' · ' + (prior.reason || '—') + ' · '
+     + (prior.cert ? t('stories.cert') : t('stories.uncert'))));
+  } else {
+   if (summary.prior_count != null) row(t('stories.priorAu'), String(summary.prior_count));
+   if (summary.prior_certified != null) row(t('stories.priorCertified'), String(summary.prior_certified));
+  }
+  if (summary.today != null) row(t('stories.today'), String(summary.today));
+  expectedRowsInto(q('#story-expected'), item.expected);
+  q('#story-observed').textContent = t('stories.observedKind') + ': ' + (item.observed_kind || '—');
+  motion(detail);
+ }
+ function renderReport() {
+  const paper = q('#report-paper');if (!paper) return;
+  const counts = {pass: 0, mismatch: 0, noteval: 0};
+  state.cases.forEach(item => counts[item.statusKey]++);
+  paper.querySelector('h2').textContent = state.connected ? t('report.headingBackend') : t('report.heading');
+  q('#report-meta').textContent = t('report.meta', {n: state.cases.length, p: counts.pass, m: counts.mismatch, w: counts.noteval});
+  const next = q('#report-next');next.replaceChildren();
+  state.cases.filter(item => item.statusKey === 'mismatch').forEach(item => literal(next, 'li', null, t('report.next.mismatch', {id: item.id})));
+  state.cases.filter(item => item.statusKey === 'noteval').forEach(item => literal(next, 'li', null, t('report.next.noteval', {id: item.id})));
+  literal(next, 'li', null, t('report.next.template'));
+  const existingConformance = q('#report-conformance');if (existingConformance) existingConformance.remove();
+  if (state.connected && state.report && state.report.conformance && state.report.conformance[0]) {
+   const conformance = literal(paper, 'p', 'muted', '');
+   conformance.id = 'report-conformance';
+   conformance.textContent = t('report.conformance', {status: state.report.conformance[0].status || '—'});
+  }
+  renderReportNotes();
+  renderReportRuns();
+ }
+ /* ------------------------- review runs (backend) -------------------------- */
+ const runBadgeClass = status => status === 'PASS' ? 'good' : status === 'MISMATCH' ? 'bad' : 'wait';
+ function countsChips(counts) {
+  if (!counts || typeof counts !== 'object') return '—';
+  const chips = ['PASS', 'MISMATCH', 'NEEDS_REVIEW', 'BLOCKED', 'NOT EVALUATED']
+   .filter(key => counts[key]).map(key => counts[key] + ' ' + key);
+  return chips.join(' · ') || '—';
+ }
+ async function runReview() {
+  const button = q('#report-run-review');if (!button) return;
+  button.disabled = true;button.textContent = t('report.runs.running');
+  try {
+   const response = await apiFetch('/api/review/run', {
+    method: 'POST', headers: {'Content-Type': 'application/json'}, body: '{}',
+   }, 120000);
+   const payload = await response.json();
+   if (!payload.ok) throw new Error(payload.error || 'review run failed');
+   if (!Array.isArray(state.reviews)) state.reviews = [];
+   if (payload.review) state.reviews = [payload.review, ...state.reviews];
+   renderReportRuns();
+   announce(t('report.runs.done', {id: payload.review && payload.review.id ? payload.review.id : '—'}));
+  } catch (error) {
+   announce(t('report.runs.failed', {error: String(error.message || error)}));
+   const reset = q('#report-run-review');
+   if (reset) {reset.disabled = false;reset.textContent = t('report.runs.generate');}
+  }
+ }
+ function renderReportRuns() {
+  const section = q('#report-runs');if (!section) return;
+  section.setAttribute('aria-label', t('report.runs.title'));
+  section.replaceChildren();
+  literal(section, 'h2', null, t('report.runs.title'));
+  if (!state.connected) {
+   literal(section, 'p', 'muted', t('report.runs.offlineNote'));
+   return;
+  }
+  const harness = state.harness;
+  if (harness && typeof harness === 'object') {
+   const stats = literal(section, 'div', 'run-stats');
+   [['cases', harness.cases], ['correct', harness.correct], ['falseAlarms', harness.false_alarms],
+    ['detected', harness.detected], ['mustFlagCases', harness.must_flag_cases]].forEach(([key, value]) => {
+    const stat = literal(stats, 'div', 'run-stat');
+    literal(stat, 'small', null, t('report.runs.' + key));
+    literal(stat, 'div', 'value', value == null ? t('detail.noValue') : String(value));
+   });
+   literal(section, 'p', 'muted run-line', [harness.run_id, harness.created_at].filter(Boolean).join(' · '));
+  }
+  const reviews = Array.isArray(state.reviews) ? state.reviews : [];
+  literal(section, 'h3', null, t('report.runs.reportsTitle'));
+  if (!reviews.length) {
+   literal(section, 'p', 'muted', t('report.runs.noReports'));
+  } else {
+   const list = literal(section, 'ul', 'run-review-list');
+   reviews.slice(0, 5).forEach(review => {
+    const li = literal(list, 'li', 'run-review');
+    const headRow = literal(li, 'div', 'run-review-head');
+    literal(headRow, 'strong', null, review.id || '—');
+    literal(headRow, 'span', 'badge ' + runBadgeClass(review.overall_status), review.overall_status || '—');
+    literal(headRow, 'small', null, countsChips(review.counts));
+   });
+   const first = reviews[0];
+   if (first && Array.isArray(first.findings) && first.findings.length) {
+    literal(section, 'h3', null, t('report.runs.findingsTitle', {id: first.id || '—'}));
+    const wrap = literal(section, 'div', 'table-wrap');
+    const table = literal(wrap, 'table', 'case-table');
+    const head = table.createTHead();const headRow = head.insertRow();
+    [t('report.runs.thRule'), t('th.expected'), t('th.observed'), t('th.result')].forEach(label => {
+     const th = document.createElement('th');th.scope = 'col';th.textContent = label;headRow.append(th);
+    });
+    const body = table.createTBody();
+    first.findings.forEach(finding => {
+     const row = body.insertRow();
+     [finding.rule, finding.expected, finding.actual].forEach(text => {
+      const cell = row.insertCell();cell.textContent = text == null ? t('detail.noValue') : String(text);
+     });
+     const statusCell = row.insertCell();
+     literal(statusCell, 'span', 'badge ' + runBadgeClass(finding.status), finding.status || '—');
+    });
+   }
+  }
+  const actions = literal(section, 'div', 'actions');
+  const button = document.createElement('button');
+  button.type = 'button';button.id = 'report-run-review';
+  button.textContent = t('report.runs.generate');
+  button.onclick = runReview;
+  actions.append(button);
+ }
+ function renderAudit() {
+  const list = q('#audit-list');if (!list) return;
+  qa('#audit-list [data-seed]').forEach(node => node.remove());
+  const seeds = [];
+  if (state.connected && state.backend) {
+   seeds.push(t('audit.backendSeed', {events: state.backend.events, gates: state.backend.gates, runs: state.backend.agent_runs}));
+  } else {
+   seeds.push(t('audit.seed1'), t('audit.seed2'), t('audit.seed3'));
+  }
+  for (const seed of seeds) {
+   const li = document.createElement('li');li.dataset.seed = 'true';
+   literal(li, 'span', 'when', t('audit.demo'));
+   literal(li, 'span', null, seed);
+   list.prepend(li);
+  }
+  renderNotes();
+ }
+ function renderReportNotes() {
+  const list = q('#report-note-list');const empty = q('#report-notes-empty');if (!list || !empty) return;
+  list.replaceChildren();
+  const entries = [];
+  for (const [id, text] of Object.entries(drafts)) if (state.cases.some(item => item.id === id) && text) entries.push({meta: t('report.draftMark') + ' · ' + id, text, draft: true});
+  notes.forEach((note, index) => {
+   if (state.cases.some(item => item.id === note.caseId)) entries.push({
+    meta: note.caseId + ' · ' + new Intl.DateTimeFormat(lang === 'de' ? 'de-DE' : 'en-GB', {hour: '2-digit', minute: '2-digit'}).format(new Date(note.at)),
+    text: note.text, index,
+   });
+  });
+  empty.textContent = t('report.notesEmpty');
+  empty.classList.toggle('hidden', entries.length !== 0);
+  for (const entry of entries) {
+   const li = document.createElement('li');
+   literal(li, 'span', 'note-meta', entry.meta);
+   literal(li, 'span', 'note-text', entry.text);
+   if (!entry.draft) {
+    const del = document.createElement('button');del.type = 'button';del.className = 'note-delete';del.textContent = t('report.delete');
+    del.onclick = () => {
+     if (!del.dataset.confirming) {
+      del.dataset.confirming = 'true';del.classList.add('confirming');del.textContent = t('report.deleteConfirm');
+      setTimeout(() => {delete del.dataset.confirming;del.classList.remove('confirming');del.textContent = t('report.delete');}, 4000);
+      return;
+     }
+     notes = notes.filter((_, i) => i !== entry.index);persist();renderReportNotes();renderNotes();
+     announce(t('toast.deleted'));
+    };
+    li.append(del);
+   }
+   list.append(li);
+  }
+ }
+ function renderNotes() {
+  qa('.timeline [data-note]').forEach(el => el.remove());
+  for (const note of notes) {
+   const li = document.createElement('li');li.dataset.note = 'true';
+   const time = document.createElement('time');time.dateTime = note.at;
+   time.textContent = new Intl.DateTimeFormat(lang === 'de' ? 'de-DE' : 'en-GB', {hour: '2-digit', minute: '2-digit'}).format(new Date(note.at));
+   literal(li, 'span', null, note.caseId + ' · ' + note.text);
+   li.prepend(time);q('#audit-list').append(li);
+  }
+ }
+ function updateDraftMarks() {
+  qa('#case-rows tr').forEach(row => {
+   const mark = row.querySelector('.draft-mark');if (mark) mark.hidden = !drafts[state.cases[+row.dataset.case].id];
+  });
+ }
+ function updateTableWrapFocus() {
+  const wrap = q('.table-wrap');if (!wrap) return;
+  if (wrap.scrollWidth > wrap.clientWidth + 1) wrap.setAttribute('tabindex', '0');else wrap.removeAttribute('tabindex');
+ }
+ function renderAll() {
+  renderTable();renderDetail({animate: false});filter();renderSources();renderStories();renderReport();renderAudit();renderReportNotes();
+  setBackendBadge(state.connected);
+  q('[data-export]').textContent = t('report.export');
+  persist();
+ }
+
+ /* -------------------------------- storage --------------------------------- */
+ function persist() {
+  try {sessionStorage.setItem(STORAGE_KEY, JSON.stringify({version: 1, drafts, notes}));storageAvailable = true;}
+  catch {storageAvailable = false;}
+  q('#note-help').textContent = storageAvailable ? t('note.help') : t('note.helpNoStorage');
+ }
+ try {
+  const saved = JSON.parse(sessionStorage.getItem(STORAGE_KEY) || 'null');
+  if (saved && saved.version === 1) {
+   if (saved.drafts && typeof saved.drafts === 'object')
+    for (const [id, value] of Object.entries(saved.drafts))
+     if (typeof value === 'string' && value.length <= 2000) drafts[id] = value;
+   if (Array.isArray(saved.notes))
+    notes = saved.notes.filter(note => note && typeof note.caseId === 'string' && typeof note.text === 'string'
+     && note.text.length <= 2000 && typeof note.at === 'string' && !Number.isNaN(Date.parse(note.at))).slice(-100);
+  }
+ } catch {storageAvailable = false;}
+
+ /* ------------------------------ interactions ------------------------------ */
+ function noteCount() {q('#note-count').textContent = new Intl.NumberFormat(lang === 'de' ? 'de-DE' : 'en-GB').format(q('textarea').value.length);}
+ function saveDraft() {
+  const item = state.cases[selected];if (!item) return;
+  const value = q('textarea').value;
+  if (value) drafts[item.id] = value;else delete drafts[item.id];
+  persist();updateDraftMarks();
+ }
+ function view(id, updateHistory = true) {
+  if (!allowedViews.includes(id)) id = 'cases';
+  saveDraft();
+  qa('.pageview').forEach(el => el.classList.toggle('active', el.id === id));
+  qa('nav [data-view]').forEach(button => {
+   const current = button.dataset.view === id;
+   button.classList.toggle('active', current);
+   if (current) button.setAttribute('aria-current', 'page');else button.removeAttribute('aria-current');
+  });
+  if (updateHistory && location.hash !== '#' + id) history.pushState(null, '', '#' + id);
+  const title = q('#' + id + ' h1');
+  if (title) {title.tabIndex = -1;title.focus({preventScroll: true});if (updateHistory) q('.workspace').scrollIntoView({behavior: 'instant', block: 'start'});}
+  if (id === 'stories') renderStories();
+  if (id === 'report') renderReport();
+  if (id === 'audit') renderAudit();
+  motion(q('#' + id));
+ }
+ function sortTable(column, button) {
+  const ascending = button.closest('th').getAttribute('aria-sort') !== 'ascending';
+  const tbody = q('#case-rows');
+  const rows = qa('#case-rows tr');
+  rows.sort((a, b) => {
+   const left = a.children[column].textContent.trim(), right = b.children[column].textContent.trim();
+   const number = value => Number(value.replace(/\./g, '').replace(',', '.').replace(/[^\d.-]/g, ''));
+   const result = (column === 2 || column === 3) && left.includes('€') && right.includes('€') ? number(left) - number(right) : left.localeCompare(right, lang === 'de' ? 'de' : 'en', {numeric: true});
+   return result * (ascending ? 1 : -1);
+  });
+  rows.forEach(row => tbody.append(row));
+  qa('th[aria-sort]').forEach(th => th.setAttribute('aria-sort', 'none'));
+  button.closest('th').setAttribute('aria-sort', ascending ? 'ascending' : 'descending');
+  qa('[data-sort] span:last-child').forEach(span => span.textContent = ' ↕');
+  button.querySelector('span:last-child').textContent = ascending ? ' ↑' : ' ↓';
+ }
+
+ function bind() {
+  qa('nav [data-view], .heading [data-view]').forEach(button => button.onclick = () => view(button.dataset.view));
+  qa('[data-source]').forEach(button => button.onclick = event => {event.preventDefault();view('sources');});
+  q('[data-review]').onclick = () => {
+   const open = q('.review-editor').classList.toggle('hidden') === false;
+   q('[data-review]').setAttribute('aria-expanded', String(open));
+   if (open) {q('textarea').focus();motion(q('.review-editor'));}
+  };
+  q('textarea').addEventListener('input', () => {
+   noteCount();saveDraft();
+   if (q('textarea').value.trim()) {q('textarea').removeAttribute('aria-invalid');q('#note-error').classList.add('hidden');}
+  });
+  q('[data-save]').onclick = () => {
+   const text = q('textarea').value.trim();
+   if (!text || text.length > 2000) {
+    q('#note-error').textContent = text.length > 2000 ? t('note.error.long') : t('note.error.empty');
+    q('#note-error').classList.remove('hidden');
+    q('textarea').setAttribute('aria-invalid', 'true');q('textarea').focus();
+    return;
+   }
+   if (notes.length >= 100) {announce(t('toast.limit'));return;}
+   notes.push({caseId: state.cases[selected].id, text, at: new Date().toISOString()});
+   delete drafts[state.cases[selected].id];
+   q('textarea').value = '';noteCount();persist();updateDraftMarks();renderReportNotes();renderNotes();
+   q('.review-editor').classList.add('hidden');q('[data-review]').setAttribute('aria-expanded', 'false');q('[data-review]').focus();
+   announce(t('toast.saved', {id: state.cases[selected].id}));
+  };
+  q('textarea').addEventListener('keydown', event => {
+   if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {event.preventDefault();q('[data-save]').click();}
+  });
+  q('[data-run]').onclick = () => {
+   const open = q('#run-evidence').classList.toggle('hidden') === false;
+   q('[data-run]').setAttribute('aria-expanded', String(open));
+   if (open) motion(q('#run-evidence'));
+  };
+  q('#case-search').addEventListener('input', filter);
+  q('#result-filter').addEventListener('change', filter);
+  q('[data-open-findings]').onclick = () => {
+   openFindingsOnly = !openFindingsOnly;
+   q('[data-open-findings]').setAttribute('aria-pressed', String(openFindingsOnly));
+   filter();
+  };
+  q('[data-reset-filter]').onclick = () => {
+   q('#case-search').value = '';q('#result-filter').value = '';
+   openFindingsOnly = false;q('[data-open-findings]').setAttribute('aria-pressed', 'false');
+   filter();q('#case-search').focus();
+  };
+  qa('[data-sort]').forEach(button => button.onclick = () => sortTable(+button.dataset.sort, button));
+  // Story suites (delegated on the persistent paper node so re-renders keep the bindings)
+  const storiesPaper = q('#stories-paper');
+  storiesPaper.addEventListener('input', event => {
+   if (event.target.id !== 'story-search') return;
+   storyState.search = event.target.value;
+   renderStoryRows();
+  });
+  storiesPaper.addEventListener('change', event => {
+   if (event.target.id !== 'story-filter') return;
+   storyState.story = event.target.value;
+   renderStoryRows();
+  });
+  storiesPaper.addEventListener('click', event => {
+   const defects = event.target.closest('#story-defects');
+   if (defects) {
+    storyState.defectsOnly = !storyState.defectsOnly;
+    defects.setAttribute('aria-pressed', String(storyState.defectsOnly));
+    renderStoryRows();
+    return;
+   }
+   if (event.target.closest('[data-reset-story]')) {
+    storyState = {search: '', story: '', defectsOnly: false, selected: -1};
+    renderStories();
+   }
+  });
+  q('[data-export]').onclick = () => {
+   try {
+    saveDraft();
+    const payload = {
+     product: 'SÜSIE', synthetic: !state.connected,
+     source: state.connected ? 'itsg-store (' + (state.backend ? state.backend.store : '') + ')' : 'synthetic-ui',
+     compliance_claim: false,
+     findings: state.cases.map(item => ({id: item.id, status: item.status})),
+     notes, drafts,
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], {type: 'application/json'});
+    const link = document.createElement('a');const url = URL.createObjectURL(blob);
+    link.href = url;link.download = 'susie-demo-bericht.json';
+    document.body.append(link);link.click();link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 10000);
+    announce(t('toast.exported'));
+   } catch {announce(t('toast.exportFailed'));}
+  };
+  window.addEventListener('popstate', () => view(location.hash.slice(1), false));
+  window.addEventListener('hashchange', () => {if (allowedViews.includes(location.hash.slice(1))) view(location.hash.slice(1), false);});
+  window.addEventListener('pagehide', saveDraft);
+  window.addEventListener('resize', updateTableWrapFocus, {passive: true});
+  // Appearance + language + settings
+  qa('[data-set-theme], [data-set-mode]').forEach(button => button.addEventListener('click', () =>
+   setAppearance(button.dataset.setTheme, button.dataset.setMode)));
+  qa('[data-set-lang]').forEach(button => button.addEventListener('click', () => setLanguage(button.dataset.setLang)));
+  q('#theme-cycle').onclick = () => {
+   const index = APPEARANCE_ORDER.findIndex(([theme, mode]) => theme === ROOT.dataset.theme && mode === ROOT.dataset.mode);
+   const [theme, mode] = APPEARANCE_ORDER[(index + 1) % APPEARANCE_ORDER.length];
+   setAppearance(theme, mode);
+  };
+  const logoFailure = () => {q('.brand-logo').hidden = true;q('.brand-fallback').hidden = false;};
+  q('.brand-logo').addEventListener('error', logoFailure);
+  if (q('.brand-logo').complete && !q('.brand-logo').naturalWidth) logoFailure();
+  // API settings
+  const endpointInput = q('#api-endpoint');
+  endpointInput.value = apiBase;
+  endpointInput.addEventListener('change', () => {
+   apiBase = endpointInput.value.trim().replace(/\/$/, '');
+   persistApiBase();
+  });
+  q('#api-check').onclick = checkConnection;
+  q('#api-run-offline').onclick = () => runDemo(false);
+  q('#api-run-live').onclick = event => {
+   const button = event.currentTarget;
+   if (!button.dataset.confirming) {
+    button.dataset.confirming = 'true';button.classList.add('confirming');button.textContent = t('api.run.liveConfirm');
+    setTimeout(() => {delete button.dataset.confirming;button.classList.remove('confirming');button.textContent = t('api.runLive');}, 5000);
+    return;
+   }
+   delete button.dataset.confirming;button.classList.remove('confirming');button.textContent = t('api.runLive');
+   runDemo(true);
+  };
+  if (matchMedia('(max-width: 1100px)').matches) q('.appearance').open = false;
+ }
+
+ /* ---------------------------------- init ---------------------------------- */
+ bind();
+ applyState(syntheticState());
+ applyI18n();
+ syncAppearance();
+ const requested = new URLSearchParams(location.search).get('case');
+ const requestedIndex = state.cases.findIndex(item => item.id === requested);
+ selectCase(requestedIndex >= 0 ? requestedIndex : state.cases.findIndex(item => item.statusKey !== 'pass'), {animate: false});
+ renderAudit();filter();updateTableWrapFocus();renderReportNotes();
+ if (location.hash) view(location.hash.slice(1), false);
+ else q('nav [data-view="cases"]').setAttribute('aria-current', 'page');
+ loadBackend({silent: false});
+})();

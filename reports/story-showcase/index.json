@@ -1,0 +1,172 @@
+[
+  {
+    "pdf_path": "reports/story-showcase/SUSIE-showcase-S1-001.pdf",
+    "content_hash": "92fd6c15cf431a6a9aa1b96c6bdb1c5f5e6e82abc149762b11b93ccd450a44f9",
+    "generated_at": "2026-10-26 22:42:51 UTC",
+    "pages": 2,
+    "client": "SÜSIE Story-Showcase · Fall S1-001 (synthetische Demodaten)",
+    "summary_used": false,
+    "generator": "itsg.report_pdf/0.2.0",
+    "case_id": "S1-001",
+    "story": 1,
+    "category": "current AU is a work accident",
+    "counts": {
+      "PASS": 3,
+      "MISMATCH": 0,
+      "NOT_EVALUATED": 0
+    }
+  },
+  {
+    "pdf_path": "reports/story-showcase/SUSIE-showcase-S1-011.pdf",
+    "content_hash": "2bc27eb26c02716c08b95f244348926b8c0b4c0e5f9a4ceaf11bbaaed2a73f8a",
+    "generated_at": "2026-10-26 22:42:52 UTC",
+    "pages": 2,
+    "client": "SÜSIE Story-Showcase · Fall S1-011 (synthetische Demodaten)",
+    "summary_used": false,
+    "generator": "itsg.report_pdf/0.2.0",
+    "case_id": "S1-011",
+    "story": 1,
+    "category": "rehab stay, mixed prior reasons",
+    "counts": {
+      "PASS": 3,
+      "MISMATCH": 0,
+      "NOT_EVALUATED": 0
+    }
+  },
+  {
+    "pdf_path": "reports/story-showcase/SUSIE-showcase-S1-021.pdf",
+    "content_hash": "afcd1ab5266a43f0d7e2c9ee51cd996c215bb49ce814113053bc6a7351839e19",
+    "generated_at": "2026-10-26 22:42:52 UTC",
+    "pages": 2,
+    "client": "SÜSIE Story-Showcase · Fall S1-021 (synthetische Demodaten)",
+    "summary_used": false,
+    "generator": "itsg.report_pdf/0.2.0",
+    "case_id": "S1-021",
+    "story": 1,
+    "category": "mixed reasons, under 30 days",
+    "counts": {
+      "PASS": 2,
+      "MISMATCH": 1,
+      "NOT_EVALUATED": 0
+    }
+  },
+  {
+    "pdf_path": "reports/story-showcase/SUSIE-showcase-S1-031.pdf",
+    "content_hash": "db93b93adf5b91d7eeed381ac545318b07b3027a1f4f45e4a515d3954371e2d7",
+    "generated_at": "2026-10-26 22:42:52 UTC",
+    "pages": 2,
+    "client": "SÜSIE Story-Showcase · Fall S1-031 (synthetische Demodaten)",
+    "summary_used": false,
+    "generator": "itsg.report_pdf/0.2.0",
+    "case_id": "S1-031",
+    "story": 1,
+    "category": "privately insured, work accident (BG, outside procedure)",
+    "counts": {
+      "PASS": 1,
+      "MISMATCH": 2,
+      "NOT_EVALUATED": 0
+    }
+  },
+  {
+    "pdf_path": "reports/story-showcase/SUSIE-showcase-S3-051.pdf",
+    "content_hash": "79a5b97ad6fa028e8184e44719a38febf1bb45141fa15ccb29ce1db62f4989cf",
+    "generated_at": "2026-10-26 22:42:53 UTC",
+    "pages": 2,
+    "client": "SÜSIE Story-Showcase · Fall S3-051 (synthetische Demodaten)",
+    "summary_used": false,
+    "generator": "itsg.report_pdf/0.2.0",
+    "case_id": "S3-051",
+    "story": 3,
+    "category": "short uncertified days right before the current AU (included)",
+    "counts": {
+      "PASS": 3,
+      "MISMATCH": 0,
+      "NOT_EVALUATED": 0
+    }
+  },
+  {
+    "pdf_path": "reports/story-showcase/SUSIE-showcase-S3-076.pdf",
+    "content_hash": "8ba9e0519a832fd28de555fbcaf202cdb5c2578f7d04fc367d3759af258087c8",
+    "generated_at": "2026-10-26 22:42:53 UTC",
+    "pages": 2,
+    "client": "SÜSIE Story-Showcase · Fall S3-076 (synthetische Demodaten)",
+    "summary_used": false,
+    "generator": "itsg.report_pdf/0.2.0",
+    "case_id": "S3-076",
+    "story": 3,
+    "category": "defect: non-seamless short days reported",
+    "counts": {
+      "PASS": 2,
+      "MISMATCH": 1,
+      "NOT_EVALUATED": 0
+    }
+  },
+  {
+    "pdf_path": "reports/story-showcase/SUSIE-showcase-S4-081.pdf",
+    "content_hash": "cec7d8ccf006ddf9e380f5f24255e8f6f3e76bd4d3c1588dca237a7bbcb6b0d5",
+    "generated_at": "2026-10-26 22:42:53 UTC",
+    "pages": 2,
+    "client": "SÜSIE Story-Showcase · Fall S4-081 (synthetische Demodaten)",
+    "summary_used": false,
+    "generator": "itsg.report_pdf/0.2.0",
+    "case_id": "S4-081",
+    "story": 4,
+    "category": "correct insurer reply",
+    "counts": {
+      "PASS": 2,
+      "MISMATCH": 0,
+      "NOT_EVALUATED": 0
+    }
+  },
+  {
+    "pdf_path": "reports/story-showcase/SUSIE-showcase-S4-101.pdf",
+    "content_hash": "f7feb3f4278e129062f74a23d36bed0ec45f1f1b897a8212a1e0170e30ba7d41",
+    "generated_at": "2026-10-26 22:42:54 UTC",
+    "pages": 2,
+    "client": "SÜSIE Story-Showcase · Fall S4-101 (synthetische Demodaten)",
+    "summary_used": false,
+    "generator": "itsg.report_pdf/0.2.0",
+    "case_id": "S4-101",
+    "story": 4,
+    "category": "defect: employer periods reordered",
+    "counts": {
+      "PASS": 1,
+      "MISMATCH": 1,
+      "NOT_EVALUATED": 0
+    }
+  },
+  {
+    "pdf_path": "reports/story-showcase/SUSIE-showcase-S6-141.pdf",
+    "content_hash": "950608780e2dbe2cd6034e2dcc324097e20905a058c49398d88484ce660231f4",
+    "generated_at": "2026-10-26 22:42:54 UTC",
+    "pages": 3,
+    "client": "SÜSIE Story-Showcase · Fall S6-141 (synthetische Demodaten)",
+    "summary_used": false,
+    "generator": "itsg.report_pdf/0.2.0",
+    "case_id": "S6-141",
+    "story": 6,
+    "category": "correct cancel-and-correct flow",
+    "counts": {
+      "PASS": 6,
+      "MISMATCH": 0,
+      "NOT_EVALUATED": 0
+    }
+  },
+  {
+    "pdf_path": "reports/story-showcase/SUSIE-showcase-S6-170.pdf",
+    "content_hash": "fad6fa2fd615eb6f1e3562a5ce89d785cd63b8dd2c4671d99d0f01c64fdae7fb",
+    "generated_at": "2026-10-26 22:42:55 UTC",
+    "pages": 3,
+    "client": "SÜSIE Story-Showcase · Fall S6-170 (synthetische Demodaten)",
+    "summary_used": false,
+    "generator": "itsg.report_pdf/0.2.0",
+    "case_id": "S6-170",
+    "story": 6,
+    "category": "defect: 88 cancels the 41 instead of the 01",
+    "counts": {
+      "PASS": 6,
+      "MISMATCH": 1,
+      "NOT_EVALUATED": 0
+    }
+  }
+]

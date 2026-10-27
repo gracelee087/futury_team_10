@@ -1,0 +1,338 @@
+{
+  "report": {
+    "id": "RPT-20261026-223313",
+    "created_at": "26.10.2026 22:33",
+    "scope": "DTA EEL – Abgabegrund 41 (DBVO) + message flow 41→61→01→61→88→01→62",
+    "template": "SYNTHETIC – no official ITSG report form found; no compliance claim",
+    "overall_status": "NOT EVALUATED",
+    "counts": {
+      "PASS": 10,
+      "NOT EVALUATED": 10,
+      "NEEDS_REVIEW": 0,
+      "MISMATCH": 0,
+      "BLOCKED": 0
+    }
+  },
+  "test_case": {
+    "id": "TC-1",
+    "source": "ITSG Files/test case/Hinweise_DTA-EEL-Bespiel_Vorerkrankung_Testkonstellation.docx (ID table + text: EFZ end 30.03.2026, after correction 27.03.2026)",
+    "inputs": {
+      "current_au": {
+        "start": "11.03.2026",
+        "end_initial": "20.03.2026",
+        "end_final": "10.04.2026"
+      },
+      "prior_au": [
+        {
+          "start": "14.07.2025",
+          "end": "15.07.2025"
+        },
+        {
+          "start": "01.10.2025",
+          "end": "17.10.2025"
+        },
+        {
+          "start": "01.12.2025",
+          "end": "03.12.2025"
+        },
+        {
+          "start": "01.03.2026",
+          "end": "03.03.2026",
+          "note": "paper certificate only, no eAU"
+        }
+      ],
+      "employment_end": "31.03.2026"
+    }
+  },
+  "execution": {
+    "id": "RUN-20261026-223313",
+    "file": "TEEL0-Test1-DBVO",
+    "observed": {
+      "DATUM-ERSTELLUNG": "14.02.2026",
+      "DATENSATZ-ID": "11111111-2222-AAAA-EEEE-111111111111",
+      "ABGABEGRUND": "41",
+      "GRUNDAV": "1",
+      "AU-AB-AG": "11.03.2026",
+      "AU-AB-SV": "00000000",
+      "KZ-AK-AU": "0",
+      "ANZAHL-AU": "04",
+      "AU-ZEITRAEUME": [
+        [
+          "01.03.2026",
+          "03.03.2026"
+        ],
+        [
+          "01.12.2025",
+          "03.12.2025"
+        ],
+        [
+          "01.10.2025",
+          "17.10.2025"
+        ],
+        [
+          "14.07.2025",
+          "15.07.2025"
+        ]
+      ]
+    },
+    "observed_sources": {
+      "message_1_41": "TEEL0 file (software output)",
+      "messages_2_to_7": "test case ID table (reference flow)"
+    }
+  },
+  "findings": [
+    {
+      "id": "F1",
+      "rule": "Abgabegrund = 41",
+      "source": "VB 13.4 §3.1.18 p.43",
+      "expected": "41",
+      "actual": "41",
+      "status": "PASS"
+    },
+    {
+      "id": "F2",
+      "rule": "ANZAHL-AU = number of prior AUs to report",
+      "source": "VB 13.4 §3.12.6 p.139",
+      "expected": "04",
+      "actual": "04",
+      "status": "PASS"
+    },
+    {
+      "id": "F3",
+      "rule": "Reported prior AU periods (order-independent)",
+      "source": "VB 13.4 §3.12.7/3.12.8 p.140-141",
+      "expected": [
+        [
+          "01.03.2026",
+          "03.03.2026"
+        ],
+        [
+          "01.10.2025",
+          "17.10.2025"
+        ],
+        [
+          "01.12.2025",
+          "03.12.2025"
+        ],
+        [
+          "14.07.2025",
+          "15.07.2025"
+        ]
+      ],
+      "actual": [
+        [
+          "01.03.2026",
+          "03.03.2026"
+        ],
+        [
+          "01.10.2025",
+          "17.10.2025"
+        ],
+        [
+          "01.12.2025",
+          "03.12.2025"
+        ],
+        [
+          "14.07.2025",
+          "15.07.2025"
+        ]
+      ],
+      "status": "PASS"
+    },
+    {
+      "id": "F4",
+      "rule": "Employer sends KZ-AK-AU = 0 (Grundstellung)",
+      "source": "VB 13.4 §3.12.4 p.138",
+      "expected": "0",
+      "actual": "0",
+      "status": "PASS"
+    },
+    {
+      "id": "F5",
+      "rule": "AU-AB-AG = start of the current AU",
+      "source": "VB 13.4 §3.12.2 p.137",
+      "expected": "11.03.2026",
+      "actual": "11.03.2026",
+      "status": "PASS"
+    },
+    {
+      "id": "F6",
+      "rule": "Employer sends AU-AB-SV = 00000000 (Grundstellung)",
+      "source": "VB 13.4 §3.12.3 p.137",
+      "expected": "00000000",
+      "actual": "00000000",
+      "status": "PASS"
+    },
+    {
+      "id": "F7",
+      "rule": "Prior AUs listed most recent first",
+      "source": "VB 13.4 §3.12.7 p.140",
+      "expected": [
+        [
+          "01.03.2026",
+          "03.03.2026"
+        ],
+        [
+          "01.12.2025",
+          "03.12.2025"
+        ],
+        [
+          "01.10.2025",
+          "17.10.2025"
+        ],
+        [
+          "14.07.2025",
+          "15.07.2025"
+        ]
+      ],
+      "actual": [
+        [
+          "01.03.2026",
+          "03.03.2026"
+        ],
+        [
+          "01.12.2025",
+          "03.12.2025"
+        ],
+        [
+          "01.10.2025",
+          "17.10.2025"
+        ],
+        [
+          "14.07.2025",
+          "15.07.2025"
+        ]
+      ],
+      "status": "PASS"
+    },
+    {
+      "id": "C9",
+      "criterion_id": "f41c7278-b5a5-4ec3-b321-39bca5c3aeeb",
+      "rule": "41 only if current AU and >=1 prior AU are certified",
+      "source": "SRC-CRIT; VB 13.4 §3.12 p.135",
+      "expected": true,
+      "actual": null,
+      "status": "NOT EVALUATED",
+      "reason": "certificate status is in neither the message nor the test case"
+    },
+    {
+      "id": "C13",
+      "rule": "No 41 for private insurance or marginal employment",
+      "source": "VB 13.4 §3.12 p.136",
+      "expected": "GKV",
+      "actual": null,
+      "status": "NOT EVALUATED",
+      "reason": "insurance type is in neither the message nor the test case"
+    },
+    {
+      "id": "C10",
+      "criterion_id": "0cefe80e-4fd9-41e1-be4f-3ae1ecbde646",
+      "rule": "<= 6 months between start of current AU and end of last prior AU",
+      "source": "SRC-CRIT; VB 13.4 §3.12 p.135",
+      "expected": "<= 6 months",
+      "actual": "8 days (03.03.2026 -> 11.03.2026)",
+      "status": "PASS"
+    },
+    {
+      "id": "C11",
+      "criterion_id": "aade0289-e8f9-4e12-9c49-464cf6cd0789",
+      "rule": "Prior AUs included only if each gap <= 6 months",
+      "source": "SRC-CRIT; VB 13.4 §3.12 p.135",
+      "expected": 4,
+      "actual": 4,
+      "status": "PASS"
+    },
+    {
+      "id": "C12",
+      "criterion_id": "9c8c9b58-4d0f-4066-98ac-973095418d63",
+      "rule": "Prior AUs (12 months) + current AU >= 30 days",
+      "source": "SRC-CRIT; VB 13.4 §3.12 p.135; Beispiel 13.4/13.5",
+      "expected": ">= 30",
+      "actual": "56 days (current 31, expected end)",
+      "status": "PASS"
+    },
+    {
+      "id": "C1",
+      "rule": "message flow check",
+      "source": "checker/checks.py",
+      "expected": null,
+      "actual": null,
+      "status": "NOT EVALUATED",
+      "reason": "checker not found in /Users/amour/Downloads/FUTURY-Team 10/checker"
+    },
+    {
+      "id": "C2",
+      "rule": "message flow check",
+      "source": "checker/checks.py",
+      "expected": null,
+      "actual": null,
+      "status": "NOT EVALUATED",
+      "reason": "checker not found in /Users/amour/Downloads/FUTURY-Team 10/checker"
+    },
+    {
+      "id": "C3",
+      "rule": "message flow check",
+      "source": "checker/checks.py",
+      "expected": null,
+      "actual": null,
+      "status": "NOT EVALUATED",
+      "reason": "checker not found in /Users/amour/Downloads/FUTURY-Team 10/checker"
+    },
+    {
+      "id": "C4",
+      "rule": "message flow check",
+      "source": "checker/checks.py",
+      "expected": null,
+      "actual": null,
+      "status": "NOT EVALUATED",
+      "reason": "checker not found in /Users/amour/Downloads/FUTURY-Team 10/checker"
+    },
+    {
+      "id": "C5",
+      "rule": "message flow check",
+      "source": "checker/checks.py",
+      "expected": null,
+      "actual": null,
+      "status": "NOT EVALUATED",
+      "reason": "checker not found in /Users/amour/Downloads/FUTURY-Team 10/checker"
+    },
+    {
+      "id": "C6",
+      "rule": "message flow check",
+      "source": "checker/checks.py",
+      "expected": null,
+      "actual": null,
+      "status": "NOT EVALUATED",
+      "reason": "checker not found in /Users/amour/Downloads/FUTURY-Team 10/checker"
+    },
+    {
+      "id": "C7",
+      "rule": "message flow check",
+      "source": "checker/checks.py",
+      "expected": null,
+      "actual": null,
+      "status": "NOT EVALUATED",
+      "reason": "checker not found in /Users/amour/Downloads/FUTURY-Team 10/checker"
+    },
+    {
+      "id": "C8",
+      "rule": "message flow check",
+      "source": "checker/checks.py",
+      "expected": null,
+      "actual": null,
+      "status": "NOT EVALUATED",
+      "reason": "checker not found in /Users/amour/Downloads/FUTURY-Team 10/checker"
+    }
+  ],
+  "robustness": {
+    "result": "NOT EVALUATED",
+    "reason": "checker/attacks.py not found",
+    "attacks": []
+  },
+  "review": {
+    "reviewer": null,
+    "decision": "pending",
+    "timestamp": null
+  },
+  "trace_url": null
+}

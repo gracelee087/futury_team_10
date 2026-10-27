@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="de" data-theme="casual" data-mode="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>SÜSIE · Prüfakte</title>
+<meta name="description" content="SÜSIE – Systemüberprüfung sozialversicherungsrechtlicher IT-Ergebnisse. Konzeptdemo mit synthetischen Prüfdaten.">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23c8133f'/%3E%3C/svg%3E">
+<script src="theme-init.js"></script>
+<link rel="stylesheet" href="pruefakte.css">
+</head>
+<body class="itsg-aligned">
+<!-- Faded geometric background matching the SÜSIE app: two waves + orbit ring, crimson-tinted -->
+<svg class="backdrop" aria-hidden="true" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice">
+ <defs>
+  <linearGradient id="wave-a" x1="0" y1="0" x2="1" y2="0">
+   <stop offset="0" stop-color="#c8133f" stop-opacity="0"/>
+   <stop offset=".55" stop-color="#c8133f" stop-opacity=".07"/>
+   <stop offset="1" stop-color="#c8133f" stop-opacity="0"/>
+  </linearGradient>
+  <linearGradient id="wave-b" x1="0" y1="0" x2="1" y2="0">
+   <stop offset="0" stop-color="#1d4e89" stop-opacity="0"/>
+   <stop offset=".5" stop-color="#1d4e89" stop-opacity=".05"/>
+   <stop offset="1" stop-color="#1d4e89" stop-opacity="0"/>
+  </linearGradient>
+ </defs>
+ <path d="M-80 700 C 260 560, 520 820, 860 690 S 1380 540, 1560 640 L 1560 980 L -80 980 Z" fill="url(#wave-a)"/>
+ <path d="M-80 780 C 300 660, 620 880, 980 760 S 1420 660, 1560 740 L 1560 980 L -80 980 Z" fill="url(#wave-b)"/>
+ <circle cx="120" cy="120" r="230" fill="none" stroke="#c8133f" stroke-opacity=".06" stroke-width="1.5"/>
+ <circle cx="120" cy="120" r="160" fill="none" stroke="#c8133f" stroke-opacity=".04" stroke-width="1"/>
+</svg>
+<a class="skip-link" href="#main-content" data-i18n="skip">Zum Prüfbereich springen</a>
+<div class="shell">
+<aside class="rail">
+ <div>
+  <div class="brand"><a class="brand-home" href="susie.html" title="SÜSIE-Modus" data-i18n-aria-label="nav.susie"><img class="brand-logo" src="assets/susie-logo.png" srcset="assets/susie-logo-380.png 380w, assets/susie-logo-760.png 760w, assets/susie-logo.png 2115w" sizes="(max-width:1100px) 160px, 190px" alt="SÜSIE" width="2115" height="743" fetchpriority="high"></a><span class="brand-fallback" hidden>SÜSIE</span></div>
+  <div class="brand-sub" data-i18n="brand.sub">Systemüberprüfung sozialversicherungsrechtlicher IT-Ergebnisse</div>
+ </div>
+ <nav aria-label="Prüfbereiche" data-i18n-aria-label="nav.aria">
+  <button data-view="cases" class="active" title="Prüffälle">
+   <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 3h9l3 3v11H4z"/><path d="M7 9h6M7 12.5h6"/></svg>
+   <span class="nav-label" data-i18n="nav.cases">Prüffälle</span><small class="nav-sub" data-i18n="nav.casesSub">Soll/Ist-Vergleich je Fall</small></button>
+  <button data-view="stories" title="Story-Suiten">
+   <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="14" height="12" rx="2"/><path d="M7 8h6M7 11h4"/></svg>
+   <span class="nav-label" data-i18n="nav.stories">Story-Suiten</span><small class="nav-sub" data-i18n="nav.storiesSub">Szenarien mit erwarteter Abweichung</small></button>
+  <button data-view="sources" title="Quellen & Kriterien">
+   <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="6.5"/><path d="M10 6.5V10l2.5 2"/></svg>
+   <span class="nav-label" data-i18n="nav.sources">Quellen &amp; Kriterien</span><small class="nav-sub" data-i18n="nav.sourcesSub">Rechtsgrundlagen und Regel-Basis</small></button>
+  <button data-view="report" title="Prüfbericht">
+   <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3h10v14H5z"/><path d="M8 7h4M8 10h4M8 13h2.5"/></svg>
+   <span class="nav-label" data-i18n="nav.report">Prüfbericht</span><small class="nav-sub" data-i18n="nav.reportSub">Belege, Maßnahmen, Freigabe-Status</small></button>
+  <button data-view="audit" title="Verlauf">
+   <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10a6 6 0 1 1 1.76 4.24M4 10V6m0 4h4"/></svg>
+   <span class="nav-label" data-i18n="nav.audit">Verlauf</span><small class="nav-sub" data-i18n="nav.auditSub">Jede Gate-Entscheidung mit Zeitstempel</small></button>
+  <a class="nav-ext" href="susie.html" title="Zurück in den SÜSIE-Modus">
+   <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v8a2.5 2.5 0 0 1-2.5 2.5H12l-4.5 3.5V17H6.5A2.5 2.5 0 0 1 4 14.5z" transform="scale(0.85) translate(1.5 1.5)"/><path d="M3 17l3-3" transform="scale(0.85) translate(1.5 1.5)"/></svg>
+   <span class="nav-label" data-i18n="nav.susie">SÜSIE-Modus</span><small class="nav-sub" data-i18n="nav.susieSub">Zurück zur Assistentin: Prüffälle, Prüfbericht &amp; Siegel</small></a>
+ </nav>
+ <div class="quick-controls">
+  <button type="button" class="ghost-lang" id="lang-toggle" aria-label="Sprache wechseln" data-i18n-aria-label="settings.language" title="Sprache / Language">DE</button>
+  <button type="button" class="ghost-icon" id="theme-toggle" aria-label="Hell / Dunkel umschalten" data-i18n-aria-label="themeToggle.aria" title="Hell / Dunkel umschalten">
+   <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 3.5v2M10 14.5v2M3.5 10h2M14.5 10h2M5.3 5.3l1.4 1.4M13.3 13.3l1.4 1.4M14.7 5.3l-1.4 1.4M6.7 13.3l-1.4 1.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="10" cy="10" r="3" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+  </button>
+  <details class="appearance" id="settings">
+   <summary class="ghost-icon settings-btn" data-i18n-aria-label="settings.title" title="Einstellungen">
+    <svg viewBox="0 0 20 20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M3 6h14M3 10h14M3 14h14"/><circle cx="8" cy="6" r="1.8" fill="var(--surface)"/><circle cx="13" cy="10" r="1.8" fill="var(--surface)"/><circle cx="7" cy="14" r="1.8" fill="var(--surface)"/></svg>
+   </summary>
+   <div class="appearance-content">
+    <fieldset><legend data-i18n="appearance.theme">Lesethema</legend>
+     <div class="segmented">
+      <button type="button" data-set-theme="casual" aria-pressed="true" data-i18n="theme.casual">Casual</button>
+      <button type="button" data-set-theme="contrast" aria-pressed="false" data-i18n="theme.contrast">Hoher Kontrast</button>
+     </div>
+    </fieldset>
+    <fieldset><legend data-i18n="appearance.mode">Farbmodus</legend>
+     <div class="segmented">
+      <button type="button" data-set-mode="light" aria-pressed="true" data-i18n="mode.light">Hell</button>
+      <button type="button" data-set-mode="dark" aria-pressed="false" data-i18n="mode.dark">Dunkel</button>
+     </div>
+    </fieldset>
+    <fieldset><legend data-i18n="settings.language">Sprache</legend>
+     <div class="segmented">
+      <button type="button" data-set-lang="de" aria-pressed="true">Deutsch</button>
+      <button type="button" data-set-lang="en" aria-pressed="false">English</button>
+     </div>
+    </fieldset>
+    <fieldset><legend data-i18n="settings.api">API</legend>
+     <label class="api-field" for="api-endpoint"><span data-i18n="api.endpoint">Backend-URL</span>
+      <input id="api-endpoint" type="url" inputmode="url" spellcheck="false" placeholder="http://127.0.0.1:8766" data-i18n-placeholder="api.endpointPlaceholder">
+     </label>
+     <p class="field-help" data-i18n="api.endpointHelp">Leer lassen, um denselben Ursprung wie diese Seite zu verwenden.</p>
+     <div class="api-actions">
+      <button type="button" id="api-check" data-i18n="api.check">Verbindung prüfen</button>
+      <button type="button" id="api-run-offline" data-i18n="api.runOffline">Demo neu ausführen (offline)</button>
+      <button type="button" id="api-run-live" data-i18n="api.runLive">Demo neu ausführen (Live-LLM)</button>
+     </div>
+     <p class="api-status" id="api-status" role="status" aria-live="polite"></p>
+     <p class="field-help" id="api-data"></p>
+     <p class="field-help" data-i18n="api.privacy">Zugangsdaten bleiben serverseitig im verschlüsselten Speicher und werden nie an den Browser übertragen.</p>
+    </fieldset>
+    <p id="appearance-status" role="status" aria-live="polite">Casual · Hell · Deutsch</p>
+   </div>
+  </details>
+ </div>
+</aside>
+<main class="workspace" id="main-content" tabindex="-1">
+ <div class="topline">
+  <span data-i18n="topline.path">Prüfungen / DTA EEL / Prüffälle</span>
+  <span class="backend-badge offline" id="backend-badge"><span class="dot" aria-hidden="true"></span><span id="backend-badge-text"></span></span>
+ </div>
+ <section class="pageview active" id="cases">
+  <div class="heading">
+   <div><h1 data-i18n="cases.title">Prüfung DTA EEL</h1><p data-i18n="cases.subtitle">Demo-Abrechnungssoftware · Prüfzyklus 2027 · Entgeltersatzleistungen</p></div>
+   <button data-view="report" data-i18n="cases.prepare">Bericht vorbereiten</button>
+  </div>
+  <div class="paper">
+   <div class="bar">
+    <strong data-i18n="cases.akte">Prüfakte EEL-DEMO-2027</strong>
+    <span class="badge wait" data-i18n="cases.badge">Fachprüfung offen</span>
+    <small id="akte-meta">3 Prüffälle · 2 Klärungspunkte</small>
+    <button type="button" class="klar-link" data-open-findings aria-pressed="false"></button>
+   </div>
+   <div class="bar">
+    <label class="search-field" for="case-search"><span data-i18n="cases.search">Prüffälle suchen</span>
+     <input id="case-search" type="search" maxlength="120" aria-label="Prüffälle suchen" data-i18n-aria-label="cases.search" data-i18n-placeholder="cases.searchPlaceholder" placeholder="Prüffall oder Feld eingeben"></label>
+    <label class="status-field" for="result-filter"><span data-i18n="cases.result">Ergebnis</span>
+     <select id="result-filter" aria-label="Ergebnis filtern" data-i18n-aria-label="cases.filterAria">
+      <option value="" data-i18n="filter.all">Alle Ergebnisse</option>
+      <option value="PASS" data-i18n="filter.pass">Übereinstimmung</option>
+      <option value="MISMATCH" data-i18n="filter.mismatch">Abweichung</option>
+      <option value="NOT_EVALUATED" data-i18n="filter.noteval">Nicht auswertbar</option>
+     </select></label>
+    <small class="count" role="status" aria-live="polite"></small>
+   </div>
+   <div class="table-wrap" role="region" aria-label="Prüfergebnisse, seitlich scrollbar" data-i18n-aria-label="cases.tableAria">
+    <table class="case-table">
+     <caption class="sr-only" data-i18n="cases.caption">Prüffälle mit Sollwert, Istwert und Vergleichsergebnis</caption>
+     <thead><tr>
+      <th scope="col" aria-sort="none"><button class="sort-button" data-sort="0" data-i18n-aria-label="sort.case"><span data-i18n="th.case">Prüffall</span><span aria-hidden="true"> ↕</span></button></th>
+      <th scope="col" aria-sort="none"><button class="sort-button" data-sort="1" data-i18n-aria-label="sort.field"><span data-i18n="th.field">Feld</span><span aria-hidden="true"> ↕</span></button></th>
+      <th class="num" scope="col" aria-sort="none"><button class="sort-button" data-sort="2" data-i18n-aria-label="sort.expected"><span data-i18n="th.expected">Soll</span><span aria-hidden="true"> ↕</span></button></th>
+      <th class="num" scope="col" aria-sort="none"><button class="sort-button" data-sort="3" data-i18n-aria-label="sort.observed"><span data-i18n="th.observed">Ist</span><span aria-hidden="true"> ↕</span></button></th>
+      <th scope="col" aria-sort="none"><button class="sort-button" data-sort="4" data-i18n-aria-label="sort.result"><span data-i18n="th.result">Ergebnis</span><span aria-hidden="true"> ↕</span></button></th>
+     </tr></thead>
+     <tbody id="case-rows"></tbody>
+    </table>
+   </div>
+   <div class="empty hidden" role="status"><p data-i18n="cases.empty">Keine passenden Prüffälle. Suchbegriff oder Ergebnisfilter ändern.</p><button type="button" data-reset-filter data-i18n="cases.reset">Filter zurücksetzen</button></div>
+   <section class="detail" aria-label="Ausgewählter Prüffall" data-i18n-aria-label="detail.aria">
+    <nav class="trace-path" aria-label="Belegkette des ausgewählten Prüffalls" data-i18n-aria-label="trace.aria">
+     <a href="#sources" data-source data-i18n="trace.source">Quellreferenz</a><span aria-hidden="true">→</span><span data-i18n="trace.basis">Sollgrundlage</span><span aria-hidden="true">→</span><span data-trace-current data-i18n="trace.case">Prüffall</span><span aria-hidden="true">→</span><span data-i18n="trace.output">Ausgabe</span>
+    </nav>
+    <div class="bar"><h2 id="detail-title" tabindex="-1"></h2><span class="badge" id="detail-badge"></span></div>
+    <div class="evidence">
+     <section><small id="detail-expected-label"></small><div class="value" id="detail-expected-value"></div><div class="kv" id="detail-expected-rest"></div><p class="cite" id="detail-expected-cite"></p></section>
+     <section><small id="detail-observed-label"></small><div class="value" id="detail-observed-value"></div><div class="kv" id="detail-observed-rest"></div><p class="cite" id="detail-observed-cite"></p></section>
+    </div>
+    <p class="reason" id="detail-reason"></p>
+    <div class="actions">
+     <button class="primary" data-review aria-expanded="false" aria-controls="note-editor" data-i18n="detail.review">Prüfnotiz erfassen</button>
+     <button data-run aria-expanded="false" aria-controls="run-evidence" data-i18n="detail.evidence">Ausgabebeleg ansehen</button>
+    </div>
+    <div class="review-editor hidden" id="note-editor">
+     <label for="review-note" data-i18n="note.label">Prüfnotiz</label>
+     <textarea maxlength="2000" id="review-note" rows="3" aria-describedby="note-help note-error" data-i18n-placeholder="note.placeholder" placeholder="Beobachtung und nächsten Schritt dokumentieren …"></textarea>
+     <p id="note-help" class="field-help"></p>
+     <p class="note-counter"><span id="note-count">0</span> / 2.000 <span data-i18n="note.chars">Zeichen</span></p>
+     <p id="note-error" class="field-error hidden" role="alert"></p>
+     <button class="primary" data-save data-i18n="note.save">Notiz zum Prüffall speichern</button>
+    </div>
+    <section id="run-evidence" class="run-evidence hidden" aria-label="Ausgabebeleg" data-i18n-aria-label="runEvidence.aria">
+     <h3 data-i18n="runEvidence.title">Ausgabebeleg</h3>
+     <p data-i18n="runEvidence.note">Der dargestellte Ausgabebeleg stammt aus der verbundenen Demo-Pipeline bzw. wurde für diesen Prototyp erstellt.</p>
+     <pre tabindex="0"></pre>
+    </section>
+   </section>
+  </div>
+ </section>
+ <section class="pageview" id="stories">
+  <h1 data-i18n="stories.title">Story-Suiten</h1>
+  <p data-i18n="stories.subtitle">Szenariobasierte Prüffälle nach Story und Kategorie.</p>
+  <div class="paper" id="stories-paper"><p class="muted">Story-Suiten sind nur mit Backend-Verbindung verfügbar.</p></div>
+ </section>
+ <section class="pageview" id="sources">
+  <h1 data-i18n="sources.title">Quellen &amp; Kriterien</h1>
+  <p data-i18n="sources.subtitle">Jedes Prüfergebnis bleibt mit seiner Grundlage verbunden.</p>
+  <div class="paper" id="sources-paper">
+   <h2>Beispielpapier DTA EEL</h2><span class="badge neutral">Version 13.3 · Demo-Referenz</span>
+   <div class="source"><h3>§ 3.1 · Gehaltsempfänger ohne Besonderheiten</h3><p>Quellverweis: S. 9–11. Die ursprüngliche Quelle muss für eine fachliche Prüfung im Original geprüft werden.</p><span class="badge wait">Fachliche Freigabe ausstehend</span></div>
+  </div>
+ </section>
+ <section class="pageview" id="report">
+  <h1 data-i18n="report.title">Prüfbericht vorbereiten</h1>
+  <p data-i18n="report.subtitle">Belege, Ergebnisse und offene Punkte in einer Ansicht.</p>
+  <div class="paper" id="report-paper">
+   <h2>Prüfung DTA EEL · Demo</h2>
+   <p id="report-meta">3 Prüffälle · 1 Übereinstimmung · 1 Abweichung · 1 nicht auswertbar</p>
+   <span class="badge wait" data-i18n="report.blocked">Freigabe blockiert</span>
+   <ul id="report-next"><li>Abweichung in TC-002 fachlich klären.</li><li>Fehlende Eingabe für TC-003 ergänzen.</li><li>Offizielle Berichtsvorlage und Version verifizieren.</li></ul>
+   <p id="release-blocker" data-i18n="report.blocker">Freigabe gesperrt: offene Prüfpunkte und eine unverifizierte Berichtsvorlage. Diese Demo trifft keine Konformitäts- oder Zertifizierungsaussage.</p>
+   <section id="report-runs" class="report-runs"></section>
+   <section class="report-notes" aria-label="Prüfnotizen und Entwürfe dieser Sitzung"><h2 data-i18n="report.notesTitle">Prüfnotizen und Entwürfe</h2><p class="muted" id="report-notes-empty"></p><ul class="report-note-list" id="report-note-list"></ul></section>
+   <div class="actions"><button data-export>Demo-Bericht als JSON herunterladen</button><button id="pdf-export" data-i18n="report.pdfExport">Formalreport als PDF herunterladen</button><button disabled aria-describedby="release-blocker" data-i18n="report.release">Bericht freigeben</button></div>
+  </div>
+ </section>
+ <section class="pageview" id="audit">
+  <h1 data-i18n="audit.title">Prüfverlauf</h1>
+  <p data-i18n="audit.subtitle">Nachvollziehbare Ereignisse für diese Demo-Sitzung.</p>
+  <div class="paper"><ul class="timeline" id="audit-list"></ul></div>
+ </section>
+ <noscript><p class="static-notice">JavaScript ist ausgeschaltet. Die angezeigten Prüffälle können gelesen werden; Filter, Notizen, Sprach- und Themenwechsel benötigen JavaScript.</p></noscript>
+ <p class="note" data-i18n="disclaimer">SÜSIE unterstützt die Prüfung. Fachliche Entscheidungen und Freigaben bleiben beim Menschen.</p>
+</main>
+</div>
+<footer class="bottom-bar">
+ <span class="mark" aria-hidden="true"></span>
+ <span class="bottom-brand">SÜSIE</span>
+ <span class="bottom-sep" aria-hidden="true"></span>
+ <span id="bottom-note" class="bottom-note" data-i18n="bottom.note">Synthetische Daten — ohne Konformitätsaussage und ohne Rechtsberatung</span>
+ <span class="bottom-spacer"></span>
+ <span id="bridge-dot" class="bridge-dot" title="Bridge-Verbindung"></span>
+ <span id="bridge-label" class="bridge-label">Verbinde …</span>
+</footer>
+<script src="pruefakte.js"></script>
+</body></html>

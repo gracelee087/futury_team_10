@@ -1,0 +1,40 @@
+{
+  "report": [
+    {
+      "key": "casual-light",
+      "ground": "rgb(245, 245, 244)",
+      "surface": "rgb(255, 255, 255)",
+      "min": 5.6,
+      "fail": []
+    },
+    {
+      "key": "casual-dark",
+      "ground": "rgb(17, 17, 17)",
+      "surface": "rgb(25, 25, 25)",
+      "min": 7.99,
+      "fail": []
+    },
+    {
+      "key": "contrast-light",
+      "ground": "rgb(255, 255, 255)",
+      "surface": "rgb(255, 255, 255)",
+      "min": 9.13,
+      "fail": []
+    },
+    {
+      "key": "contrast-dark",
+      "ground": "rgb(0, 0, 0)",
+      "surface": "rgb(0, 0, 0)",
+      "min": 11.9,
+      "fail": []
+    }
+  ],
+  "errors": [],
+  "checked": [
+    "four variants",
+    "1440/768/390",
+    "case/filter actions",
+    "persistence",
+    "all review views in dark/light"
+  ]
+}

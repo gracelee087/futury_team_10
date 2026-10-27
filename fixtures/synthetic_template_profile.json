@@ -1,0 +1,24 @@
+{
+  "profile_id": "PROFILE-SYNTH-1",
+  "warning": "SYNTHETIC TEMPLATE PROFILE — NOT an official ITSG form profile. Conformance checks against this profile say nothing about official-form compliance (plan.md; agent-governance.md §4).",
+  "template_id": "TPL-SYNTH-1",
+  "output_type": "json",
+  "required_fields": ["case_id", "criterion_id", "result_status", "reason", "evidence_links"],
+  "field_order": ["case_id", "criterion_id", "result_status", "reason", "evidence_links"],
+  "labels": {
+    "case_id": "Fall-ID",
+    "criterion_id": "Kriterium",
+    "result_status": "Ergebnisstatus",
+    "reason": "Begründung",
+    "evidence_links": "Belegkette"
+  },
+  "permitted_result_status": ["PASS", "MISMATCH", "NOT_EVALUATED"],
+  "field_types": {
+    "case_id": "string",
+    "criterion_id": "string",
+    "result_status": "string",
+    "reason": "string",
+    "evidence_links": "list"
+  },
+  "status": "needs_review"
+}

@@ -1,0 +1,68 @@
+{
+  "source": "/Users/amour/.codex/visualizations/2026/10/26/01a179a9-a697-76e1-a26d-0799127a6eec/susie-designs",
+  "destination": "/Users/amour/Downloads/FUTURY-Team 10/frontend",
+  "method": "copy2 plus SHA-256 for every selected file",
+  "files": [
+    {
+      "path": "pruefakte.html",
+      "bytes": 10286,
+      "sha256": "c31dfafb637b2db736bf009557c55d7f05eeb20117418a84191fdf48df4c74be"
+    },
+    {
+      "path": "pruefakte.css",
+      "bytes": 19592,
+      "sha256": "95ce15081ac767cc48b75515637ddc67342cc8dc822a772cc36c9ec56a6276a3"
+    },
+    {
+      "path": "pruefakte.js",
+      "bytes": 12779,
+      "sha256": "6980f6abc301211feecad06080b1cc117e1e6b88185519cdc247c369e4dc3a96"
+    },
+    {
+      "path": "theme-init.js",
+      "bytes": 713,
+      "sha256": "09997fc865fdb30919e30d3eb093bae7b0258d06788da3a5293c0497b8223942"
+    },
+    {
+      "path": "themes.js",
+      "bytes": 1879,
+      "sha256": "3d7773d990cb6886813501240151f9cfa95dfa810762b238c68ca5768269fde0"
+    },
+    {
+      "path": "PRODUCT.md",
+      "bytes": 1823,
+      "sha256": "915987c5f840f0e983955684086b331c78f0b40ff58ac8c9b38d7015838004bd"
+    },
+    {
+      "path": "DESIGN.md",
+      "bytes": 6142,
+      "sha256": "f14e001c54c24aacefaa088213bb259806b77e7c9a40ee79b017a0c0e91bdd00"
+    },
+    {
+      "path": "POLISH-VERIFICATION.md",
+      "bytes": 2339,
+      "sha256": "205e6987bf201183c5cf56482194700acfa4614c99d991cedf088ce9293bd296"
+    },
+    {
+      "path": "theme-verification.json",
+      "bytes": 783,
+      "sha256": "36a3cc52c1af1da82ded6e0f3b39432c6d9fde62b4fbb18477bd2b0eae342eb0"
+    },
+    {
+      "path": ".impeccable/design.json",
+      "bytes": 5581,
+      "sha256": "167103d87de85e2b4172f1768391542fe795cec75c4b82a2da4d5d528ac3e5ee"
+    },
+    {
+      "path": "assets/susie-logo.png",
+      "bytes": 487152,
+      "sha256": "a3acd0c916d057e5b1d0315ee4d9af865f24429e30b47498070309434c6cc0cb"
+    },
+    {
+      "path": "assets/logo-generation.md",
+      "bytes": 1646,
+      "sha256": "458909a4c4d25c7b968753551876e24fad3813137112359e29e7d22e88b53f8d"
+    }
+  ],
+  "verified_equal": 12
+}

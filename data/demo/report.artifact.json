@@ -1,0 +1,61 @@
+{
+  "report_id": "RPT-1",
+  "template_id": "TPL-SYNTH-1",
+  "template_version": "synthetic-0.1",
+  "template_warning": "SYNTHETIC TEMPLATE PROFILE — NOT an official ITSG form profile. Conformance checks against this profile say nothing about official-form compliance (plan.md; agent-governance.md §4).",
+  "official_form_id": null,
+  "renderer_version": "itsg.renderer/0.1.0",
+  "field_map_version": "itsg.fieldmap/synth-1",
+  "generated_at": "2026-10-27T07:25:36+00:00",
+  "field_labels": {
+    "case_id": "Fall-ID",
+    "criterion_id": "Kriterium",
+    "result_status": "Ergebnisstatus",
+    "reason": "Begründung",
+    "evidence_links": "Belegkette"
+  },
+  "compliance_claim": false,
+  "compliance_claim_reason": "synthetic template (official_form_id=None): no legal or template compliance claim may be derived (plan.md, architecture.md §8)",
+  "results": [
+    {
+      "case_id": "TC-1",
+      "criterion_id": "CRIT-EAZ-1",
+      "result_status": "PASS",
+      "reason": "observed output matches expected value",
+      "evidence_links": [
+        "TC-1",
+        "RUN-1"
+      ]
+    },
+    {
+      "case_id": "TC-2",
+      "criterion_id": "CRIT-EAZ-1",
+      "result_status": "MISMATCH",
+      "reason": "EAZ-BEGINN-1: expected '20XX0101', observed '20XX0401'",
+      "evidence_links": [
+        "TC-2",
+        "RUN-2"
+      ]
+    },
+    {
+      "case_id": "TC-3",
+      "criterion_id": "CRIT-EAZ-1",
+      "result_status": "NOT_EVALUATED",
+      "reason": "missing expected value",
+      "evidence_links": [
+        "TC-3",
+        "RUN-3"
+      ]
+    },
+    {
+      "case_id": "TC-4",
+      "criterion_id": "CRIT-VOER-1",
+      "result_status": "PASS",
+      "reason": "observed output matches expected value",
+      "evidence_links": [
+        "TC-4",
+        "RUN-4"
+      ]
+    }
+  ]
+}

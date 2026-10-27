@@ -1,0 +1,47 @@
+{
+  "fixture_id": "FIX-VOER-KONSTELLATION",
+  "example_type": "normal",
+  "description": "Official multi-step test constellation for the Vorerkrankungsanfrage (DBVO, Abgabegrund 41): the recorded AU episodes plus the current AU, with the deterministic trigger evaluation (Verfahrensbeschreibung §3.12). Episodes are employer-side recorded sickness periods; all dates are the official constellation's fabricated demo dates.",
+  "citation": {
+    "source": "Hinweise zur Testkonstellation EEL-Anwendungsprogramme (Vorerkrankung)",
+    "section": "AU-Zeiten im System + Tabelle zu den jeweils zu verwendenden IDs/AZVU",
+    "pages": [],
+    "version": "undated (DOCX, aus dem offiziellen Korpus)",
+    "effective": null,
+    "document_date": null,
+    "issuer": "GKV-Spitzenverband (offizielles Korpus 'test case')",
+    "source_file": "ITSG Files/test case/Hinweise_DTA-EEL-Bespiel_Vorerkrankung_Testkonstellation.docx",
+    "source_sha256": "daa4cdaf67b89bac1532bf95b60f5c63c9a1f10488ff595ddff2448e514a04e3",
+    "rule_citation": {
+      "source": "Verfahrensbeschreibung DTA EEL",
+      "section": "3.12 Datenbaustein DBVO – Vorerkrankungszeiten",
+      "pages": [135, 136],
+      "version": "13.4",
+      "effective": "2027-01-01",
+      "source_file": "ITSG Files/Rules details/2026_03_10_Endfassung_Verfahrensbeschreibung_DTA_EEL_Version_13.4_ab_01.01.2027.pdf",
+      "source_sha256": "94ecfd874033615d33cd42a368a0fe9cb75acc0d7e16f18d319e42b9649e1397"
+    }
+  },
+  "current_au": {
+    "start": "2026-03-11",
+    "end": "2026-03-20",
+    "end_note": "zunächst bis 20.03.2026 bekannt; endet schlussendlich 10.04.2026 (für die Meldung am 11.03.2026 gilt der bekannte Zeitraum)",
+    "attested": true
+  },
+  "reporting_date": "2026-03-11",
+  "prior_episodes": [
+    {"start": "2025-07-14", "end": "2025-07-15", "attested": true, "note": "eAU übermittelt"},
+    {"start": "2025-10-01", "end": "2025-10-17", "attested": true, "note": "eAU übermittelt"},
+    {"start": "2025-12-01", "end": "2025-12-03", "attested": true, "note": "eAU übermittelt"},
+    {"start": "2026-03-01", "end": "2026-03-03", "attested": true, "note": "Papiernachweis beim AG, zunächst nicht bei der KK — gilt AG-seitig als bescheinigt"}
+  ],
+  "expected": {
+    "VOER-ANFRAGE-AUSGELOEST": "J",
+    "ABGABEGRUND": "41",
+    "kumulierte_tage_vorzeiten": 25,
+    "kumulierte_tage_aktuelle_au": 10,
+    "kumulierte_tage_gesamt": 35
+  },
+  "expected_basis": "Verfahrensbeschreibung DTA EEL V13.4 §3.12 (S. 135–136): Anfrage nur wenn (a) AU-Bescheinigung für aktuelle AU vorliegt, (b) mindestens eine bescheinigte potentielle Vorerkrankung in den letzten 6 Monaten vor AU-Beginn, (c) kumulierte Zeiten aller potentiellen Vorerkrankungen in den letzten 12 Monaten zusammen mit der aktuellen AU zum Zeitpunkt der Meldung mindestens 30 Tage. Konstellation: 2+17+3+3=25 Tage Vorzeiten + 10 Tage aktuelle AU = 35 ≥ 30; letzte attestierte AU endet 03.03.2026, 8 Tage vor AU-Beginn (≤ 6 Monate).",
+  "boundary": "Payroll transmit side only — the DBVO request is what the employer's payroll program must create and transmit, not a benefit decision."
+}

@@ -1,0 +1,24 @@
+SRCV-2-A — Derived verbatim text extraction (NOT the original; original = sgb4_95b.html)
+
+- Derivation: HTML tags stripped from sgb4_95b.html (charset iso-8859-1) with html.unescape;
+  2026-10-26, T10-035. Each line below is verbatim page text; only tag boundaries became
+  newlines, plus this header.
+- Source: https://www.gesetze-im-internet.de/sgb_4/__95b.html (gesetze-im-internet.de,
+  Bundesministerium der Justiz in Verbindung mit der juris GmbH).
+- Non-official table of contents; the statute text itself is the official wording.
+
+Sozialgesetzbuch (SGB) Viertes Buch (IV) - Gemeinsame Vorschriften für die Sozialversicherung - (Artikel I des Gesetzes vom 23. Dezember 1976, BGBl. I S. 3845)
+
+§ 95b
+
+Systemprüfung
+
+(1) Meldepflichtige haben Meldungen und Beitragsnachweise durch Datenübertragung aus systemgeprüften Programmen oder systemgeprüften elektronischen Ausfüllhilfen zu erstatten. Dies gilt auch für Anträge und Bescheinigungen, soweit dies nach diesem Gesetzbuch oder dem Aufwendungsausgleichsgesetz geregelt ist. Die Daten der Datei nach § 98a sind dabei zu verwenden.
+
+(2) Eine Systemprüfung ist für Programme und elektronische Ausfüllhilfen, die für den Datenaustausch zwischen Meldepflichtigen und den Sozialversicherungsträgern und weiteren annehmenden Stellen nach Absatz 1 eingesetzt werden, durchzuführen. Die Systemprüfung umfasst die Beratung sowie die fachliche und technische Prüfung der Anwendungssoftware für die Erfassung, Prüfung, Verwaltung, Berechnung und Verarbeitung sowie Übermittlung, Annahme oder den Abruf der erforderlichen Daten. Entgeltabrechnungsprogramme haben die Berechnungen und die Erzeugung von Daten sowie deren Prüfung maschinell durchzuführen; Ausfüllhilfen unterstützen die manuellen Berechnungen durch die elektronische Übermittlung und Speicherung der Daten. Ist die Anwendungssoftware auf unterschiedliche informationstechnische Systeme verteilt, ist sicherzustellen, dass sie als geschlossene Software-Anwendung anhand einer eindeutig identifizierbaren Version in der jeweils gültigen Fassung gekennzeichnet ist.
+
+(3) Kein Bestandteil der Systemprüfung sind die zur informationstechnischen Infrastruktur eines Meldepflichtigen gehörende Hardware, die Betriebssysteme sowie die interne Kommunikationssoftware.
+
+(4) Die Systemprüfung wird durch den Spitzenverband Bund der Krankenkassen mit Beteiligung der Träger der Rentenversicherung, der Träger der Unfallversicherung und der Bundesagentur für Arbeit im Auftrag aller Spitzenorganisationen der Sozialversicherungsträger und der Arbeitsgemeinschaft berufsständischer Versorgungseinrichtungen e. V. durchgeführt.
+
+(5) Die Absätze 1 bis 4 gelten entsprechend für die Systemprüfung von Anwendungsprogrammen oder Anwendungsprogrammteilen, die für die Annahme, Verarbeitung und Weiterleitung von Beitragsnachweisen, Meldungen, Anträgen, Bescheinigungen und Abrufen der Meldepflichtigen oder der von ihnen beauftragten Stellen sowie für die Erstellung, Abgabe und Übermittlung von Meldungen, Bescheinigungen und elektronischen Anforderungen an die Meldepflichtigen oder der von ihnen beauftragten Stellen durch die Einzugsstellen zur Durchführung der Melde- und Beitrags-, Antrags- und Bescheinigungsverfahren nach diesem Buch und dem Aufwendungsausgleichsgesetz eingesetzt werden. Die Systemprüfung umfasst auch die Programme der von den Einzugsstellen für die Annahme und Weiterleitung der in Satz 1 genannten Daten errichteten Annahmestellen nach § 97 Absatz 1.

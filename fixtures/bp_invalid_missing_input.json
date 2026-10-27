@@ -1,0 +1,26 @@
+{
+  "fixture_id": "FIX-BP-INVALID-MISSING-INPUT",
+  "example_type": "invalid",
+  "description": "Invalid/missing-input case: the Sachverhalt is incomplete (letzter abgerechneter Entgeltabrechnungszeitraum and Abrechnungsrhythmus missing), so no official expected DTA record can be cited. The Beispielpapier provides no worked example for this input. Fail-closed by design: expected is empty and the comparator must return NOT_EVALUATED, never PASS.",
+  "citation": {
+    "source": "Beispielpapier DTA EEL",
+    "section": "3.1 (Sachverhaltsfelder als Eingabe; kein offizielles Beispiel für unvollständige Eingabe)",
+    "pages": [9],
+    "version": "13.3",
+    "effective": "2027-01-01",
+    "document_date": "2026-03-10",
+    "issuer": "GKV-Spitzenverband",
+    "source_file": "ITSG Files/Example Case/2026_03_10_Endfassung_Beispielpapier_DTA_EEL_Version_13.3_gueltig_ab_01.01.2027.pdf",
+    "source_sha256": "1355bfd7cbe71cf77e8f9573d747b2b9d86d23198daf91637c0eb42b60339386"
+  },
+  "sachverhalt": {
+    "brutto_monat": "2.000,00 EUR (festes monatliches Gehalt)",
+    "beginn_arbeitsunfaehigkeit": "Mo. 03.05.20XX",
+    "ende_arbeitsunfaehigkeit": "UNVOLLSTÄNDIG — nicht überliefert",
+    "abrechnung": "UNVOLLSTÄNDIG — nicht überliefert",
+    "letzter_abgerechneter_zeitraum_bei_au_beginn": "UNVOLLSTÄNDIG — nicht überliefert"
+  },
+  "expected": {},
+  "expected_basis": "Keine offizielle Grundlage: Das Beispielpapier DTA EEL V13.3 liefert kein Beispiel für einen unvollständigen Sachverhalt. Ein erwarteter Datensatz darf nicht erfunden werden (agent-governance.md §1: cite or abstain; fail closed).",
+  "boundary": "Payroll transmit side only — no benefit-amount claim. The correct demo outcome is NOT_EVALUATED with a recorded reason."
+}

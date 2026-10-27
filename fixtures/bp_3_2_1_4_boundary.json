@@ -1,0 +1,41 @@
+{
+  "fixture_id": "FIX-BP-3-2-1-4-BOUNDARY",
+  "example_type": "boundary",
+  "description": "Beispielpapier §3.2.1.4 'Vollständige Fehlzeit im EAZ' — official Abwandlung (deviation ladder) of example §3.1. Because the entire preceding Entgeltabrechnungszeitraum is a Fehlzeit (unpaid vacation Alternative A / Krankengeldbezug Alternative B), the reported EAZ shifts to the last paid period (January) instead of the base example's April.",
+  "citation": {
+    "source": "Beispielpapier DTA EEL",
+    "section": "3.2.1.4",
+    "section_title": "Vollständige Fehlzeit im EAZ",
+    "parent_section": "3.2 Abwandlungen von Beispiel 3.1 \"Gehaltsempfänger ohne Besonderheiten\"",
+    "pages": [12],
+    "version": "13.3",
+    "effective": "2027-01-01",
+    "document_date": "2026-03-10",
+    "issuer": "GKV-Spitzenverband",
+    "source_file": "ITSG Files/Example Case/2026_03_10_Endfassung_Beispielpapier_DTA_EEL_Version_13.3_gueltig_ab_01.01.2027.pdf",
+    "source_sha256": "1355bfd7cbe71cf77e8f9573d747b2b9d86d23198daf91637c0eb42b60339386"
+  },
+  "sachverhalt": {
+    "alternative_a": "Unbezahlter Urlaub vom Mo. 01.02.20XX bis zum So. 28.02.20XX",
+    "alternative_b": "Krankengeldbezug vom Mo. 01.02.20XX bis zum So. 28.02.20XX",
+    "beginn_arbeitsunfaehigkeit": "Mi. 10.03.20XX (neue Krankheit)",
+    "abrechnung": "jeweils zum 05. des Folgemonats"
+  },
+  "expected": {
+    "ABGABEGRUND": "01",
+    "EAZ-BEGINN-1": "20XX0101",
+    "EAZ-ENDE-1": "20XX0131"
+  },
+  "expected_field_pages": {
+    "ABGABEGRUND": 9,
+    "EAZ-BEGINN-1": 12,
+    "EAZ-ENDE-1": 12
+  },
+  "deviation_from_base": {
+    "base_section": "3.1",
+    "base_values": {"EAZ-BEGINN-1": "20XX0401", "EAZ-ENDE-1": "20XX0430"},
+    "explanation": "Der gesamte Folgemonat des letzten abgerechneten Zeitraums ist Fehlzeit, daher wird der letzte bezahlte EAZ (Januar) gemeldet statt des Februar-Zeitraums."
+  },
+  "expected_basis": "Beispielpapier DTA EEL V13.3 (gültig ab 01.01.2027), §3.2.1.4, S. 12 (DBAE-Tabelle). Offizielle Erwartungswerte, Transmit-Seite.",
+  "boundary": "Payroll transmit side only — no benefit-amount claim."
+}

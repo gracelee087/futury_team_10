@@ -1,0 +1,115 @@
+{
+  "report_id": "SHOWCASE-S6-170",
+  "template_id": "TPL-SYNTH-1",
+  "template_version": "synthetic-0.1",
+  "template_warning": "SYNTHETIC TEMPLATE PROFILE — NOT an official ITSG form profile. Conformance checks against this profile say nothing about official-form compliance.",
+  "official_form_id": null,
+  "renderer_version": "itsg.story_pdfs/0.1.0",
+  "field_map_version": "itsg.storyfieldmap/synth-1",
+  "generated_at": "2026-10-26T22:42:55+00:00",
+  "field_labels": {
+    "case_id": "Prüfaspekt",
+    "criterion_id": "Regel/Grundlage",
+    "result_status": "Ergebnisstatus",
+    "reason": "Begründung",
+    "evidence_links": "Belegkette"
+  },
+  "compliance_claim": false,
+  "compliance_claim_reason": "synthetic template (official_form_id=None): no legal or template compliance claim may be derived; showcase on fabricated data only",
+  "context": [
+    [
+      "Story",
+      "6 — GG EEL 13.1 §2.5, VB 13.4 §3.1.18, Hinweise Testkonstellation"
+    ],
+    [
+      "Kategorie",
+      "defect: 88 cancels the 41 instead of the 01"
+    ],
+    [
+      "Regeltaxonomie-Tag",
+      "F-88-UR"
+    ],
+    [
+      "Versicherung / Stichtag",
+      "— / —"
+    ]
+  ],
+  "results": [
+    {
+      "case_id": "Ablauf/AZVU",
+      "criterion_id": "AZVU durchgängig identisch",
+      "result_status": "PASS",
+      "reason": "AZVU 6126-1413-011 in allen 7 Nachrichten.",
+      "evidence_links": [
+        "S6-170",
+        "GG EEL 13.1 §2.5"
+      ]
+    },
+    {
+      "case_id": "Ablauf/88-Referenz",
+      "criterion_id": "88 storniert die letzte 01",
+      "result_status": "MISMATCH",
+      "reason": "88 (Nr. 5) referenziert DSID-UR=D354787B-D043-86B7-EDB9-4ADF912379FC, erwartet DSID der letzten 01 (B363DC91-7285-36B9-E863-FFF4B62E6BF8).",
+      "evidence_links": [
+        "S6-170",
+        "GG EEL 13.1 §2.5"
+      ]
+    },
+    {
+      "case_id": "Ablauf/EFZ-Ende",
+      "criterion_id": "korrigiertes EFZ-Ende = erwartetes Datum",
+      "result_status": "PASS",
+      "reason": "Letzte 01 meldet EFZ_Ende=20.08.2026, erwartet 20.08.2026.",
+      "evidence_links": [
+        "S6-170",
+        "GG EEL 13.1 §2.5"
+      ]
+    },
+    {
+      "case_id": "Ablauf/61-Referenz",
+      "criterion_id": "61 referenziert die 41",
+      "result_status": "PASS",
+      "reason": "61 (Nr. 2) REF-ID=D354787B-D043-86B7-EDB9-4ADF912379FC, 41 DSID=D354787B-D043-86B7-EDB9-4ADF912379FC.",
+      "evidence_links": [
+        "S6-170",
+        "GG EEL 13.1 §2.5"
+      ]
+    },
+    {
+      "case_id": "Ablauf/61-Referenz",
+      "criterion_id": "61 referenziert die 41",
+      "result_status": "PASS",
+      "reason": "61 (Nr. 4) REF-ID=D354787B-D043-86B7-EDB9-4ADF912379FC, 41 DSID=D354787B-D043-86B7-EDB9-4ADF912379FC.",
+      "evidence_links": [
+        "S6-170",
+        "GG EEL 13.1 §2.5"
+      ]
+    },
+    {
+      "case_id": "Ablauf/62-Referenz",
+      "criterion_id": "62 referenziert die gültige 01",
+      "result_status": "PASS",
+      "reason": "62 (Nr. 7) REF-ID=DA02D91A-7929-A7F5-0EF9-DF136A78643C, gültige 01 DSID=DA02D91A-7929-A7F5-0EF9-DF136A78643C.",
+      "evidence_links": [
+        "S6-170",
+        "GG EEL 13.1 §2.5"
+      ]
+    },
+    {
+      "case_id": "Ground-Truth-Abgleich",
+      "criterion_id": "unabhängige Kennzeichnung (Generator, Seed 4136)",
+      "result_status": "PASS",
+      "reason": "SÜSIE-Befund (MISMATCH) stimmt mit der Regeltaxonomie überein (must_flag=F-88-UR).",
+      "evidence_links": [
+        "S6-170",
+        "testCase-stories.md; harness/generate_story_cases.py"
+      ]
+    }
+  ],
+  "counts": {
+    "PASS": 6,
+    "MISMATCH": 1,
+    "NOT_EVALUATED": 0
+  },
+  "case_id": "S6-170"
+}

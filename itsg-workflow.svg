@@ -1,0 +1,196 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1120" role="img" aria-labelledby="title description">
+  <title id="title">ITSG AI Review Assistant — workflow schematic</title>
+  <desc id="description">A schematic showing authoritative German law, ITSG specifications, and mandated report forms/templates flowing through versioned source intake, cited requirements, human review, test design, human execution in payroll software, deterministic comparison, mandated-template rendering and conformance checking, evidence-backed reporting, and an audit graph. Vendor documentation is kept separate from observed execution output. Translation is an optional reviewed branch.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="9" refY="6" orient="auto" markerUnits="strokeWidth">
+      <path d="M1,1 L10,6 L1,11" fill="none" stroke="#58718b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <marker id="arrowBlue" markerWidth="12" markerHeight="12" refX="9" refY="6" orient="auto" markerUnits="strokeWidth">
+      <path d="M1,1 L10,6 L1,11" fill="none" stroke="#3976ba" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <marker id="arrowGreen" markerWidth="12" markerHeight="12" refX="9" refY="6" orient="auto" markerUnits="strokeWidth">
+      <path d="M1,1 L10,6 L1,11" fill="none" stroke="#31836f" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#1d3042" flood-opacity="0.08"/>
+    </filter>
+    <style>
+      text { font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+      .title { font-size: 34px; font-weight: 760; fill: #172b40; letter-spacing: -0.7px; }
+      .subtitle { font-size: 16px; fill: #617388; }
+      .lane-title { font-size: 13px; font-weight: 760; letter-spacing: 1.15px; fill: #536b81; }
+      .node-title { font-size: 17px; font-weight: 700; fill: #1d3349; }
+      .node-copy { font-size: 13px; fill: #60758a; }
+      .small { font-size: 12px; fill: #63778b; }
+      .tiny { font-size: 11px; fill: #6b7e91; }
+      .tag { font-size: 10px; font-weight: 760; letter-spacing: 0.9px; }
+      .flow { fill: none; stroke: #58718b; stroke-width: 2.2; marker-end: url(#arrow); }
+      .flow-blue { fill: none; stroke: #3976ba; stroke-width: 2.2; marker-end: url(#arrowBlue); }
+      .flow-green { fill: none; stroke: #31836f; stroke-width: 2.2; marker-end: url(#arrowGreen); }
+      .flow-dashed { fill: none; stroke: #7990a5; stroke-width: 1.8; stroke-dasharray: 6 6; marker-end: url(#arrow); }
+    </style>
+  </defs>
+
+  <rect width="1600" height="1120" fill="#f5f8fb"/>
+  <circle cx="1490" cy="40" r="150" fill="#eaf1f7" opacity="0.75"/>
+  <circle cx="1520" cy="40" r="94" fill="#f5f8fb" opacity="0.8"/>
+
+  <g>
+    <text x="72" y="72" class="title">ITSG AI Review Assistant</text>
+    <text x="74" y="103" class="subtitle">A traceable workflow for reviewing payroll software against Entgeltersatzleistungen requirements</text>
+    <rect x="1190" y="55" width="334" height="42" rx="21" fill="#e8f0f8"/>
+    <circle cx="1214" cy="76" r="6" fill="#3976ba"/>
+    <text x="1230" y="81" font-size="12" font-weight="700" fill="#355c82">AI assists · people approve · code compares</text>
+  </g>
+
+  <!-- Lanes -->
+  <rect x="56" y="128" width="1488" height="190" rx="20" fill="#ffffff" stroke="#e3eaf0"/>
+  <rect x="56" y="332" width="1488" height="184" rx="20" fill="#ffffff" stroke="#e3eaf0"/>
+  <rect x="56" y="530" width="1488" height="192" rx="20" fill="#ffffff" stroke="#e3eaf0"/>
+  <rect x="56" y="736" width="1488" height="176" rx="20" fill="#ffffff" stroke="#e3eaf0"/>
+  <rect x="56" y="926" width="1488" height="142" rx="20" fill="#eaf1f7" stroke="#d9e3ec"/>
+
+  <text x="82" y="155" class="lane-title">01  SOURCE INTAKE &amp; PROVENANCE</text>
+  <text x="82" y="359" class="lane-title">02  REQUIREMENTS &amp; HUMAN REVIEW</text>
+  <text x="82" y="557" class="lane-title">03  TEST DESIGN &amp; EXECUTION</text>
+  <text x="82" y="763" class="lane-title">04  COMPARISON &amp; REVIEW REPORT</text>
+  <text x="82" y="953" class="lane-title">CROSS-CUTTING  TRACEABILITY &amp; AUDIT</text>
+
+  <!-- Source intake -->
+  <g filter="url(#shadow)">
+    <rect x="82" y="174" width="250" height="112" rx="14" fill="#f1f5f9" stroke="#d8e2eb"/>
+    <rect x="350" y="174" width="300" height="112" rx="14" fill="#f1f5f9" stroke="#d8e2eb"/>
+    <rect x="720" y="174" width="250" height="112" rx="14" fill="#edf4fb" stroke="#cbdced"/>
+    <rect x="1010" y="174" width="250" height="112" rx="14" fill="#edf4fb" stroke="#cbdced"/>
+    <rect x="1280" y="174" width="235" height="112" rx="14" fill="#f8f2e9" stroke="#ead9bd"/>
+  </g>
+  <text x="102" y="204" class="node-title">Official law + ITSG specs</text>
+  <text x="102" y="228" class="node-copy">Legal text + review requirements</text>
+  <text x="102" y="249" class="small">Authority and effective dates matter</text>
+  <text x="370" y="204" class="node-title">Mandated forms / templates</text>
+  <text x="370" y="228" class="node-copy">Official layout, fields, structure</text>
+  <text x="370" y="249" class="small">Applicable edition and validity recorded</text>
+  <text x="740" y="204" class="node-title">Versioned source registry</text>
+  <text x="740" y="228" class="node-copy">Origin · version · dates · checksum</text>
+  <text x="740" y="249" class="small">Law, specs, forms; prior versions kept</text>
+  <text x="1030" y="204" class="node-title">Segments + citations</text>
+  <text x="1030" y="228" class="node-copy">Stable page / section locators</text>
+  <text x="1030" y="249" class="small">Exact source passage remains visible</text>
+  <text x="1300" y="204" class="node-title">Vendor documentation</text>
+  <text x="1300" y="228" class="node-copy">Claims / configuration context</text>
+  <text x="1300" y="249" class="small">Not proof of actual execution</text>
+
+  <path d="M332 229 H690" class="flow"/>
+  <path d="M500 286 V300 H690 V229" class="flow"/>
+  <path d="M690 229 H716" class="flow"/>
+  <path d="M970 229 H1006" class="flow"/>
+  <path d="M1400 286 V478 H1260" class="flow-dashed"/>
+  <text x="1269" y="463" class="tiny">context only</text>
+
+  <!-- Requirement / review -->
+  <g filter="url(#shadow)">
+    <rect x="82" y="379" width="285" height="112" rx="14" fill="#edf4fb" stroke="#cbdced"/>
+    <rect x="405" y="379" width="300" height="112" rx="14" fill="#fff5e5" stroke="#eed9b4"/>
+    <rect x="744" y="379" width="300" height="112" rx="14" fill="#eaf6f2" stroke="#c9e5db"/>
+    <rect x="1082" y="379" width="433" height="112" rx="14" fill="#f3eff9" stroke="#ded3ed"/>
+  </g>
+  <text x="102" y="410" class="node-title">AI requirement assistant</text>
+  <text x="102" y="434" class="node-copy">Suggests atomic candidates</text>
+  <text x="102" y="455" class="small">Must cite source; may flag uncertainty</text>
+  <text x="425" y="410" class="node-title">G1 · Expert review</text>
+  <text x="425" y="434" class="node-copy">Accept · edit · reject · escalate</text>
+  <text x="425" y="455" class="small">AI suggestions are never approval</text>
+  <text x="764" y="410" class="node-title">Approved test criteria</text>
+  <text x="764" y="434" class="node-copy">Observable behavior + source link</text>
+  <text x="764" y="455" class="small">Expected values need an approved basis</text>
+  <text x="1102" y="410" class="node-title">Optional translation branch</text>
+  <text x="1102" y="434" class="node-copy">German source → working English draft</text>
+  <text x="1102" y="455" class="small">Independent bilingual QA; German stays canonical</text>
+
+  <path d="M1120 286 V332 H224 V375" class="flow-blue"/>
+  <path d="M367 435 H401" class="flow-blue"/>
+  <path d="M705 435 H740" class="flow-green"/>
+  <path d="M1100 286 V346 H1295 V375" class="flow-dashed"/>
+
+  <!-- Test design and execution -->
+  <g filter="url(#shadow)">
+    <rect x="82" y="578" width="290" height="112" rx="14" fill="#edf4fb" stroke="#cbdced"/>
+    <rect x="405" y="578" width="290" height="112" rx="14" fill="#fff5e5" stroke="#eed9b4"/>
+    <rect x="728" y="578" width="310" height="112" rx="14" fill="#f3eff9" stroke="#ded3ed"/>
+    <rect x="1071" y="578" width="205" height="112" rx="14" fill="#f1f5f9" stroke="#d8e2eb"/>
+    <rect x="1308" y="578" width="207" height="112" rx="14" fill="#eaf6f2" stroke="#c9e5db"/>
+  </g>
+  <text x="102" y="609" class="node-title">Test-case assistant</text>
+  <text x="102" y="633" class="node-copy">Normal · boundary · invalid</text>
+  <text x="102" y="654" class="small">Drafts only from approved criteria</text>
+  <text x="425" y="609" class="node-title">G3 · Review expected</text>
+  <text x="425" y="633" class="node-copy">Independent second check</text>
+  <text x="425" y="654" class="small">No guessed legal calculations</text>
+  <text x="748" y="609" class="node-title">Human runs payroll test</text>
+  <text x="748" y="633" class="node-copy">Specified software + test input</text>
+  <text x="748" y="654" class="small">Prototype uses fabricated data</text>
+  <text x="1088" y="609" class="node-title">Observed output</text>
+  <text x="1088" y="633" class="node-copy">Raw result retained</text>
+  <text x="1088" y="654" class="small">Build · config · time</text>
+  <text x="1325" y="609" class="node-title">Output parser</text>
+  <text x="1325" y="633" class="node-copy">Typed fields + evidence</text>
+  <text x="1325" y="654" class="small">Malformed → blocked</text>
+
+  <path d="M894 491 V548 H227 V574" class="flow-green"/>
+  <path d="M372 634 H401" class="flow-blue"/>
+  <path d="M695 634 H724" class="flow"/>
+  <path d="M1038 634 H1067" class="flow"/>
+  <path d="M1276 634 H1304" class="flow-green"/>
+  <path d="M1400 286 V505 H830 V574" class="flow-dashed"/>
+  <text x="1214" y="523" class="tiny">vendor docs inform context; execution is separate</text>
+
+  <!-- Comparison/report -->
+  <g filter="url(#shadow)">
+    <rect x="82" y="782" width="248" height="102" rx="14" fill="#edf4fb" stroke="#cbdced"/>
+    <rect x="350" y="782" width="270" height="102" rx="14" fill="#eaf6f2" stroke="#c9e5db"/>
+    <rect x="640" y="782" width="270" height="102" rx="14" fill="#edf4fb" stroke="#cbdced"/>
+    <rect x="930" y="782" width="280" height="102" rx="14" fill="#f1f5f9" stroke="#d8e2eb"/>
+    <rect x="1230" y="782" width="285" height="102" rx="14" fill="#fff5e5" stroke="#eed9b4"/>
+  </g>
+  <text x="102" y="814" class="node-title">Expected result</text>
+  <text x="102" y="838" class="node-copy">Reviewed case + rationale</text>
+  <text x="102" y="859" class="small">Criterion and source linked</text>
+  <text x="370" y="814" class="node-title">Deterministic comparator</text>
+  <text x="370" y="838" class="node-copy">Expected ↔ observed</text>
+  <text x="370" y="859" class="small">PASS · MISMATCH · NOT EVALUATED</text>
+  <text x="660" y="814" class="node-title">Mandated-form renderer</text>
+  <text x="660" y="838" class="node-copy">Applicable official template</text>
+  <text x="660" y="859" class="small">Required fields, order, layout, format</text>
+  <text x="950" y="814" class="node-title">Template conformance check</text>
+  <text x="950" y="838" class="node-copy">Version · completeness · structure</text>
+  <text x="950" y="859" class="small">Invalid / unknown template → blocked</text>
+  <text x="1250" y="814" class="node-title">G5 · Human sign-off</text>
+  <text x="1250" y="838" class="node-copy">Findings + form conformance</text>
+  <text x="1250" y="859" class="small">No automated legal certification</text>
+
+  <path d="M510 690 V754 H236 V778" class="flow-blue"/>
+  <path d="M1408 690 V754 H236 V778" class="flow-green"/>
+  <path d="M330 833 H346" class="flow-green"/>
+  <path d="M620 833 H636" class="flow-green"/>
+  <path d="M910 833 H926" class="flow-green"/>
+  <path d="M1210 833 H1226" class="flow"/>
+
+  <!-- Audit and evidence backbone -->
+  <g>
+    <rect x="82" y="976" width="690" height="68" rx="13" fill="#ffffff" stroke="#d7e2ec"/>
+    <rect x="794" y="976" width="721" height="68" rx="13" fill="#ffffff" stroke="#d7e2ec"/>
+    <circle cx="112" cy="1010" r="13" fill="#dce9f5"/>
+    <path d="M106 1010h12M112 1004v12" stroke="#3976ba" stroke-width="1.8" stroke-linecap="round"/>
+    <circle cx="824" cy="1010" r="13" fill="#dce9f5"/>
+    <path d="M818 1010h12M824 1004v12" stroke="#3976ba" stroke-width="1.8" stroke-linecap="round"/>
+  </g>
+  <text x="137" y="1005" font-size="15" font-weight="700" fill="#1d3349">Evidence graph + hybrid search</text>
+  <text x="137" y="1027" class="small">Sources + form versions · requirements · cases · runs · findings · approvals</text>
+  <text x="849" y="1005" font-size="15" font-weight="700" fill="#1d3349">Append-only audit trail</text>
+  <text x="849" y="1027" class="small">Who · what · when · template/renderer version · review decision</text>
+  <path d="M180 976 V918 H110 V888" class="flow-dashed"/>
+  <path d="M1430 976 V918 H1460 V888" class="flow-dashed"/>
+
+  <!-- Footer safety note -->
+  <text x="800" y="1093" text-anchor="middle" font-size="12" font-weight="650" fill="#617388">Zero defects is the target, not a guarantee. Uncertain, conflicting, or unverified items stop for human review.</text>
+</svg>

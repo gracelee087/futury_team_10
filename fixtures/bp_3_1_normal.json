@@ -1,0 +1,63 @@
+{
+  "fixture_id": "FIX-BP-3-1-NORMAL",
+  "example_type": "normal",
+  "description": "Beispielpapier §3.1 'Gehaltsempfänger ohne Besonderheiten' — official worked example, Abgabegrund 01 (Krankengeld). Expected DTA record fields transcribed from the official pages; 20XX is the official placeholder year and is kept verbatim.",
+  "citation": {
+    "source": "Beispielpapier DTA EEL",
+    "section": "3.1",
+    "section_title": "Gehaltsempfänger ohne Besonderheiten",
+    "pages": [9, 10, 11],
+    "version": "13.3",
+    "effective": "2027-01-01",
+    "document_date": "2026-03-10",
+    "issuer": "GKV-Spitzenverband",
+    "source_file": "ITSG Files/Example Case/2026_03_10_Endfassung_Beispielpapier_DTA_EEL_Version_13.3_gueltig_ab_01.01.2027.pdf",
+    "source_sha256": "1355bfd7cbe71cf77e8f9573d747b2b9d86d23198daf91637c0eb42b60339386"
+  },
+  "sachverhalt": {
+    "brutto_monat": "2.000,00 EUR (festes monatliches Gehalt)",
+    "netto_monat": "1.353,84 EUR",
+    "urlaubsgeld": "1.000,00 EUR (im Juni)",
+    "weihnachtsgeld": "1.000,00 EUR (im November)",
+    "weitergezahltes_arbeitsentgelt_waehrend_eel": "0,00 EUR",
+    "elterneigenschaft": "nein",
+    "beginn_arbeitsunfaehigkeit": "Mo. 03.05.20XX",
+    "ende_arbeitsunfaehigkeit": "offen",
+    "ende_entgeltfortzahlung": "So. 13.06.20XX",
+    "entgeltbescheinigung_erstellen_am": "Fr. 04.06.20XX",
+    "abrechnung": "letzter Tag des Monats",
+    "letzter_abgerechneter_zeitraum_bei_au_beginn": "April 20XX"
+  },
+  "expected": {
+    "ABGABEGRUND": "01",
+    "KORR-ABGABEGRUND": "00",
+    "MM-ALLGEMEIN": "J",
+    "MM-ENTGELT": "J",
+    "MM-ZEITKG": "N",
+    "MM-VOER": "N",
+    "DATUM-AB": "20XX0503",
+    "DATUM-EGZBIS": "20XX0613",
+    "EAZ-BEGINN-1": "20XX0401",
+    "EAZ-ENDE-1": "20XX0430",
+    "BRUTTO-1": "00200000",
+    "NETTO-1": "00135384",
+    "WAEHREEL-BRUTTO": "00000000"
+  },
+  "expected_field_pages": {
+    "ABGABEGRUND": 9,
+    "KORR-ABGABEGRUND": 9,
+    "MM-ALLGEMEIN": 9,
+    "MM-ENTGELT": 9,
+    "MM-ZEITKG": 9,
+    "MM-VOER": 10,
+    "DATUM-AB": 10,
+    "DATUM-EGZBIS": 10,
+    "EAZ-BEGINN-1": 11,
+    "EAZ-ENDE-1": 11,
+    "BRUTTO-1": 11,
+    "NETTO-1": 11,
+    "WAEHREEL-BRUTTO": 10
+  },
+  "expected_basis": "Beispielpapier DTA EEL V13.3 (gültig ab 01.01.2027), §3.1, S. 9–11: DSLW (S. 9–10), DBAL (S. 10), DBAE (S. 11). Offizielle Erwartungswerte für die Abgabeseite des Entgeltabrechnungsprogramms (Transmit-Seite); keine Leistungsbeitragsbehauptung.",
+  "boundary": "Payroll transmit side only — this is what the payroll program must transmit, not a Krankenkasse benefit calculation."
+}

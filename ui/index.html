@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Team 10 — ITSG Review Loop Demo</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div class="banner banner-synthetic" role="note">
+    Synthetic data and synthetic report template – no legal or compliance claim
+  </div>
+  <div id="offline-banner" class="banner banner-offline" role="alert" hidden>
+    OFFLINE SAMPLE DATA – the server is not reachable. Everything below comes from js/data.js (fabricated examples),
+    not from the real review, harness, retrieval or seal. Start <code>python ui/server.py</code> and open
+    <code>http://localhost:8000</code> for real results.
+  </div>
+
+  <h1>ITSG Review Loop — Demo</h1>
+
+  <nav class="tabs" aria-label="Sections">
+    <button id="tab-overview" class="active">Overview</button>
+    <button id="tab-report">Review report</button>
+    <button id="tab-cases">Test cases</button>
+    <button id="tab-ask">Ask the rulebook</button>
+    <button id="tab-seal">Trust &amp; seal</button>
+    <button id="tab-sources">Sources &amp; requirements</button>
+    <button id="tab-privacy">Datenschutz</button>
+  </nav>
+
+  <main>
+    <section id="overview-view"></section>
+
+    <section id="report-view" hidden></section>
+
+    <section id="cases-view" hidden>
+      <div id="test-case-list-view">
+        <div id="harness-box"></div>
+        <div id="list-summary"></div>
+        <div id="test-case-list"></div>
+      </div>
+      <div id="test-case-detail" hidden></div>
+    </section>
+
+    <section id="ask-view" hidden></section>
+
+    <section id="seal-view" hidden></section>
+
+    <section id="sources-view" hidden></section>
+
+    <section id="privacy-view" hidden></section>
+  </main>
+
+  <script src="js/data.js"></script>
+  <script src="js/util.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/report.js"></script>
+  <script src="js/cases.js"></script>
+  <script src="js/ask.js"></script>
+  <script src="js/seal.js"></script>
+  <script src="js/privacy.js"></script>
+  <script src="js/offline.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

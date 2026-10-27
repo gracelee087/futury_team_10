@@ -1,0 +1,31 @@
+{
+  "status": "PASS",
+  "timestamp": "2026-10-26T21:49:36.678Z",
+  "base_url": "http://127.0.0.1:8766",
+  "frontend_directory": "/Users/amour/Downloads/FUTURY-Team 10/frontend",
+  "engine": "Chromium via Playwright (SÜSIE bridge)",
+  "checks": [
+    "backend wiring: /api/state drives table, connected badge, 4 cases",
+    "casual/light: logo, theme state, sidebar elevation, 1440/768/390 layout and screenshots",
+    "casual/dark: logo, theme state, sidebar elevation, 1440/768/390 layout and screenshots",
+    "contrast/light: logo, theme state, sidebar elevation, 1440/768/390 layout and screenshots",
+    "contrast/dark: logo, theme state, sidebar elevation, 1440/768/390 layout and screenshots",
+    "search, empty/reset, status filter, open-findings toggle (backend data)",
+    "story suites view: cards, 200 cases, story/defect filters, search, case detail with expected record",
+    "case/run evidence, note validation, reload recovery, literal multilingual text, sorting, deep links, backend source view, blocked release, report notes, two-step delete, JSON export",
+    "review runs section: harness numbers, latest reports, findings table, offline review generation",
+    "language selector EN/DE: live switch, persistence, translated chrome",
+    "theme cycle icon rotates casual/light → casual/dark → contrast/dark → contrast/light",
+    "settings menu: API endpoint field, connection check, offline demo re-run",
+    "appearance persistence, 320/812-landscape/2560 layouts, 200% root font, reduced motion, forced-colors interaction, print chrome",
+    "synthetic fallback with explicit offline banner when API is unreachable",
+    "denied browser storage and broken-image recovery"
+  ],
+  "errors": [],
+  "failedResponses": [],
+  "limits": [
+    "Backend = itsg demo store via stdlib bridge; not a production service",
+    "No Safari, physical-device or screen-reader validation"
+  ],
+  "command": "SUSIE_BASE_URL=http://127.0.0.1:8766 PLAYWRIGHT_MODULE=<installed package> SUSIE_CHROMIUM_EXECUTABLE=<installed Chromium> node frontend/checks/smoke.cjs (against python3 -m itsg.webserver)"
+}

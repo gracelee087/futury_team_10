@@ -1,0 +1,498 @@
+{
+ "checks": {
+  "GG_EEL": {
+   "chunks": 27,
+   "words_pdf": 3335,
+   "words_lost": 0,
+   "toc_entries": 26,
+   "toc_missing": [],
+   "pages_body": 14,
+   "pages_uncovered": [],
+   "empty_chunks": [
+    "2",
+    "4"
+   ],
+   "replacement_chars": 0,
+   "toc_rows_removed": 0,
+   "dup_sections": []
+  },
+  "VB": {
+   "chunks": 220,
+   "words_pdf": 36140,
+   "words_lost": 0,
+   "toc_entries": 27,
+   "toc_missing": [],
+   "pages_body": 154,
+   "pages_uncovered": [
+    134
+   ],
+   "empty_chunks": [
+    "2.2",
+    "2.2.2",
+    "2.2.3",
+    "2.3",
+    "2.3.2",
+    "2.3.3",
+    "3.1",
+    "3.4",
+    "3.5",
+    "3.8",
+    "3.10"
+   ],
+   "replacement_chars": 0,
+   "toc_rows_removed": 0,
+   "dup_sections": [],
+   "crossrefs": 83,
+   "crossrefs_ok": 83,
+   "crossref_mismatch": []
+  },
+  "Beispiel": {
+   "chunks": 154,
+   "words_pdf": 17665,
+   "words_lost": 0,
+   "toc_entries": 149,
+   "toc_missing": [
+    "1"
+   ],
+   "pages_body": 154,
+   "pages_uncovered": [
+    148
+   ],
+   "empty_chunks": [
+    "3",
+    "3.2",
+    "3.2.1",
+    "3.2.2",
+    "3.2.3",
+    "3.2.4",
+    "3.2.5",
+    "3.3",
+    "4.2",
+    "4.2.5",
+    "4.2.6",
+    "4.2.7",
+    "4.2.8",
+    "4.2.10",
+    "5",
+    "5.2.1",
+    "5.3.1",
+    "7",
+    "12",
+    "13",
+    "16",
+    "17",
+    "17.6",
+    "20"
+   ],
+   "replacement_chars": 0,
+   "toc_rows_removed": 0,
+   "dup_sections": []
+  },
+  "Anl1": {
+   "chunks": 179,
+   "words_pdf": 44899,
+   "words_lost": 0,
+   "toc_entries": 182,
+   "toc_missing": [
+    "1",
+    "10.12.2025",
+    "13.03.2024"
+   ],
+   "pages_body": 148,
+   "pages_uncovered": [],
+   "empty_chunks": [
+    "4",
+    "4.4.1",
+    "5",
+    "7.2.3",
+    "7.3",
+    "9.5.9",
+    "11.2",
+    "16",
+    "16.1",
+    "16.2",
+    "16.3"
+   ],
+   "replacement_chars": 0,
+   "toc_rows_removed": 0,
+   "dup_sections": []
+  },
+  "Anl2": {
+   "chunks": 145,
+   "words_pdf": 33927,
+   "words_lost": 0,
+   "toc_entries": 146,
+   "toc_missing": [
+    "1",
+    "03.12.2020",
+    "13",
+    "192"
+   ],
+   "pages_body": 122,
+   "pages_uncovered": [],
+   "empty_chunks": [
+    "3.2",
+    "3.3",
+    "9.1",
+    "9.2.1",
+    "9.2.2",
+    "9.2.3",
+    "9.2.4.2",
+    "9.2.4.7",
+    "9.2.4.7.2.2",
+    "9.2.4.9",
+    "9.3",
+    "9.5",
+    "10",
+    "10.1",
+    "10.3"
+   ],
+   "replacement_chars": 0,
+   "toc_rows_removed": 0,
+   "dup_sections": []
+  },
+  "Anl3": {
+   "chunks": 494,
+   "words_pdf": 105428,
+   "words_lost": 0,
+   "toc_entries": 473,
+   "toc_missing": [
+    "1",
+    "20",
+    "31.12.2027"
+   ],
+   "pages_body": 385,
+   "pages_uncovered": [],
+   "empty_chunks": [
+    "3",
+    "3.1.1.1.1.4",
+    "3.1.1.1.2.1.1",
+    "3.1.1.1.2.1.6",
+    "3.1.1.1.2.1.7",
+    "3.1.1.1.2.5.2",
+    "3.1.1.1.2.11.2",
+    "3.1.1.1.3",
+    "3.1.1.1.3.1",
+    "3.1.1.1.9.3",
+    "3.1.3.3",
+    "4",
+    "4.1.1.1.1.2",
+    "4.1.1.1.4",
+    "4.1.2.1.2.1",
+    "4.2",
+    "5",
+    "5.5",
+    "7",
+    "7.1",
+    "7.1.3",
+    "7.2",
+    "7.2.2",
+    "7.3",
+    "8.1.1",
+    "10",
+    "10.2.5",
+    "11.1",
+    "13",
+    "13.2",
+    "14",
+    "14.2.1.1.5",
+    "14.2.1.1.5.1",
+    "18",
+    "18.4",
+    "18.5",
+    "18.10",
+    "18.11",
+    "18.13"
+   ],
+   "replacement_chars": 0,
+   "toc_rows_removed": 1636,
+   "dup_sections": []
+  }
+ },
+ "removed_rows": {
+  "GG_EEL": [
+   [
+    "Gemeinsame Grundsätze für die Erstattung der Mitteilungen im Rahmen des | Stand: #.#.#",
+    14
+   ],
+   [
+    "Datenaustausches Entgeltersatzleistungen (§ # SGB IV)",
+    14
+   ],
+   [
+    "Seite # von #",
+    14
+   ],
+   [
+    "Version #.#",
+    14
+   ],
+   [
+    "# Das Bundesministerium für Arbeit und Soziales hat die ab #. Januar # an geltenden angepassten aktualisierten",
+    14
+   ],
+   [
+    "Gemeinsamen Grundsätze im Einvernehmen mit dem Bundesministerium für Gesundheit, dem Bundesministerium für",
+    14
+   ],
+   [
+    "Ernährung und Landwirtschaft und nach Anhörung der Bundesvereinigung der Deutschen Arbeitgeberverbände",
+    14
+   ],
+   [
+    "am #.#.# genehmigt.",
+    14
+   ]
+  ],
+  "VB": [
+   [
+    "Stand: #.#.# | Seite # von # | Version #.#",
+    154
+   ],
+   [
+    "Datenbaustein DBAE – Arbeitsentgelt",
+    24
+   ],
+   [
+    "Datenbaustein DBFR – Angaben zur Freistellung bei Erkrankung/Verletzung des Kindes",
+    17
+   ],
+   [
+    "Datenbaustein DBMU – Entgeltbescheinigung zur Berechnung von Mutterschaftsgeld",
+    17
+   ],
+   [
+    "Datensatz DSLW – Datensatz Leistungswesen",
+    14
+   ],
+   [
+    "Datenbaustein DBVO – Vorerkrankungszeiten",
+    13
+   ],
+   [
+    "Datenbaustein DBAL – Allgemeines",
+    10
+   ],
+   [
+    "Rechtlicher Hintergrund zur Erhebung und Speicherung der Daten",
+    6
+   ],
+   [
+    "Verfahren bei den Arbeitgebern",
+    6
+   ],
+   [
+    "Datenbaustein DBZA – Arbeitszeit",
+    5
+   ],
+   [
+    "Verfahren bei den Sozialversicherungsträgern",
+    4
+   ],
+   [
+    "Datenbaustein DBEE – Ende Entgeltersatzleistung",
+    4
+   ]
+  ],
+  "Beispiel": [
+   [
+    "#",
+    153
+   ],
+   [
+    "Stand #.#.#",
+    153
+   ],
+   [
+    "Abgabegrund # – Krankengeld bei Erkrankung des Kindes (Kinderkrankengeld)",
+    32
+   ],
+   [
+    "Abgabegrund # –Mutterschaftsgeld",
+    25
+   ],
+   [
+    "Abgabegrund # – Krankengeld",
+    19
+   ],
+   [
+    "Abgabegrund # - Vorerkrankungszeiten KV",
+    18
+   ],
+   [
+    "Abgabegrund # - Übergangsgeld Leistungen med. Reha",
+    14
+   ],
+   [
+    "Abgabegrund # – Übergangsgeld (BA)",
+    8
+   ],
+   [
+    "Abgabegrund # – Übermittlung Ende der Entgeltersatzleistung",
+    8
+   ],
+   [
+    "Abgabegrund # - Anforderung Vorerkrankungsmitteilungen",
+    5
+   ],
+   [
+    "Abgabegrund # - Höhe der Entgeltersatzleistung",
+    5
+   ],
+   [
+    "Abgabegrund # – Abfrage Ende der Entgeltersatzleistung",
+    2
+   ]
+  ],
+  "Anl1": [
+   [
+    "Gemeinsames Rundschreiben vom #.#.# in der Fassung vom #.#.# zum Krankengeld bei Erkrankung des Kin-",
+    135
+   ],
+   [
+    "des gemäß § # SGB V, zum Kinderverletztengeld gemäß § # Abs. # SGB VII und zum Krankengeld der Sozialen Entschä-",
+    135
+   ],
+   [
+    "digung bei Erkrankung eines Kindes gemäß § # Abs. # SGB XIV",
+    135
+   ],
+   [
+    "Seite # von #",
+    135
+   ],
+   [
+    "Berechnung und Höhe des Kinderkrankengeldes",
+    33
+   ],
+   [
+    "Zusammentreffen mit anderen Leistungen und Ruhen des Anspruchs auf Kinderkrankengeld",
+    31
+   ],
+   [
+    "Anspruchsvoraussetzungen",
+    23
+   ],
+   [
+    "Zahlung des Kinderkrankengeldes",
+    15
+   ],
+   [
+    "Beginn und Dauer des Anspruchs",
+    14
+   ],
+   [
+    "Gemeinsames Rundschreiben vom #.#.# in der Fassung vom #.#.# zum Krankengeld bei Erkrankung des Kindes gemäß § # SGB V, zum Kinderverletztengeld gemäß",
+    13
+   ],
+   [
+    "§ # Abs. # SGB VII und zum Krankengeld der Sozialen Entschädigung bei Erkrankung eines Kindes gemäß § # Abs. # SGB XIV | Seite # von #",
+    13
+   ],
+   [
+    "Kinderkrankengeld der Sozialen Entschädigung",
+    6
+   ]
+  ],
+  "Anl2": [
+   [
+    "Gemeinsames Rundschreiben vom #./#.#.# in der Fassung vom #.#.# zu",
+    122
+   ],
+   [
+    "den Leistungen bei Schwangerschaft und Mutterschaft | Seite # von #",
+    122
+   ],
+   [
+    "Mutterschaftsgeld",
+    100
+   ],
+   [
+    "Ärztliche Betreuung und Hebammenhilfe",
+    5
+   ],
+   [
+    "Haushaltshilfe",
+    4
+   ],
+   [
+    "Leistungen bei Schwangerschaft und Mutterschaft",
+    3
+   ],
+   [
+    "Entbindung",
+    3
+   ],
+   [
+    "Versorgung mit Arznei-, Verband-, Heil- und Hilfsmitteln",
+    2
+   ],
+   [
+    "Häusliche Pflege",
+    2
+   ],
+   [
+    "Betriebs- und Haushaltshilfe in der landwirtschaftlichen Krankenversicherung",
+    2
+   ],
+   [
+    "Anlage – Auflistung der verwiesenen Anlagen",
+    1
+   ],
+   [
+    "[chapter TOC row]",
+    0
+   ]
+  ],
+  "Anl3": [
+   [
+    "[chapter TOC row]",
+    1636
+   ],
+   [
+    "Seite # von #",
+    380
+   ],
+   [
+    "Gemeinsames Rundschreiben vom #.#.# in der Fassung vom #.#.# zum Krankengeld nach § #, § #b SGB V, zum",
+    378
+   ],
+   [
+    "Verletztengeld nach § # SGB VII und zum Krankengeld der Sozialen Entschädigung nach § # SGB XIV",
+    378
+   ],
+   [
+    "Anspruch auf Krankengeld",
+    91
+   ],
+   [
+    "Krankengeld nach § #b SGB V",
+    57
+   ],
+   [
+    "Höhe des Krankengeldes",
+    51
+   ],
+   [
+    "Berechnung des Regelentgelts",
+    48
+   ],
+   [
+    "Dauer des Anspruchs auf Krankengeld",
+    38
+   ],
+   [
+    "Ruhen des Anspruchs auf Krankengeld",
+    29
+   ],
+   [
+    "Verletztengeld der gesetzlichen Unfallversicherung",
+    27
+   ],
+   [
+    "Wegfall des Krankengeldes, Antrag auf Leistungen zur Teilhabe",
+    12
+   ]
+  ]
+ }
+}
