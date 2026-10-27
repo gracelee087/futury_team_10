@@ -1,3 +1,18 @@
+# Integration branch `integration-final` (T10-008, 2026-10-27) — English summary
+- What it contains: `origin/lisa-update` (Sohee: agents, orchestrator, F1-F7 incl. "always run F1/F4/F6", C9-C13, story cases, experiments)
+  merged with `origin/member2-privacy` (Fares: checker C1-C8 + attacks, retrieval, seal, ui, privacy airlock, Langfuse guard).
+  Restored on top of Sohee's logic (marked `T10-008`): `flow_findings` C1-C8 with the NOT EVALUATED mapping in `run_review.py`, and the Langfuse guard in `run_review.py` and `harness/run_harness.py`.
+- New: `harness/story_flow_adapter.py` (stories 4/6 -> checker; story 6 now evaluated, story 4 stays NOT EVALUATED, see `experiments.md`);
+  `orchestrator/llm.py` privacy gate + optional `TEAM10_LLM_PROVIDER=hessian` (default `anthropic` unchanged).
+- Checks run: pytest privacy retrieval seal ui orchestrator harness: 287 passed; `checker/attacks.py` 14/14; `run_review.py` 18 PASS / 2 NOT EVALUATED / 0 MISMATCH (F1-F7, C9-C13, C1-C8); harness 300/300, 0 false alarms; orchestrator design/verdict with `TEAM10_MOCK=1` run, `TEAM10_MOCK=broken` blocks.
+- Not tested: live Anthropic or hessian.AI calls through the new gate, a real Langfuse upload, Docker/deploy.
+  The mock orchestrator run needs `chunks/chunks.jsonl` (gitignored); here it was rebuilt from `chunks/*/*.md` because the source PDFs are not in this checkout.
+- Open team decisions: (1) keep or delete `ui/` (it hosts the seal/privacy demo backend); (2) model provider, Anthropic (default) or hessian.AI (Germany);
+  (3) merge order: this PR replaces #13 and `lisa-update`; (4) the figures `figures/multi-agent.png` and `figures/system-overview.png` exist in two versions, Sohee's was kept
+  (Fares' versions are on `member2-privacy`); (5) duplicate board ID T10-003 (see log); (6) REF-ID checks for story 6 do not exist yet (8 of 40 defects missed).
+
+---
+
 # 최신 업데이트 (2026-10-27) — 전체 루프 그림(한국어 입문용)
 - 최신 커밋: `23808cb` (lisa-stories, 이번 세션, 미푸시). 그 전: `d2be005`.
 - 사용자가 `loop-overview.txt` 내용(🤖 AI / ⚙️ 코드 / 👤 사람 역할 분담)으로 "한 화면, 초보자용" 전체 루프 그림을 요청 → 아티팩트로 만듦.

@@ -15,6 +15,7 @@ If anything personal is still left, the request is **BLOCKED** and nothing is se
 | `test_schleuse.py`, `test_leak.py` | Unit tests and the leak test as tests |
 | `../retrieval/ask.py` | Uses the airlock before every model call |
 | `../retrieval/test_privacy_integration.py` | Tests of the airlock inside `ask()` |
+| `../orchestrator/llm.py`, `../orchestrator/test_llm_privacy.py` | Uses the airlock before every agent call (T10-008) and tests it |
 
 ## What counts as personal data (in scope)
 
@@ -62,6 +63,26 @@ payload was clean; otherwise a message says it was refused. Without Langfuse key
 Tests (`test_langfuse_guard.py`) use a fake Langfuse that records everything: the TEEL0 VSNR, names, emails and phone
 numbers never appear, and the review findings and counts are the same with and without Langfuse.
 Limit: the allowed-key list is hand-made; a new field must be added to it to show up in Langfuse.
+
+## Agents (`orchestrator/llm.py`, T10-008, needs review by Sohee)
+
+All six agents plus the source finder call the model through `llm.call()`. Before every call (also in `TEAM10_MOCK` mode):
+
+1. The user payload is pseudonymized, then `check_clean` runs strictly. The static system prompt is only checked, with
+   `allow_specimen=True` (public rulebook examples). Anything left, or any error in the gate (for example an invalid `PRIVACY_KEY`),
+   raises `PrivacyBlockedError`, a kind of `AgentError`: the step is BLOCKED, no model is called, and the message names categories only.
+2. The Langfuse generation gets its input and output only through `langfuse_guard.py` (policy `langfuse`: only the first 200 characters
+   of the pseudonymized text). Error texts are scrubbed with `scrub_for_log`.
+
+Provider switch `TEAM10_LLM_PROVIDER`: `anthropic` (default, unchanged) or `hessian` (OpenAI-compatible endpoint
+`https://hip-gw.hessian.ai/v1`, models from `TEAM10_HESSIAN_MODEL` / `TEAM10_HESSIAN_MODEL_LIGHT`, key `HESSIAN_API_KEY`).
+hessian.AI runs self-hosted open-weight models, so processing stays in Germany; Anthropic does not guarantee that.
+The default is Sohee's decision. The gate is the same for both.
+Tests (`orchestrator/test_llm_privacy.py`, recording fake clients, no network): the TEEL0 VSNR, names, email and phone never reach the
+model or Langfuse; leftover personal data gives BLOCKED with no call; `TEAM10_MOCK=broken` still fails closed.
+Limits: pseudonymizing the whole user text also tokenizes the one rulebook chunk with a Betriebsnummer (`VB/3.1.8`), so a quote
+from it would not match; names in free text without a cue word are not found (see stress test above); model answers keep the tokens
+(`PERSON_1`), they are not mapped back; other Langfuse spans in `orchestrator/graph.py` (gates, per-check spans) do not use the guard yet.
 
 ## UI tab and retention
 

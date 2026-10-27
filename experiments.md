@@ -154,3 +154,25 @@ person (NEEDS_REVIEW); it can never turn a check into PASS. Score = same as the 
   same case), so no result changed and no clean case got extra work. Missed errors: 0.
 - Sick-leave outcomes: 87 clean, 92 detected, 6 BLOCKED (malformed output), 15 escalated (ambiguous rule).
 - Limit: cases and checker come from the same reading of the rules (same as the 300).
+
+
+## Stories 4 and 6 through the message-flow checker (T10-008, 2026-10-27)
+- Command: `python harness/run_harness.py --stories` (200 story cases, code only, no AI, no Langfuse), before and after
+  `harness/story_flow_adapter.py` + `run_harness.score_story`. Reports `reports/harness-HARNESS-20261027-072602.json` (before) and
+  `-072656` (after).
+- Checker = Fares' C1-C8 (`checker/checks.py`). Expected AZVU and final EFZ end come from each story-6 case's own `scenario`.
+
+| Story | Before | After |
+|---|---|---|
+| 1 (40 cases) | 40 evaluated, 40 correct | unchanged |
+| 3 (40 cases) | 40 evaluated, 40 correct | unchanged |
+| 4 insurer reply 61 (60 cases) | 60 NOT EVALUATED | 60 NOT EVALUATED |
+| 6 cancellation 88 (60 cases) | 60 NOT EVALUATED | 60 evaluated: 20 clean cases, 0 false alarms; 32 of 40 defects detected by the right check; 8 MISSED |
+| All 200 | 80 evaluated, 80 correct, 120 not evaluated | 140 evaluated, 132 correct, 60 not evaluated, 0 false alarms, 62 of 70 defects detected |
+
+- Story 4 stays NOT EVALUATED on purpose: a story-4 case holds only the employer 41 and the insurer 61 as field values, with no AZVU,
+  message IDs or 01/88/62 messages. C1-C8 check the message flow, so none of the eight checks can run. The 61 rules (VB 13.4 3.12.x)
+  have no checker yet.
+- The 8 missed story-6 defects are "61 does not refer to the 41" (4) and "62 refers to the cancelled 01" (4): C1-C8 have no REF-ID check.
+- Unchanged: `python harness/run_harness.py` 300/300 correct, 0 false alarms; `python checker/attacks.py` 14/14, baseline no false alarm.
+- Limit: cases and checker come from the same reading of the rules; the right-check mapping (`RIGHT_FLOW`) is ours.
