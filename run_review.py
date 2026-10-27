@@ -177,6 +177,19 @@ def c12(cur_au, scenario, obs, prior, cur, file_periods):
     return finding("C12", rule, src, ">= 30", actual, "PASS" if reported >= 30 else "MISMATCH", criterion_id=cid)
 
 
+def flow_findings(case, checker_dir):   # T10-008: restored (removed on lisa-update)
+    """C1-C8 from Fares' comparator (checker/checks.py); FAIL is reported as MISMATCH."""
+    try:
+        sys.path.insert(0, str(checker_dir))
+        from checks import run_checks
+    except ImportError:
+        return [finding(f"C{i}", "message flow check", "checker/checks.py", None, None, "NOT EVALUATED",
+                        f"checker not found in {checker_dir}") for i in range(1, 9)]
+    status_map = {"PASS": "PASS", "MISMATCH": "MISMATCH", "NOT_EVALUATED": "NOT EVALUATED", "NOT EVALUATED": "NOT EVALUATED"}
+    return [finding(r["id"], r["rule"], r["source"], r["expected"], r["actual"],
+                    status_map.get(r["status"], "MISMATCH"), r.get("reason")) for r in run_checks(case)]
+
+
 def robustness(case):
     try:
         from attacks import mutations, evaluate
@@ -197,7 +210,7 @@ def robustness(case):
 def human(report):
     r, cnt = report["report"], report["report"]["counts"]
     short = lambda v: (json.dumps(v, ensure_ascii=False) if not isinstance(v, str) else v)[:12] if v is not None else "-"
-    lines = [f"REVIEW REPORT {r['id']} – Abgabegrund 41 (DBVO)     Overall: {r['overall_status']}",
+    lines = [f"REVIEW REPORT {r['id']} – Abgabegrund 41 (DBVO) + message flow     Overall: {r['overall_status']}",
              f"Template: {r['template']}",
              f"Test data: {report['execution']['file']}   ID {report['execution']['observed'].get('DATENSATZ-ID', '-')}",
              f"Test case: {report['test_case']['source']}",
@@ -226,14 +239,21 @@ def main():
     if os.environ.get("LANGFUSE_PUBLIC_KEY") and os.environ.get("LANGFUSE_SECRET_KEY"):
         from langfuse import get_client
         lf = get_client()
-    span = (lambda **kw: lf.start_as_current_span(**kw)) if lf else (lambda **kw: contextlib.nullcontext())
+    # T10-007 privacy guard (Fares, needs Sohee's review): everything sent to Langfuse is minimized, pseudonymized
+    # and checked first (policy "langfuse", privacy/schleuse.py). Without Langfuse keys nothing changes.
+    guard = None
+    if lf:
+        from privacy.langfuse_guard import LangfuseGuard
+        guard = LangfuseGuard()
+    span = (lambda **kw: lf.start_as_current_span(**guard.kwargs(**kw))) if lf else (lambda **kw: contextlib.nullcontext())
 
     report_id = "RPT-" + datetime.now().strftime("%Y%m%d-%H%M%S")
     case = json.loads(Path(args.case).read_text(encoding="utf-8-sig"))
     with span(name="review-run", input={"case": args.case, "teel0": args.teel0}):
         if lf:
-            lf.update_current_trace(name="review-run", tags=["Team10", "Abgabegrund-41", "DBVO"], public=args.public,
-                                    metadata={"report_id": report_id, "test_case": case.get("source")})
+            # T10-007: the trace starts private; --public is applied at the end, only if every payload was clean
+            lf.update_current_trace(**guard.kwargs(name="review-run", tags=["Team10", "Abgabegrund-41", "DBVO"],
+                                                   metadata={"report_id": report_id, "test_case": case.get("source")}))
         with span(name="load_test_case", input=args.case, output={"scenario": case["scenario"], "messages": len(case["messages"])}):
             pass
         try:
@@ -245,7 +265,7 @@ def main():
         with span(name="parse_teel0", input=args.teel0, output=observed,
                   level="ERROR" if "error" in observed else "DEFAULT"):
             pass
-        findings = dbvo
+        findings = dbvo + flow_findings(case, args.checker_dir)   # T10-008: C1-C8 restored
         with span(name="checks", output={"total": len(findings)}):
             for f in findings:
                 with span(name=f"check {f['id']}", input={"rule": f["rule"], "source": f["source"], "expected": f["expected"]},
@@ -263,12 +283,13 @@ def main():
         trace_url = lf.get_trace_url(trace_id=lf.get_current_trace_id()) if lf else None
         report = {
             "report": {"id": report_id, "created_at": datetime.now().strftime("%d.%m.%Y %H:%M"),
-                       "scope": "DTA EEL – Abgabegrund 41 (DBVO)",
+                       "scope": "DTA EEL – Abgabegrund 41 (DBVO) + message flow 41→61→01→61→88→01→62",   # T10-008
                        "template": "SYNTHETIC – no official ITSG report form found; no compliance claim",
                        "overall_status": overall, "counts": counts},
             "test_case": {"id": "TC-1", "source": case.get("source", args.case), "inputs": case["scenario"]},
             "execution": {"id": "RUN-" + report_id[4:], "file": Path(args.teel0).name, "observed": observed,
-                          "observed_sources": {"message_1_41": "TEEL0 file (software output)"}},
+                          "observed_sources": {"message_1_41": "TEEL0 file (software output)",   # T10-008
+                                               "messages_2_to_7": "test case ID table (reference flow)"}},
             "findings": findings,
             "robustness": rb,
             "review": {"reviewer": None, "decision": "pending", "timestamp": None},
@@ -277,7 +298,13 @@ def main():
         with span(name="report", output=report):
             pass
         if lf:
-            lf.update_current_trace(output={"overall_status": overall, "counts": counts, "robustness": rb["result"]})
+            lf.update_current_trace(**guard.kwargs(output={"overall_status": overall, "counts": counts,
+                                                           "robustness": rb["result"]}))
+            if args.public and guard.all_clean:   # T10-007: refuse a public trace unless every payload passed check_clean
+                lf.update_current_trace(public=True)
+            elif args.public:
+                print(f"--public refused: {guard.withheld} Langfuse payload(s) still looked personal and were withheld; "
+                      "the trace stays private.")
 
     if lf:
         lf.flush()
