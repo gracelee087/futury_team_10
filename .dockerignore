@@ -1,0 +1,8 @@
+.git
+.env
+.venv
+reports
+**/__pycache__
+**/.pytest_cache
+seal-data
+*.jsonl

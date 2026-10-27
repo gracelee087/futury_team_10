@@ -82,31 +82,31 @@ def build(make, want_send, want_rule, tries=300):
 
 
 # ---------------------------------------------------------------- story 1
-def story1():
+def story1(k=1):   # k: multiply the case counts (k=1 = the original 40)
     out = []
     def case(cat, sc, dbvo, observed, must, kind):
         out.append({"story": 1, "category": cat, "scenario": ser(sc),
                     "expected": {"send_41": dbvo is not None and must is None or kind == "defect",
                                  "dbvo": dbvo_of(dbvo) if dbvo else None},
                     "observed_kind": kind, "observed_dbvo": observed, "must_flag": must})
-    for _ in range(10):
+    for _ in range(10 * k):
         sc, d = build(lambda: scenario(chain_prior(rnd.randint(1, 3), reasons=["illness"]), rnd.randint(12, 25),
                                        reason="work accident"), True, "OK")
         case("current AU is a work accident", sc, d, dbvo_of(d), None, "correct output")
-    for _ in range(10):
+    for _ in range(10 * k):
         sc, d = build(lambda: scenario(chain_prior(rnd.randint(1, 3)), rnd.randint(14, 28), reason="rehabilitation"),
                       True, "OK")
         case("rehab stay, mixed prior reasons", sc, d, dbvo_of(d), None, "correct output")
-    for _ in range(10):
+    for _ in range(10 * k):
         sc, d = build(lambda: scenario(chain_prior(1, lengths=(3, 8)), rnd.randint(5, 12),
                                        reason=rnd.choice(REASONS)), False, "R3")
         case("mixed reasons, under 30 days", sc, None, unwanted_41(sc), "R3", "41 sent although not allowed")
-    for _ in range(5):
+    for _ in range(5 * k):
         sc, d = build(lambda: scenario(chain_prior(rnd.randint(1, 2)), rnd.randint(12, 25),
                                        reason="work accident", insurance="PKV"), False, "R4")
         case("privately insured, work accident (BG, outside procedure)", sc, None, unwanted_41(sc), "R4",
              "41 sent although not allowed")
-    for _ in range(5):   # payroll software treats an accident period as "not illness" and drops it
+    for _ in range(5 * k):   # payroll software treats an accident period as "not illness" and drops it
         def mk():
             sc = scenario(chain_prior(2, reasons=["illness"]), rnd.randint(14, 25))
             sc["prior"][rnd.randint(0, 1)]["reason"] = "work accident"
@@ -123,7 +123,7 @@ def story1():
 
 
 # ---------------------------------------------------------------- story 3
-def story3():
+def story3(k=1):   # k: multiply the case counts (k=1 = the original 40)
     out = []
     def add(cat, sc, d, observed, must, kind, send):
         out.append({"story": 3, "category": cat, "scenario": ser(sc),
@@ -146,16 +146,16 @@ def story3():
             sc["prior"].append(short)
             return sc
         return mk
-    for _ in range(10):
+    for _ in range(10 * k):
         sc, d = build(with_short("before prior"), True, "OK")
         add("short uncertified days right before a certified AU (included)", sc, d, dbvo_of(d), None, "correct output", True)
-    for _ in range(10):
+    for _ in range(10 * k):
         sc, d = build(with_short("before current"), True, "OK")
         add("short uncertified days right before the current AU (included)", sc, d, dbvo_of(d), None, "correct output", True)
-    for _ in range(10):
+    for _ in range(10 * k):
         sc, d = build(with_short("gap"), True, "OK")
         add("short uncertified days with a gap (left out)", sc, d, dbvo_of(d), None, "correct output", True)
-    for _ in range(5):
+    for _ in range(5 * k):
         def mk():
             sc = scenario(lambda s: [], rnd.randint(10, 20))
             sc["prior"] = [dict(gap_before(sc["current_start"], rnd.randint(3, 40), rnd.randint(1, 3), cert=False),
@@ -163,7 +163,7 @@ def story3():
             return sc
         sc, d = build(mk, False, "R2")
         add("only uncertified short days, none seamless", sc, None, unwanted_41(sc), "R2", "41 sent although not allowed", False)
-    for _ in range(5):   # software also reports the non-seamless short absence
+    for _ in range(5 * k):   # software also reports the non-seamless short absence
         sc, d = build(with_short("gap"), True, "OK")
         short = [p for p in sc["prior"] if not p["cert"]][0]
         bad = dbvo_of(d)

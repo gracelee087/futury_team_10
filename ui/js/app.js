@@ -1,303 +1,142 @@
-// Task 4 UI — renders the test-case list, the test-case detail
-// (expected vs observed), the report screen and the sources screen
-// from the records in js/data.js.
+// Team 10 demo UI: tabs, start-up (live or offline), overview and the sources tab.
+// The other tabs live in report.js, cases.js, ask.js and seal.js; offline sample screens in offline.js.
 
-const STATUS_STYLES = {
-  "PASS": "badge-pass",
-  "MISMATCH": "badge-mismatch",
-  "NOT EVALUATED": "badge-not-evaluated"
-};
+const TABS = ["overview", "report", "cases", "ask", "seal", "sources", "privacy"];
+const VIEW_IDS = { overview: "overview-view", report: "report-view", cases: "cases-view", ask: "ask-view", seal: "seal-view", sources: "sources-view", privacy: "privacy-view" };
+const RENDERERS = { overview: () => renderOverview(), report: () => renderReport(), cases: () => renderCases(),
+  ask: () => renderAsk(), seal: () => renderSeal(), sources: () => renderSources(), privacy: () => renderPrivacy() };
 
-function badge(status) {
-  const style = STATUS_STYLES[status] || "badge-neutral";
-  return `<span class="badge ${style}">${status}</span>`;
-}
-
-function findingFor(testCaseId) {
-  return DATA.findings.find((f) => f.test_case_id === testCaseId) || null;
-}
-
-function executionFor(testCaseId) {
-  return DATA.executions.find((r) => r.test_case_id === testCaseId) || null;
-}
-
-function criterionFor(id) {
-  return DATA.criteria.find((c) => c.id === id) || null;
-}
-
-function requirementFor(id) {
-  return DATA.requirements.find((r) => r.id === id) || null;
-}
-
-function sourceFor(id) {
-  return DATA.sources.find((s) => s.id === id) || null;
-}
-
-/* ---------- Test-case list ---------- */
-
-function renderTestCaseList() {
-  const container = document.getElementById("test-case-list");
-  const summary = document.getElementById("list-summary");
-
-  const counts = { "PASS": 0, "MISMATCH": 0, "NOT EVALUATED": 0 };
-  DATA.findings.forEach((f) => {
-    if (counts[f.status] !== undefined) counts[f.status] += 1;
+function switchTab(tab) {
+  if (!TABS.includes(tab)) tab = "overview";
+  TABS.forEach((t) => {
+    document.getElementById(VIEW_IDS[t]).hidden = t !== tab;
+    const button = document.getElementById("tab-" + t);
+    button.classList.toggle("active", t === tab);
+    button.setAttribute("aria-current", t === tab ? "page" : "false");
   });
-  summary.innerHTML = `
-    <p>
-      ${counts["PASS"]} × ${badge("PASS")} &nbsp;
-      ${counts["MISMATCH"]} × ${badge("MISMATCH")} &nbsp;
-      ${counts["NOT EVALUATED"]} × ${badge("NOT EVALUATED")}
-    </p>`;
+  try { history.replaceState(null, "", "#" + tab); } catch (err) { /* file:// may refuse; the tab still works */ }
+  RENDERERS[tab]();
+}
 
-  const rows = DATA.testCases
-    .map((tc) => {
-      const finding = findingFor(tc.id);
-      const status = finding ? finding.status : "NOT EVALUATED";
-      return `
-        <tr class="clickable" data-case="${tc.id}">
-          <td>${tc.id}</td>
-          <td>${tc.title}</td>
-          <td>${tc.kind}</td>
-          <td>${tc.review_status}</td>
-          <td>${badge(status)}</td>
-        </tr>`;
-    })
-    .join("");
-  container.innerHTML = `
-    <table>
-      <thead>
-        <tr><th>ID</th><th>Test case</th><th>Kind</th><th>Review</th><th>Result</th></tr>
-      </thead>
-      <tbody>${rows}</tbody>
-    </table>`;
+/* ---------- overview ---------- */
 
-  container.querySelectorAll("tr.clickable").forEach((row) => {
-    row.addEventListener("click", () => showTestCaseDetail(row.dataset.case));
+const PIPELINE = [
+  ["checker", "Checker", "Deterministic checks and the 14 planted-error attacks", "Rules in code, no AI decides a result"],
+  ["harness", "Harness", "300 generated cases scored against the DBVO review", "Shows how often the reviewer finds planted errors"],
+  ["retrieval", "Retrieval", "Keyword search in the rulebook chunks + AI answer with checked quotes", "Answers are candidates for a human"],
+  ["seal", "Seal", "Run IDs and signed receipts for report fingerprints", "Detects edited or hidden vendor results"],
+];
+
+function renderOverview() {
+  const box = document.getElementById("overview-view");
+  clear(box);
+  const live = APP.mode === "live";
+  const figure = live ? "/figures/system-overview.png" : "../figures/system-overview.png";
+  const parts = (APP.health && APP.health.parts) || {};
+  const cards = PIPELINE.map(([key, name, what, note]) => {
+    const p = parts[key];
+    const state = live ? (p ? p.status : "unavailable") : "unavailable";
+    const detail = !live ? "unknown – the server is not reachable (offline sample mode)" : p ? (p.reason || p.version || "") : "not reported by the server";
+    return h("div", { class: "card pipe pipe-" + state },
+      h("h4", {}, name + " ", badge(state)),
+      h("p", { text: what }), h("p", { class: "meta", text: note }),
+      h("p", { class: "evidence", text: detail }),
+      p && p.cases ? h("p", { class: "meta", text: `${p.cases} cases loaded` + (p.latest_run ? ` · latest run ${p.latest_run}` : "") }) : null);
   });
+  box.append(
+    h("h2", { text: "What this demo shows" }),
+    h("p", { class: "lead", text: "Employers send sick-leave data to health insurers through the electronic procedure for income replacement benefits (Entgeltersatzleistungen, § 95b SGB IV). " +
+      "ITSG reviews whether payroll software sends this data correctly. Doing that by hand is slow, so Team 10 built a prototype of the review loop: " +
+      "rules from the official documents become checks, the checks run on the software's output, every finding points back to its source, and a person makes the final decision. " +
+      "All data here is synthetic." }),
+    h("img", { class: "figure", src: figure, alt: "System overview diagram of the Team 10 review loop" }),
+    h("h3", { text: "The pipeline and what is running right now" }),
+    live ? null : message("warn", "Offline sample mode: availability of the parts is unknown."),
+    h("div", { class: "pipeline" }, cards),
+    h("h3", { text: "Where to go next" }),
+    h("ul", {}, [
+      ["report", "Review report – run the review and see every finding with its source and evidence chain."],
+      ["cases", "Test cases – browse the 500 synthetic cases and the harness score."],
+      ["ask", "Ask the rulebook – questions answered with checked quotes."],
+      ["seal", "Trust & seal – how ITSG can tell whether a vendor edited or hid a result."],
+    ].map(([tab, text]) => {
+      const b = h("button", { class: "link", text: text.split(" – ")[0] });
+      b.addEventListener("click", () => switchTab(tab));
+      return h("li", {}, b, " – " + text.split(" – ")[1]);
+    })),
+    h("p", { class: "meta", text: live ? `UI ${APP.health.ui_version} · server time ${shortDate(APP.health.time)}` : "" }));
 }
 
-/* ---------- Test-case detail ---------- */
-
-function evidenceChainFor(testCaseId) {
-  // The full chain: report → finding → execution → test case → criterion → requirement → source.
-  const tc = DATA.testCases.find((t) => t.id === testCaseId);
-  const finding = findingFor(testCaseId);
-  const execution = executionFor(testCaseId);
-  const criterion = tc ? criterionFor(tc.criterion_id) : null;
-  const requirement = criterion ? requirementFor(criterion.requirement_id) : null;
-
-  const steps = [{ kind: "report", id: DATA.report.id }];
-  if (execution) steps.push({ kind: "run", id: execution.id });
-  steps.push({ kind: "case", id: testCaseId });
-  if (criterion) steps.push({ kind: "criterion", id: criterion.id });
-  if (requirement) steps.push({ kind: "requirement", id: requirement.id });
-  if (requirement) steps.push({ kind: "source", id: requirement.source_id });
-
-  // Only requirement and source have detail cards to jump to; the rest
-  // are plain text in this skeleton.
-  return steps
-    .map((s) => {
-      const jumpable = s.kind === "requirement" || s.kind === "source";
-      const label = jumpable
-        ? `<button class="chain-link" data-jump="${s.id}">${s.id}</button>`
-        : `<span class="chain-step">${s.id}</span>`;
-      return `${label}<span class="chain-arrow">→</span>`;
-    })
-    .join("")
-    .replace(/<span class="chain-arrow">→<\/span>$/, "");
-}
-
-function showTestCaseDetail(testCaseId) {
-  const tc = DATA.testCases.find((t) => t.id === testCaseId);
-  const finding = findingFor(testCaseId);
-  const execution = executionFor(testCaseId);
-  const detail = document.getElementById("test-case-detail");
-
-  const observedSection = execution
-    ? renderComparison(tc.expected, execution.observed)
-    : `<p class="warning">No execution output for this case — result cannot be evaluated.</p>`;
-
-  detail.innerHTML = `
-    <h3>${tc.id} — ${tc.title}</h3>
-    <p>Criterion: ${tc.criterion_id} · Kind: ${tc.kind} · Review: ${tc.review_status}
-       (by ${tc.review.reviewer} at ${tc.review.timestamp})</p>
-    <h4>Inputs</h4>
-    <pre>${JSON.stringify(tc.inputs, null, 2)}</pre>
-    <h4>Expected basis</h4>
-    <p>${tc.expected_basis}</p>
-    <h4>Expected vs. observed</h4>
-    ${observedSection}
-    <h4>Finding</h4>
-    <p>${badge(finding ? finding.status : "NOT EVALUATED")} ${finding ? finding.reason : ""}</p>
-    <h4>Evidence chain (click requirement or source)</h4>
-    <p class="chain">${evidenceChainFor(testCaseId)}</p>
-    <button id="back-to-list">← Back to list</button>`;
-
-  document.getElementById("back-to-list").addEventListener("click", showListView);
-  detail.querySelectorAll("[data-jump]").forEach((btn) => {
-    btn.addEventListener("click", () => jumpToItem(btn.dataset.jump));
-  });
-
-  switchTab("cases");
-  document.getElementById("test-case-list-view").hidden = true;
-  detail.hidden = false;
-}
-
-function renderComparison(expected, observed) {
-  const keys = new Set([...Object.keys(expected), ...Object.keys(observed)]);
-  const rows = [...keys]
-    .map((key) => {
-      const match = expected[key] === observed[key];
-      const cls = match ? "match" : "mismatch";
-      return `<tr class="${cls}">
-          <td>${key}</td>
-          <td>${expected[key] ?? "—"}</td>
-          <td>${observed[key] ?? "—"}</td>
-          <td>${match ? "✓" : "✗ differs"}</td>
-        </tr>`;
-    })
-    .join("");
-  return `
-    <table>
-      <thead><tr><th>Field</th><th>Expected</th><th>Observed</th><th>Result</th></tr></thead>
-      <tbody>${rows}</tbody>
-    </table>`;
-}
-
-function showListView() {
-  switchTab("cases");
-}
-
-/* ---------- Report ---------- */
-
-function renderReport() {
-  const report = DATA.report;
-  const container = document.getElementById("report-view");
-
-  const checks = report.conformance
-    .map(
-      (c) => `
-      <li>${c.check}: <strong>${c.status}</strong>${c.detail ? ` — ${c.detail}` : ""}</li>`
-    )
-    .join("");
-
-  const reviewEvents = DATA.testCases
-    .map(
-      (tc) => `
-      <tr>
-        <td>${tc.id}</td>
-        <td>${tc.review.reviewer}</td>
-        <td>${tc.review.decision}</td>
-        <td>${tc.review.timestamp}</td>
-      </tr>`
-    )
-    .join("");
-
-  container.innerHTML = `
-    <h3>Report ${report.id}</h3>
-    <p>Template: ${report.template_id}</p>
-    <p>Renderer: ${report.renderer_version}</p>
-    <div class="warning">
-      Because a conformance check failed, this report may <strong>not</strong> be signed off
-      as compliant until the issue is corrected and re-checked.
-    </div>
-    <h4>Conformance checks</h4>
-    <ul>${checks}</ul>
-    <h4>Findings included</h4>
-    <ul>${report.findings.map((id) => `<li>${id} ${badge(findingFor(id)?.status || "NOT EVALUATED")}</li>`).join("")}</ul>
-    <h4>Human review events</h4>
-    <table>
-      <thead><tr><th>Test case</th><th>Reviewer</th><th>Decision</th><th>Timestamp</th></tr></thead>
-      <tbody>${reviewEvents}</tbody>
-    </table>
-    <p class="warning">${report.limitations}</p>`;
-}
-
-/* ---------- Sources & requirements ---------- */
+/* ---------- sources & requirements ---------- */
 
 function renderSources() {
-  const container = document.getElementById("sources-view");
-
-  const sourceCards = DATA.sources
-    .map(
-      (s) => `
-      <div class="card" id="item-${s.id}">
-        <h4>${s.id} — ${s.title}</h4>
-        <p>Issuer: ${s.issuer} · Version: ${s.version}</p>
-        <p class="evidence">Citation: ${s.citation}</p>
-      </div>`
-    )
-    .join("");
-
-  const requirementCards = DATA.requirements
-    .map((r) => {
-      const src = sourceFor(r.source_id);
-      return `
-      <div class="card" id="item-${r.id}">
-        <h4>${r.id} ${badge(r.status)}</h4>
-        <p>${r.text}</p>
-        <p class="evidence">From ${r.source_id} (${r.citation})
-          <button class="chain-link" data-jump="${r.source_id}">show source</button>
-        </p>
-      </div>`;
-    })
-    .join("");
-
-  const criterionCards = DATA.criteria
-    .map(
-      (c) => `
-      <div class="card" id="item-${c.id}">
-        <h4>${c.id} ${badge(c.status)}</h4>
-        <p>${c.text}</p>
-        <p class="evidence">Approved by ${c.approved_by} · derived from ${c.requirement_id}
-          <button class="chain-link" data-jump="${c.requirement_id}">show requirement</button>
-        </p>
-      </div>`
-    )
-    .join("");
-
-  container.innerHTML = `
-    <h3>Sources</h3>
-    ${sourceCards}
-    <h3>Requirements (candidates until a human approves them)</h3>
-    ${requirementCards}
-    <h3>Testable criteria (human-approved)</h3>
-    ${criterionCards}`;
-
-  container.querySelectorAll("[data-jump]").forEach((btn) => {
-    btn.addEventListener("click", () => jumpToItem(btn.dataset.jump));
+  const box = document.getElementById("sources-view");
+  if (APP.mode === "offline") return renderOfflineSources(box);
+  clear(box).append(loading("Loading the sources used by the latest review…"));
+  api("/api/review/latest").then((payload) => drawSources(box, payload), (err) => {
+    clear(box).append(h("h2", { text: "Sources & requirements" }), err.status === 404
+      ? message("info", "No review report yet, so there are no cited sources to show. Run the review first.")
+      : message("error", "The sources could not be loaded. " + problemText(err)));
   });
+}
+
+function drawSources(box, payload) {
+  const findings = payload.data.findings || [];
+  const bySource = new Map();
+  findings.forEach((f) => {
+    if (!bySource.has(f.source)) bySource.set(f.source, []);
+    bySource.get(f.source).push(f);
+  });
+  const cards = [...bySource.entries()].map(([source, list]) => {
+    const ask = h("button", { class: "chain-link", text: "Ask the rulebook about this" });
+    ask.addEventListener("click", () => {
+      switchTab("ask");
+      const q = document.getElementById("question");
+      if (q) { q.value = `What does ${source} say?`; q.dispatchEvent(new Event("input")); q.focus(); }
+    });
+    const criteria = [...new Set(list.map((f) => f.criterion_id).filter(Boolean))];
+    return h("div", { class: "card", id: sourceAnchor(source) },
+      h("h4", { class: "evidence", text: source }),
+      h("p", {}, "Used by checks: ", list.map((f) => [h("span", { class: "chain-step", text: f.id }), " ", badge(f.status), "  "])),
+      criteria.length ? h("p", { class: "meta", text: "Criterion IDs: " + criteria.join(", ") }) : null, ask);
+  });
+  clear(box).append(
+    h("h2", { text: "Sources & requirements" }),
+    message("info", `These are the sources cited by the ${findings.length} checks of report ${(payload.data.report || {}).id || "—"}. ` +
+      "Source records, requirement text and criterion approvals are not part of the live data yet, so they are not shown here; " +
+      "the earlier fabricated sample cards appear only in offline sample mode."),
+    cards.length ? cards : message("info", "The report cites no sources."));
 }
 
 function jumpToItem(id) {
   switchTab("sources");
-  const target = document.getElementById("item-" + id);
-  if (target) {
+  const find = () => document.getElementById(id) || document.getElementById("item-" + id);
+  const go = () => {
+    const target = find();
+    if (!target) return;
     target.scrollIntoView({ behavior: "smooth", block: "center" });
     target.classList.remove("flash");
     void target.offsetWidth; // restart the CSS animation
     target.classList.add("flash");
+  };
+  if (find()) go(); else setTimeout(go, 400);   // live sources load asynchronously
+}
+
+/* ---------- start-up ---------- */
+
+async function boot() {
+  TABS.forEach((t) => document.getElementById("tab-" + t).addEventListener("click", () => switchTab(t)));
+  try {
+    const health = await api("/api/health", { timeoutMs: 15000 });
+    if (!health || !health.parts) throw new Error("not our server");
+    APP.mode = "live";
+    APP.health = health;
+  } catch (err) {
+    APP.mode = "offline";
+    document.getElementById("offline-banner").hidden = false;
+    document.title = "OFFLINE SAMPLE DATA — " + document.title;
   }
+  switchTab((location.hash || "").slice(1) || "overview");
 }
 
-/* ---------- Tabs ---------- */
-
-function switchTab(tab) {
-  document.getElementById("test-case-list-view").hidden = tab !== "cases";
-  document.getElementById("test-case-detail").hidden = true;
-  document.getElementById("report-view").hidden = tab !== "report";
-  document.getElementById("sources-view").hidden = tab !== "sources";
-  document.getElementById("tab-cases").classList.toggle("active", tab === "cases");
-  document.getElementById("tab-report").classList.toggle("active", tab === "report");
-  document.getElementById("tab-sources").classList.toggle("active", tab === "sources");
-}
-
-document.getElementById("tab-cases").addEventListener("click", () => switchTab("cases"));
-document.getElementById("tab-report").addEventListener("click", () => switchTab("report"));
-document.getElementById("tab-sources").addEventListener("click", () => switchTab("sources"));
-
-renderTestCaseList();
-renderReport();
-renderSources();
-showListView();
+boot();

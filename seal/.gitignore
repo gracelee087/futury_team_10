@@ -1,0 +1,5 @@
+seal-data/
+*.jsonl
+*.receipt.json
+.seal_current_run
+__pycache__/
