@@ -1,7 +1,7 @@
 """Langfuse link for SÜSIE: the chat can show what Langfuse holds, and every chat turn is traced.
 
   summary()          datasets (item counts) + harness scores, read from Langfuse; cached 60 s
-  item_url(case_id)  link to the case's dataset item in team10-dbvo-v1 (same ids as data/testcases.json)
+  item_url(case_id)  link to the case's dataset item in team10-eaz-v1 (same ids as data/eaz_cases.json)
   trace_chat(...)    one trace per chat turn (user message + SÜSIE reply), through the privacy guard
 
 Keys come from the environment only (LANGFUSE_PUBLIC_KEY / LANGFUSE_SECRET_KEY / LANGFUSE_HOST); no key → every
@@ -16,10 +16,8 @@ import time
 import urllib.parse
 import urllib.request
 
-DATASETS = (("team10-dbvo-v1", "Krankengeld / Vorerkrankung (41)", "Sick leave / prior illness (41)"),
-            ("team10-stories-v1", "Story-Fälle (41)", "Story cases (41)"),
-            ("team10-maternity-v1", "Mutterschaftsgeld (03)", "Maternity benefit (03)"))
-CASE_DATASET = "team10-dbvo-v1"
+DATASETS = (("team10-eaz-v1", "Krankengeld (01), Format Beispielpapier §3.1", "Sickness benefit (01), Beispielpapier §3.1 format"),)
+CASE_DATASET = "team10-eaz-v1"
 CACHE_S = 60
 _cache: dict = {}
 

@@ -346,7 +346,7 @@ def _langfuse_utterance(text: str, english: bool) -> str:
         n = d["items"] if d["items"] is not None else ("missing" if english else "fehlt")
         lines.append(f"• {d.get('label_en', d['label']) if english else d['label']}: {n} {'cases' if english else 'Fälle'}"
                      + (f" — {d['url']}" if d["url"] else ""))
-    m = re.search(r"\b(GOLD-\d+\.\d+|(?:DEC|OUT|AMB)-\d{3})\b", text, re.IGNORECASE)
+    m = re.search(r"\b(EAZ-\d{3})\b", text, re.IGNORECASE)
     if m:
         url = langfuse_link.item_url(m.group(1).upper())
         if url:

@@ -1,0 +1,394 @@
+{
+ "summary": {
+  "run_id": "EAZ-HARNESS-20261027-094812-eaz-30",
+  "git_sha": "7b0332e",
+  "dataset": "team10-eaz-v1",
+  "reviewer": "itsg.comparator.compare",
+  "approval": "approved by Sohee Lee (chat 2026-10-27: format + 2 sample cases)",
+  "cases": 30,
+  "correct": 30,
+  "false_alarms": 0,
+  "clean_cases": 20,
+  "detected": 10,
+  "must_flag_cases": 10,
+  "wrong": []
+ },
+ "results": [
+  {
+   "id": "EAZ-001",
+   "category": "§3.1 pattern, letzter Tag des Monats",
+   "must_flag": null,
+   "planted_error": null,
+   "status": "PASS",
+   "diffs": [],
+   "flagged": [],
+   "ok": true,
+   "outcome": "clean"
+  },
+  {
+   "id": "EAZ-002",
+   "category": "§3.1 pattern, letzter Tag des Monats",
+   "must_flag": null,
+   "planted_error": null,
+   "status": "PASS",
+   "diffs": [],
+   "flagged": [],
+   "ok": true,
+   "outcome": "clean"
+  },
+  {
+   "id": "EAZ-003",
+   "category": "§3.1 pattern, letzter Tag des Monats | planted: EAZ = month of AU start (not yet settled)",
+   "must_flag": "EAZ-BEGINN-1",
+   "planted_error": "EAZ = month of AU start (not yet settled)",
+   "status": "MISMATCH",
+   "diffs": [
+    "EAZ-BEGINN-1: expected '20260501', observed '20260601'",
+    "EAZ-ENDE-1: expected '20260531', observed '20260630'"
+   ],
+   "flagged": [
+    "EAZ-BEGINN-1",
+    "EAZ-ENDE-1"
+   ],
+   "ok": true,
+   "outcome": "detected"
+  },
+  {
+   "id": "EAZ-004",
+   "category": "§3.1 pattern, 05. des Folgemonats | planted: Vorerkrankung flag set without prior AU",
+   "must_flag": "MM-VOER",
+   "planted_error": "Vorerkrankung flag set without prior AU",
+   "status": "MISMATCH",
+   "diffs": [
+    "MM-VOER: expected 'N', observed 'J'"
+   ],
+   "flagged": [
+    "MM-VOER"
+   ],
+   "ok": true,
+   "outcome": "detected"
+  },
+  {
+   "id": "EAZ-005",
+   "category": "§3.1 pattern, letzter Tag des Monats",
+   "must_flag": null,
+   "planted_error": null,
+   "status": "PASS",
+   "diffs": [],
+   "flagged": [],
+   "ok": true,
+   "outcome": "clean"
+  },
+  {
+   "id": "EAZ-006",
+   "category": "§3.1 pattern, letzter Tag des Monats",
+   "must_flag": null,
+   "planted_error": null,
+   "status": "PASS",
+   "diffs": [],
+   "flagged": [],
+   "ok": true,
+   "outcome": "clean"
+  },
+  {
+   "id": "EAZ-007",
+   "category": "§3.1 pattern, letzter Tag des Monats",
+   "must_flag": null,
+   "planted_error": null,
+   "status": "PASS",
+   "diffs": [],
+   "flagged": [],
+   "ok": true,
+   "outcome": "clean"
+  },
+  {
+   "id": "EAZ-008",
+   "category": "§3.1 pattern, letzter Tag des Monats",
+   "must_flag": null,
+   "planted_error": null,
+   "status": "PASS",
+   "diffs": [],
+   "flagged": [],
+   "ok": true,
+   "outcome": "clean"
+  },
+  {
+   "id": "EAZ-009",
+   "category": "§3.1 pattern, letzter Tag des Monats",
+   "must_flag": null,
+   "planted_error": null,
+   "status": "PASS",
+   "diffs": [],
+   "flagged": [],
+   "ok": true,
+   "outcome": "clean"
+  },
+  {
+   "id": "EAZ-010",
+   "category": "§3.1 pattern, letzter Tag des Monats",
+   "must_flag": null,
+   "planted_error": null,
+   "status": "PASS",
+   "diffs": [],
+   "flagged": [],
+   "ok": true,
+   "outcome": "clean"
+  },
+  {
+   "id": "EAZ-011",
+   "category": "§3.1 pattern, 05. des Folgemonats",
+   "must_flag": null,
+   "planted_error": null,
+   "status": "PASS",
+   "diffs": [],
+   "flagged": [],
+   "ok": true,
+   "outcome": "clean"
+  },
+  {
+   "id": "EAZ-012",
+   "category": "§3.1 pattern, 05. des Folgemonats",
+   "must_flag": null,
+   "planted_error": null,
+   "status": "PASS",
+   "diffs": [],
+   "flagged": [],
+   "ok": true,
+   "outcome": "clean"
+  },
+  {
+   "id": "EAZ-013",
+   "category": "§3.1 pattern, letzter Tag des Monats",
+   "must_flag": null,
+   "planted_error": null,
+   "status": "PASS",
+   "diffs": [],
+   "flagged": [],
+   "ok": true,
+   "outcome": "clean"
+  },
+  {
+   "id": "EAZ-014",
+   "category": "§3.1 pattern, letzter Tag des Monats",
+   "must_flag": null,
+   "planted_error": null,
+   "status": "PASS",
+   "diffs": [],
+   "flagged": [],
+   "ok": true,
+   "outcome": "clean"
+  },
+  {
+   "id": "EAZ-015",
+   "category": "§3.1 pattern, letzter Tag des Monats",
+   "must_flag": null,
+   "planted_error": null,
+   "status": "PASS",
+   "diffs": [],
+   "flagged": [],
+   "ok": true,
+   "outcome": "clean"
+  },
+  {
+   "id": "EAZ-016",
+   "category": "§3.1 pattern, letzter Tag des Monats | planted: EAZ end = 30th in a 31-day month",
+   "must_flag": "EAZ-ENDE-1",
+   "planted_error": "EAZ end = 30th in a 31-day month",
+   "status": "MISMATCH",
+   "diffs": [
+    "EAZ-ENDE-1: expected '20260531', observed '20260530'"
+   ],
+   "flagged": [
+    "EAZ-ENDE-1"
+   ],
+   "ok": true,
+   "outcome": "detected"
+  },
+  {
+   "id": "EAZ-017",
+   "category": "§3.1 pattern, 05. des Folgemonats | planted: following-month settlement ignored (EAZ one month too late)",
+   "must_flag": "EAZ-BEGINN-1",
+   "planted_error": "following-month settlement ignored (EAZ one month too late)",
+   "status": "MISMATCH",
+   "diffs": [
+    "EAZ-BEGINN-1: expected '20251101', observed '20251201'",
+    "EAZ-ENDE-1: expected '20251130', observed '20251231'"
+   ],
+   "flagged": [
+    "EAZ-BEGINN-1",
+    "EAZ-ENDE-1"
+   ],
+   "ok": true,
+   "outcome": "detected"
+  },
+  {
+   "id": "EAZ-018",
+   "category": "§3.1 pattern, letzter Tag des Monats",
+   "must_flag": null,
+   "planted_error": null,
+   "status": "PASS",
+   "diffs": [],
+   "flagged": [],
+   "ok": true,
+   "outcome": "clean"
+  },
+  {
+   "id": "EAZ-019",
+   "category": "§3.1 pattern, 05. des Folgemonats | planted: one-off payment of 1.000,00 EUR added to monthly gross",
+   "must_flag": "BRUTTO-1",
+   "planted_error": "one-off payment of 1.000,00 EUR added to monthly gross",
+   "status": "MISMATCH",
+   "diffs": [
+    "BRUTTO-1: expected '00640000', observed '00740000'"
+   ],
+   "flagged": [
+    "BRUTTO-1"
+   ],
+   "ok": true,
+   "outcome": "detected"
+  },
+  {
+   "id": "EAZ-020",
+   "category": "§3.1 pattern, letzter Tag des Monats",
+   "must_flag": null,
+   "planted_error": null,
+   "status": "PASS",
+   "diffs": [],
+   "flagged": [],
+   "ok": true,
+   "outcome": "clean"
+  },
+  {
+   "id": "EAZ-021",
+   "category": "§3.1 pattern, letzter Tag des Monats | planted: EGZ end one day late",
+   "must_flag": "DATUM-EGZBIS",
+   "planted_error": "EGZ end one day late",
+   "status": "MISMATCH",
+   "diffs": [
+    "DATUM-EGZBIS: expected '20260529', observed '20260530'"
+   ],
+   "flagged": [
+    "DATUM-EGZBIS"
+   ],
+   "ok": true,
+   "outcome": "detected"
+  },
+  {
+   "id": "EAZ-022",
+   "category": "§3.1 pattern, letzter Tag des Monats",
+   "must_flag": null,
+   "planted_error": null,
+   "status": "PASS",
+   "diffs": [],
+   "flagged": [],
+   "ok": true,
+   "outcome": "clean"
+  },
+  {
+   "id": "EAZ-023",
+   "category": "§3.1 pattern, letzter Tag des Monats",
+   "must_flag": null,
+   "planted_error": null,
+   "status": "PASS",
+   "diffs": [],
+   "flagged": [],
+   "ok": true,
+   "outcome": "clean"
+  },
+  {
+   "id": "EAZ-024",
+   "category": "§3.1 pattern, 05. des Folgemonats | planted: EGZ end one day early",
+   "must_flag": "DATUM-EGZBIS",
+   "planted_error": "EGZ end one day early",
+   "status": "MISMATCH",
+   "diffs": [
+    "DATUM-EGZBIS: expected '20260714', observed '20260713'"
+   ],
+   "flagged": [
+    "DATUM-EGZBIS"
+   ],
+   "ok": true,
+   "outcome": "detected"
+  },
+  {
+   "id": "EAZ-025",
+   "category": "§3.1 pattern, letzter Tag des Monats",
+   "must_flag": null,
+   "planted_error": null,
+   "status": "PASS",
+   "diffs": [],
+   "flagged": [],
+   "ok": true,
+   "outcome": "clean"
+  },
+  {
+   "id": "EAZ-026",
+   "category": "§3.1 pattern, letzter Tag des Monats | planted: net in euros, not cents",
+   "must_flag": "NETTO-1",
+   "planted_error": "net in euros, not cents",
+   "status": "MISMATCH",
+   "diffs": [
+    "NETTO-1: expected '00312620', observed '00003126'"
+   ],
+   "flagged": [
+    "NETTO-1"
+   ],
+   "ok": true,
+   "outcome": "detected"
+  },
+  {
+   "id": "EAZ-027",
+   "category": "§3.1 pattern, 05. des Folgemonats",
+   "must_flag": null,
+   "planted_error": null,
+   "status": "PASS",
+   "diffs": [],
+   "flagged": [],
+   "ok": true,
+   "outcome": "clean"
+  },
+  {
+   "id": "EAZ-028",
+   "category": "§3.1 pattern, 05. des Folgemonats | planted: AU start shifted",
+   "must_flag": "DATUM-AB",
+   "planted_error": "AU start shifted",
+   "status": "MISMATCH",
+   "diffs": [
+    "DATUM-AB: expected '20260301', observed '20260302'"
+   ],
+   "flagged": [
+    "DATUM-AB"
+   ],
+   "ok": true,
+   "outcome": "detected"
+  },
+  {
+   "id": "EAZ-029",
+   "category": "§3.1 pattern, letzter Tag des Monats | planted: net and gross swapped",
+   "must_flag": "NETTO-1",
+   "planted_error": "net and gross swapped",
+   "status": "MISMATCH",
+   "diffs": [
+    "BRUTTO-1: expected '00190000', observed '00116814'",
+    "NETTO-1: expected '00116814', observed '00190000'"
+   ],
+   "flagged": [
+    "BRUTTO-1",
+    "NETTO-1"
+   ],
+   "ok": true,
+   "outcome": "detected"
+  },
+  {
+   "id": "EAZ-030",
+   "category": "§3.1 pattern, letzter Tag des Monats",
+   "must_flag": null,
+   "planted_error": null,
+   "status": "PASS",
+   "diffs": [],
+   "flagged": [],
+   "ok": true,
+   "outcome": "clean"
+  }
+ ]
+}

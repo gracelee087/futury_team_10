@@ -18,17 +18,17 @@ class LangfuseLinkTest(unittest.TestCase):
 
     def test_chat_command_lists_datasets_and_case_link(self):
         info = {"host": "https://lf", "datasets": [
-                    {"name": "team10-dbvo-v1", "label": "Krankengeld / Vorerkrankung (41)", "items": 300, "url": "https://lf/d1"},
+                    {"name": "team10-eaz-v1", "label": "Krankengeld (01)", "items": 30, "url": "https://lf/d1"},
                     {"name": "team10-maternity-v1", "label": "Mutterschaftsgeld (03)", "items": None, "url": None}],
                 "scores": {"case_correct": {"true": 299, "false": 1}, "false_alarm": {"true": 0, "false": 130}}}
         with mock.patch.object(langfuse_link, "summary", return_value=info), \
-                mock.patch.object(langfuse_link, "item_url", return_value="https://lf/item/OUT-041"):
-            reply = chat.deterministic_turn("show langfuse for OUT-041", {}, task_id="T", session_id="s")
+                mock.patch.object(langfuse_link, "item_url", return_value="https://lf/item/EAZ-021"):
+            reply = chat.deterministic_turn("show langfuse for EAZ-021", {}, task_id="T", session_id="s")
         ut = reply.utterance
-        self.assertIn("300 cases — https://lf/d1", ut)
+        self.assertIn("30 cases — https://lf/d1", ut)
         self.assertIn("missing", ut)
         self.assertNotIn("299", ut)   # all-run score totals are not shown (they mix old runs)
-        self.assertIn("OUT-041: https://lf/item/OUT-041", ut)
+        self.assertIn("EAZ-021: https://lf/item/EAZ-021", ut)
         self.assertEqual(reply.agent_run["result"]["deterministic_command"], "langfuse")
 
 

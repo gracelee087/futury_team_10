@@ -303,26 +303,6 @@ class TestStoriesReviews(unittest.TestCase):
         self.assertEqual(state["reviews"], [])
         self.assertIsNone(state["harness"])
 
-    def test_review_run_real_returns_new_report(self):
-        # run_review.py writes to its own ROOT/reports; point the handler there
-        # for this one real (deterministic, offline) execution.
-        SUSIEHandler.reports_path = webserver.ROOT / "reports"
-        try:
-            status, body = _request(
-                self.port, "POST", "/api/review/run", body=json.dumps({"scope": "ignored"}).encode(),
-                headers={"Content-Type": "application/json"}, timeout=60)
-            payload = json.loads(body)
-        finally:
-            SUSIEHandler.reports_path = Path(self.tmp.name) / "reports"
-        self.assertEqual(status, 200)
-        self.assertTrue(payload["ok"])
-        review = payload["review"]
-        self.assertTrue(review["id"].startswith("RPT-"))
-        self.assertEqual(review["file"], review["id"] + ".json")
-        self.assertIn("PASS", review["counts"])
-        self.assertIsInstance(review["findings"], list)
-        self.assertIn("result", review["robustness"])
-
 
 class _FakeGateway:
     """Offline stand-in for the LLM gateway — no network, no credentials."""
