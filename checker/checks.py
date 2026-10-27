@@ -22,7 +22,10 @@ def valid_date(s):
     except (TypeError, ValueError):
         return False
 
-def run_checks(case):
+def run_checks(case, expected=None):
+    """expected: optional {"AZVU": str|None, "EFZ_Ende_final": str|None}. Default = the fixed ITSG Testkonstellation
+    values above (T10-008: story cases pass their own ground truth; None = no approved expected value)."""
+    exp = EXPECTED if expected is None else expected
     m = case.get("messages", [])
     tc = case.get("test_case_id", "TC-1")
     run = case.get("run_id", "RUN-1")
@@ -51,7 +54,7 @@ def run_checks(case):
     no88 = None if st88 else "No cancellation (88) in observed output"
 
     add("C1", "All messages use the same AZVU", "SRC-TK", "ID table, column AZVU", True,
-        "AZVU", [EXPECTED["AZVU"]], sorted({str(x.get("AZVU")) for x in m}))
+        "AZVU", [exp["AZVU"]] if exp.get("AZVU") else None, sorted({str(x.get("AZVU")) for x in m}))
     add("C2", "Exactly one cancellation (88) is sent", "SRC-TK", "ID table, Abgabegrund rows", True,
         "count(Abgabegrund=88)", 1, len(st88))
     add("C3", "The cancellation is flagged Stornierung = J", "SRC-TK", "ID table, column Stornierung", True,
@@ -66,7 +69,7 @@ def run_checks(case):
         "01 after 88", True, bool(st88) and any(i > st88[0] for i in ag01), no88)
     add("C6", "Final sick-pay end (EFZ) after the correction", "SRC-TK",
         "Text: EFZ ends 27.03.2026 after the corrected 61", True,
-        "EFZ_Ende", EXPECTED["EFZ_Ende_final"], m[ag01[-1]].get("EFZ_Ende") if ag01 else None,
+        "EFZ_Ende", exp.get("EFZ_Ende_final"), m[ag01[-1]].get("EFZ_Ende") if ag01 else None,
         None if ag01 else "No 01 message in observed output")
     add("C7", "Prior-illness request (41) comes before the first 01", "SRC-TK", "ID table, row order", True,
         "order(41 before 01)", True,

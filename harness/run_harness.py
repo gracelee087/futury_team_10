@@ -99,9 +99,37 @@ def score(case, findings):
     return {"flagged": flagged, "ok": ok, "outcome": outcome}
 
 
+# T10-008: which of Fares' flow checks (C1-C8) is the right one for a story 6 defect (others may also fire).
+# F-REF-61 / F-REF-62 (REF-ID wrong) have no check in C1-C8 -> empty set: such a case can only count as MISSED.
+RIGHT_FLOW = {"F-88": {"C2"}, "F-88-flag": {"C3"}, "F-88-UR": {"C4"}, "F-new-01": {"C5"}, "F-order": {"C5"},
+              "F-AZVU": {"C1"}, "F-correction": {"C6"}, "F-REF-62": set(), "F-REF-61": set()}
+
+
+def score_story(case, findings):
+    """Story 4/6 scoring against the case's own must_flag. A story with no evaluable check is NOT EVALUATED."""
+    if all(f["status"] == "NOT EVALUATED" for f in findings):
+        return {"flagged": [], "ok": None, "outcome": "NOT EVALUATED (no applicable check)"}
+    flagged = sorted(f["id"] for f in findings if f["status"] in ("MISMATCH", "BLOCKED"))
+    must = case["must_flag"]
+    if must is None:
+        return ({"flagged": flagged, "ok": False, "outcome": "FALSE ALARM"} if flagged
+                else {"flagged": [], "ok": True, "outcome": "clean"})
+    if not flagged:
+        return {"flagged": [], "ok": False, "outcome": "MISSED"}
+    if "GUARD" in flagged:
+        return {"flagged": flagged, "ok": False, "outcome": "BLOCKED by the input guard"}
+    ok = bool(RIGHT_FLOW.get(must, set()) & set(flagged))
+    return {"flagged": flagged, "ok": ok, "outcome": "detected" if ok else "flagged, but by an unrelated check"}
+
+
 def evaluate(case, raw, tmpdir):
-    """Findings + score for one case. Story 4/6 cases (insurer reply, message flow) have no checker yet."""
+    """Findings + score for one case. Story 4/6 go through the flow checker via harness/story_flow_adapter.py."""
     if "observed_dbvo" not in case:
+        if case.get("story") in (4, 6):   # T10-008
+            sys.path.insert(0, str(ROOT / "harness"))
+            from story_flow_adapter import story_findings
+            findings = story_findings(case)
+            return findings, score_story(case, findings)
         return [], {"flagged": [], "ok": None, "outcome": "NOT EVALUATED (no checker)"}
     _, findings = review(case, raw, tmpdir)
     return findings, score(case, findings)
