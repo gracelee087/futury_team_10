@@ -181,16 +181,12 @@ def _execute_mutating(action_id: str, params: dict, store_root: Path, reviewer: 
             "executed_by": "susie-assistant",
         }
     if action_id == "run_comparison":
-        # live=True re-runs the demo with real gateway calls (AI roles draft
-        # requirement + test-case candidates). Offline (the comparison button)
-        # re-runs the field comparison of Team 10's 30 cases (data/eaz_cases.json).
+        # Both buttons ("Create test cases from the law" = live, "Run comparison" = offline)
+        # work on Team 10's 30 cases only (data/eaz_cases.json): load them and compare all
+        # again. The old demo seed (TC-1..TC-4) is no longer used by the website.
         live = bool(params.get("live", False))
-        if live:
-            from . import demo  # lazy: keeps the heavy demo stack out of chat imports
-            demo.run_demo(store_root, live=True, fresh=False)
-        else:
-            from . import eaz_import
-            eaz_import.run_import(Path(store_root), eaz_import.ROOT / "data" / "eaz_cases.json")
+        from . import eaz_import
+        eaz_import.run_import(Path(store_root), eaz_import.ROOT / "data" / "eaz_cases.json")
         return {"executed": True, "mode": "server", "live": live}
     # initiate_review_flow opens the review dialog client-side; nothing to record here.
     return {"executed": True, "mode": "client"}

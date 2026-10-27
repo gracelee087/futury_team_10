@@ -547,12 +547,13 @@ def run_demo_into(store_root: Path, live: bool, fresh: bool = False) -> dict:
     ``fresh`` deletes the store first — that silently destroys a fed corpus
     (T10-045 footgun), so the API only wipes on the explicit opt-in flag.
     """
-    from . import demo  # local import keeps --help cheap
+    # The website runs on Team 10's 30 cases only: (re)load data/eaz_cases.json and compare them.
+    from . import eaz_import
 
     with _run_lock:
         buffer = io.StringIO()
         with contextlib.redirect_stdout(buffer):
-            demo.run_demo(store_root, live=live, fresh=fresh)
+            eaz_import.run_import(Path(store_root), eaz_import.ROOT / "data" / "eaz_cases.json")
     return build_state(store_root)
 
 

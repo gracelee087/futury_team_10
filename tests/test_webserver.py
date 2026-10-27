@@ -115,7 +115,8 @@ class TestWebserver(unittest.TestCase):
         payload = json.loads(body)
         self.assertEqual(status, 200)
         self.assertTrue(payload["ok"])
-        self.assertEqual(len(payload["cases"]), 4)
+        # /api/run (re)loads and compares Team 10's 30 cases (data/eaz_cases.json)
+        self.assertEqual(len([c for c in payload["cases"] if c["id"].startswith("EAZ-")]), 30)
 
     def test_run_rejects_non_object_body(self):
         status, _ = _request(
