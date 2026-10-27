@@ -23,18 +23,19 @@
   }
  },
  "requirement": {
-  "REQ-VOER-1": {
-   "id": "REQ-VOER-1",
-   "text": "Die Vorerkrankungsanfrage (Abgabegrund 41) darf nur ausgelöst werden, wenn eine AU-Bescheinigung für die aktuelle AU vorliegt, mindestens eine bescheinigte potentielle Vorerkrankung in den letzten 6 Monaten vor AU-Beginn im Datenbestand liegt und die kumulierten Vorzeiten der letzten 12 Monate zusammen mit der aktuellen AU zum Zeitpunkt der Meldung mindestens 30 Tage umfassen.",
-   "source_id": "SRC-VB",
-   "citation": "S. 135, §3.12 (VB DTA EEL V13.4)",
-   "status": "needs_review"
+  "REQ-EAZ-1": {
+   "id": "REQ-EAZ-1",
+   "text": "Entgeltbescheinigung Krankengeld (Abgabegrund 01), Sachverhalt \"Gehaltsempfänger ohne Besonderheiten\": das Entgeltabrechnungsprogramm übermittelt DSLW, DBAL und DBAE mit den im Beispiel gezeigten Inhalten (u. a. DATUM-AB = Beginn der Arbeitsunfähigkeit, DATUM-EGZBIS = Ende der Entgeltfortzahlung, EAZ-BEGINN-1/EAZ-ENDE-1 = letzter abgerechneter Entgeltabrechnungszeitraum bei Beginn der AU, BRUTTO-1/NETTO-1 = Monatsentgelt); bei Abrechnung zum 05. des Folgemonats ist der davorliegende Monat anzugeben.",
+   "source_id": "SRC-BP",
+   "citation": "S. 9–11, §3.1 und S. 11–12, §3.2.1.1 (Beispielpapier DTA EEL V13.3)",
+   "status": "needs_review",
+   "working_translation_en": "Sickness benefit certificate (Abgabegrund 01), salaried employee without special features: the payroll program transmits DSLW, DBAL and DBAE with the contents shown in the example (DATUM-AB = start of incapacity, DATUM-EGZBIS = end of continued pay, EAZ = last settled period at the start of incapacity, BRUTTO-1/NETTO-1 = monthly pay); with settlement on the 5th of the following month the month before is reported."
   }
  },
  "criterion": {
   "CRIT-EAZ-1": {
    "id": "CRIT-EAZ-1",
-   "requirement_id": "REQ-VOER-1",
+   "requirement_id": "REQ-EAZ-1",
    "description": "Für §3.1-Sachverhalte überträgt das Abrechnungsprogramm den offiziellen DSLW/DBAL/DBAE-Erwartungsdatensatz (Beispielpapier V13.3 §3.1 S. 9–11; Abwandlung §3.2.1.4 S. 12).",
    "expected_basis": "Beispielpapier DTA EEL V13.3 (gültig ab 01.01.2027), §3.1, S. 9–11: DSLW (S. 9–10), DBAL (S. 10), DBAE (S. 11). Offizielle Erwartungswerte für die Abgabeseite des Entgeltabrechnungsprogramms (Transmit-Seite); keine Leistungsbeitragsbehauptung.",
    "review_status": "approved"

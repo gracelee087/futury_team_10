@@ -89,3 +89,5 @@
 {"action": "put", "at": "2026-10-27T09:12:13+00:00", "id": "RUN-EAZ-030", "kind": "execution", "seq": 89}
 {"action": "put", "at": "2026-10-27T09:12:13+00:00", "id": "FIND-EAZ-030", "kind": "finding", "seq": 90}
 {"action": "put", "at": "2026-10-27T09:12:13+00:00", "id": "RPT-1", "kind": "report", "seq": 91}
+{"action": "put", "at": "2026-10-27T10:31:45+00:00", "id": "REQ-EAZ-1", "kind": "requirement", "seq": 92}
+{"action": "put", "at": "2026-10-27T10:31:45+00:00", "id": "CRIT-EAZ-1", "kind": "criterion", "seq": 93}
