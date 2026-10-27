@@ -11,6 +11,7 @@ Fail-closed contract under test:
 """
 from __future__ import annotations
 
+import shutil
 import tempfile
 import unittest
 from pathlib import Path
@@ -193,15 +194,20 @@ class ActionRegistryTests(unittest.TestCase):
         with self.assertRaises(PermissionError):
             actions.execute("record_review_state", params, tok, self.store_root, "Amr")
 
-    # -- run_comparison (lazy demo import) -------------------------------------------
+    # -- run_comparison (offline: the 30 EAZ cases) ------------------------------------
 
-    def test_run_comparison_runs_offline_demo(self):
+    def test_run_comparison_compares_the_30_cases(self):
+        demo_store = Path(__file__).resolve().parent.parent / "data" / "demo"
+        Path(self.store_root).mkdir(parents=True, exist_ok=True)
+        shutil.copy(demo_store / "records.json", Path(self.store_root) / "records.json")
         tok = actions.propose("run_comparison", {}, "s1")["confirm_token"]
         out = actions.execute("run_comparison", {}, tok, self.store_root, "Amr")
         self.assertEqual(out, {"executed": True, "mode": "server", "live": False})
         store = Store(self.store_root)
         self.assertTrue(store.all("report"))
-        self.assertTrue(store.events())
+        findings = store.all("finding")
+        self.assertEqual(len(findings), 30)
+        self.assertEqual(sorted({f["status"] for f in findings}), ["MISMATCH", "PASS"])
 
     # -- confirmation binds the proposed params (Finding: proposal-bound tokens) ----
 
