@@ -613,7 +613,7 @@
       const prev = (S.viewStack || []).pop();
       showView(prev && prev !== S.view ? prev : "cases");
       renderCases(); renderReport(); renderSources();
-      return { executed: true, detail: LANG === "de" ? `Zurück zu ${S.view}` : `Back to ${S.view}` };
+      return { executed: true, detail: LANG === "de" ? `Zurück zu ${t(S.view)}` : `Back to ${t(S.view)}` };
     },
     next_case() { return stepCase(+1); },
     prev_case() { return stepCase(-1); },
@@ -622,35 +622,37 @@
       renderCases();
       const card = document.querySelector(`[data-case="${CSS.escape(case_id)}"]`);
       if (card) { card.scrollIntoView({ block: "center" }); flash(card); }
-      return { executed: true, detail: `Fall ${case_id} ausgewählt` };
+      return { executed: true, detail: LANG === "de" ? `Fall ${case_id} ausgewählt` : `Case ${case_id} selected` };
     },
     open_evidence({ case_id }) {
       S.selectedCase = case_id; S.openEvidence.add(case_id);
       S.view = "cases"; showView("cases"); renderCases();
       const card = document.querySelector(`[data-case="${CSS.escape(case_id)}"]`);
       if (card) { card.scrollIntoView({ block: "center" }); flash(card); }
-      return { executed: true, detail: `Nachweise zu ${case_id} geöffnet` };
+      return { executed: true, detail: LANG === "de" ? `Nachweise zu ${case_id} geöffnet` : `Evidence for ${case_id} opened` };
     },
     filter_cases({ filter }) {
       S.filter = String(filter ?? ""); renderCases();
-      return { executed: true, detail: S.filter ? `Filter „${S.filter}“ aktiv` : "Filter zurückgesetzt" };
+      return { executed: true, detail: S.filter ? (LANG === "de" ? `Filter „${S.filter}“ aktiv` : `Filter "${S.filter}" active`)
+                                 : (LANG === "de" ? "Filter zurückgesetzt" : "Filter cleared") };
     },
     jump_to_source({ ref }) {
       S.view = "sources"; showView("sources"); renderSources();
       const target = document.getElementById(`src-${CSS.escape(ref || "")}`) || document.querySelector(".card");
       if (target) { target.scrollIntoView({ block: "center" }); flash(target); }
-      return { executed: true, detail: "Zur Quelle gesprungen" };
+      return { executed: true, detail: LANG === "de" ? "Zur Quelle gesprungen" : "Jumped to the source" };
     },
     show_comparison({ case_id }) {
       S.selectedCase = case_id; S.openEvidence.add(case_id);
       S.view = "cases"; showView("cases"); renderCases();
       const card = document.querySelector(`[data-case="${CSS.escape(case_id)}"]`);
       if (card) { card.scrollIntoView({ block: "center" }); flash(card); }
-      return { executed: true, detail: `Vergleich für ${case_id} angezeigt` };
+      return { executed: true, detail: LANG === "de" ? `Vergleich für ${case_id} angezeigt` : `Comparison for ${case_id} shown` };
     },
     switch_mode({ mode }) {
       setMode(mode === "fullscreen" ? "fullscreen" : "overlay");
-      return { executed: true, detail: mode === "fullscreen" ? "Vollbild-Modus" : "Overlay-Modus" };
+      return { executed: true, detail: mode === "fullscreen" ? (LANG === "de" ? "Vollbild-Modus" : "Full-screen mode")
+                                     : (LANG === "de" ? "Overlay-Modus" : "Overlay mode") };
     },
   };
 
@@ -666,7 +668,7 @@
       });
       const body = await res.json().catch(() => ({}));
       if (!res.ok || body.ok === false) {
-        const err = new Error(body.error || `Aktion fehlgeschlagen (HTTP ${res.status})`);
+        const err = new Error(body.error || `${LANG === "de" ? "Aktion fehlgeschlagen" : "Action failed"} (HTTP ${res.status})`);
         err.actionResult = "err"; throw err;
       }
       emit("action_executed", { actionId: actionId, result: body.result });
@@ -676,7 +678,7 @@
       return body.result;
     }
     const fn = clientExec[actionId];
-    if (!fn) { const e = new Error(`Unbekannte Aktion: ${actionId}`); e.actionResult = "err"; throw e; }
+    if (!fn) { const e = new Error(`${LANG === "de" ? "Unbekannte Aktion" : "Unknown action"}: ${actionId}`); e.actionResult = "err"; throw e; }
     const result = fn(params);
     emit("action_executed", { actionId, result });
     return result;
@@ -802,6 +804,17 @@
     if (search && document.activeElement !== search && search.value !== (S.filter || "")) {
       search.value = S.filter || "";  // chat commands can drive the query too
     }
+    // The toolbar is built once; texts follow the current language on every render (DE/EN switch).
+    if (search) {
+      search.placeholder = t("searchCases");
+      search.setAttribute("aria-label", t("searchCases"));
+    }
+    const sort = $("case-sort");
+    if (sort) {
+      const keys = { default: "sortDefault", id: "sortId", "id-desc": "sortIdDesc", group: "sortGroup" };
+      for (const opt of sort.options) opt.textContent = t(keys[opt.value]);
+      sort.setAttribute("aria-label", LANG === "de" ? "Sortieren" : "Sort");
+    }
     const counts = { all: total };
     for (const c of S.appState?.cases || []) counts[c.status] = (counts[c.status] || 0) + 1;
     const seg = $("case-status-filter");
@@ -909,10 +922,14 @@
         const diff = Object.keys(exp).find((k) => obs[k] !== undefined && String(obs[k]) !== String(exp[k]))
           || Object.keys(exp).find((k) => obs[k] === undefined || obs[k] === "");
         recs.push(diff
-          ? `${c.id}: Feld „${fieldLabel(diff)}“ im Abrechnungsprogramm prüfen und korrigieren (erwartet „${exp[diff]}“, übermittelt „${obs[diff] ?? "—"}“), Test wiederholen.`
-          : `${c.id}: Abweichung im Abrechnungsprogramm prüfen, Test wiederholen.`);
+          ? (LANG === "de"
+            ? `${c.id}: Feld „${fieldLabel(diff)}“ im Abrechnungsprogramm prüfen und korrigieren (erwartet „${exp[diff]}“, übermittelt „${obs[diff] ?? "—"}“), Test wiederholen.`
+            : `${c.id}: check and correct field "${fieldLabel(diff)}" in the payroll program (expected "${exp[diff]}", transmitted "${obs[diff] ?? "—"}"), repeat the test.`)
+          : (LANG === "de" ? `${c.id}: Abweichung im Abrechnungsprogramm prüfen, Test wiederholen.`
+                           : `${c.id}: check the deviation in the payroll program, repeat the test.`));
       } else if (c.status === "NOT_EVALUATED") {
-        recs.push(`${c.id}: vollständige Eingaben bereitstellen und den Test erneut ausführen.`);
+        recs.push(LANG === "de" ? `${c.id}: vollständige Eingaben bereitstellen und den Test erneut ausführen.`
+                                 : `${c.id}: provide complete inputs and run the test again.`);
       }
     }
     if (!recs.length && cases.length) {
@@ -1633,7 +1650,7 @@
     try {
       const res = await fetch("/api/chat", {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ session_id: S.sessionId, message: text, reviewer: S.reviewer }),
+        body: JSON.stringify({ session_id: S.sessionId, message: text, reviewer: S.reviewer, lang: LANG }),
       });
       reply = await res.json();
     } catch {
@@ -1693,10 +1710,10 @@
   // Report generation deliverable: the formal PDF (itsg/report_pdf via the
   // bridge's /api/report/pdf), fetched after the confirmed export action.
   async function downloadReport() {
-    const res = await fetch("/api/report/pdf");
+    const res = await fetch(`/api/report/pdf?lang=${LANG}`);  // report in the UI language
     if (!res.ok) {
       const body = await res.json().catch(() => ({}));
-      throw new Error(body.error || `PDF-Endpunkt ${res.status}`);
+      throw new Error(body.error || `${LANG === "de" ? "PDF-Endpunkt" : "PDF endpoint"} ${res.status}`);
     }
     const blob = await res.blob();
     const url = URL.createObjectURL(blob);
@@ -1801,7 +1818,7 @@
             await downloadReport();
             finish("ok", `${t("exportDone")} (PDF) — ${t("done", detail)}`);
           } catch (pdfErr) {
-            finish("err", `${t("exportDone")} fehlgeschlagen: ${pdfErr.message}`);
+            finish("err", `${t("exportDone")} ${LANG === "de" ? "fehlgeschlagen" : "failed"}: ${pdfErr.message}`);
           }
         }
         emit("action_executed", { actionId: action.id, result });

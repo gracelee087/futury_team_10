@@ -6,7 +6,7 @@
   "official_form_id": null,
   "renderer_version": "itsg.renderer/0.1.0",
   "field_map_version": "itsg.fieldmap/synth-1",
-  "generated_at": "2026-10-27T07:25:36+00:00",
+  "generated_at": "2026-10-27T09:12:13+00:00",
   "field_labels": {
     "case_id": "Fall-ID",
     "criterion_id": "Kriterium",
@@ -18,43 +18,303 @@
   "compliance_claim_reason": "synthetic template (official_form_id=None): no legal or template compliance claim may be derived (plan.md, architecture.md §8)",
   "results": [
     {
-      "case_id": "TC-1",
+      "case_id": "EAZ-001",
       "criterion_id": "CRIT-EAZ-1",
       "result_status": "PASS",
       "reason": "observed output matches expected value",
       "evidence_links": [
-        "TC-1",
-        "RUN-1"
+        "EAZ-001",
+        "RUN-EAZ-001"
       ]
     },
     {
-      "case_id": "TC-2",
+      "case_id": "EAZ-002",
+      "criterion_id": "CRIT-EAZ-1",
+      "result_status": "PASS",
+      "reason": "observed output matches expected value",
+      "evidence_links": [
+        "EAZ-002",
+        "RUN-EAZ-002"
+      ]
+    },
+    {
+      "case_id": "EAZ-003",
       "criterion_id": "CRIT-EAZ-1",
       "result_status": "MISMATCH",
-      "reason": "EAZ-BEGINN-1: expected '20XX0101', observed '20XX0401'",
+      "reason": "EAZ-BEGINN-1: expected '20260501', observed '20260601'; EAZ-ENDE-1: expected '20260531', observed '20260630'",
       "evidence_links": [
-        "TC-2",
-        "RUN-2"
+        "EAZ-003",
+        "RUN-EAZ-003"
       ]
     },
     {
-      "case_id": "TC-3",
+      "case_id": "EAZ-004",
       "criterion_id": "CRIT-EAZ-1",
-      "result_status": "NOT_EVALUATED",
-      "reason": "missing expected value",
+      "result_status": "MISMATCH",
+      "reason": "MM-VOER: expected 'N', observed 'J'",
       "evidence_links": [
-        "TC-3",
-        "RUN-3"
+        "EAZ-004",
+        "RUN-EAZ-004"
       ]
     },
     {
-      "case_id": "TC-4",
-      "criterion_id": "CRIT-VOER-1",
+      "case_id": "EAZ-005",
+      "criterion_id": "CRIT-EAZ-1",
       "result_status": "PASS",
       "reason": "observed output matches expected value",
       "evidence_links": [
-        "TC-4",
-        "RUN-4"
+        "EAZ-005",
+        "RUN-EAZ-005"
+      ]
+    },
+    {
+      "case_id": "EAZ-006",
+      "criterion_id": "CRIT-EAZ-1",
+      "result_status": "PASS",
+      "reason": "observed output matches expected value",
+      "evidence_links": [
+        "EAZ-006",
+        "RUN-EAZ-006"
+      ]
+    },
+    {
+      "case_id": "EAZ-007",
+      "criterion_id": "CRIT-EAZ-1",
+      "result_status": "PASS",
+      "reason": "observed output matches expected value",
+      "evidence_links": [
+        "EAZ-007",
+        "RUN-EAZ-007"
+      ]
+    },
+    {
+      "case_id": "EAZ-008",
+      "criterion_id": "CRIT-EAZ-1",
+      "result_status": "PASS",
+      "reason": "observed output matches expected value",
+      "evidence_links": [
+        "EAZ-008",
+        "RUN-EAZ-008"
+      ]
+    },
+    {
+      "case_id": "EAZ-009",
+      "criterion_id": "CRIT-EAZ-1",
+      "result_status": "PASS",
+      "reason": "observed output matches expected value",
+      "evidence_links": [
+        "EAZ-009",
+        "RUN-EAZ-009"
+      ]
+    },
+    {
+      "case_id": "EAZ-010",
+      "criterion_id": "CRIT-EAZ-1",
+      "result_status": "PASS",
+      "reason": "observed output matches expected value",
+      "evidence_links": [
+        "EAZ-010",
+        "RUN-EAZ-010"
+      ]
+    },
+    {
+      "case_id": "EAZ-011",
+      "criterion_id": "CRIT-EAZ-1",
+      "result_status": "PASS",
+      "reason": "observed output matches expected value",
+      "evidence_links": [
+        "EAZ-011",
+        "RUN-EAZ-011"
+      ]
+    },
+    {
+      "case_id": "EAZ-012",
+      "criterion_id": "CRIT-EAZ-1",
+      "result_status": "PASS",
+      "reason": "observed output matches expected value",
+      "evidence_links": [
+        "EAZ-012",
+        "RUN-EAZ-012"
+      ]
+    },
+    {
+      "case_id": "EAZ-013",
+      "criterion_id": "CRIT-EAZ-1",
+      "result_status": "PASS",
+      "reason": "observed output matches expected value",
+      "evidence_links": [
+        "EAZ-013",
+        "RUN-EAZ-013"
+      ]
+    },
+    {
+      "case_id": "EAZ-014",
+      "criterion_id": "CRIT-EAZ-1",
+      "result_status": "PASS",
+      "reason": "observed output matches expected value",
+      "evidence_links": [
+        "EAZ-014",
+        "RUN-EAZ-014"
+      ]
+    },
+    {
+      "case_id": "EAZ-015",
+      "criterion_id": "CRIT-EAZ-1",
+      "result_status": "PASS",
+      "reason": "observed output matches expected value",
+      "evidence_links": [
+        "EAZ-015",
+        "RUN-EAZ-015"
+      ]
+    },
+    {
+      "case_id": "EAZ-016",
+      "criterion_id": "CRIT-EAZ-1",
+      "result_status": "MISMATCH",
+      "reason": "EAZ-ENDE-1: expected '20260531', observed '20260530'",
+      "evidence_links": [
+        "EAZ-016",
+        "RUN-EAZ-016"
+      ]
+    },
+    {
+      "case_id": "EAZ-017",
+      "criterion_id": "CRIT-EAZ-1",
+      "result_status": "MISMATCH",
+      "reason": "EAZ-BEGINN-1: expected '20251101', observed '20251201'; EAZ-ENDE-1: expected '20251130', observed '20251231'",
+      "evidence_links": [
+        "EAZ-017",
+        "RUN-EAZ-017"
+      ]
+    },
+    {
+      "case_id": "EAZ-018",
+      "criterion_id": "CRIT-EAZ-1",
+      "result_status": "PASS",
+      "reason": "observed output matches expected value",
+      "evidence_links": [
+        "EAZ-018",
+        "RUN-EAZ-018"
+      ]
+    },
+    {
+      "case_id": "EAZ-019",
+      "criterion_id": "CRIT-EAZ-1",
+      "result_status": "MISMATCH",
+      "reason": "BRUTTO-1: expected '00640000', observed '00740000'",
+      "evidence_links": [
+        "EAZ-019",
+        "RUN-EAZ-019"
+      ]
+    },
+    {
+      "case_id": "EAZ-020",
+      "criterion_id": "CRIT-EAZ-1",
+      "result_status": "PASS",
+      "reason": "observed output matches expected value",
+      "evidence_links": [
+        "EAZ-020",
+        "RUN-EAZ-020"
+      ]
+    },
+    {
+      "case_id": "EAZ-021",
+      "criterion_id": "CRIT-EAZ-1",
+      "result_status": "MISMATCH",
+      "reason": "DATUM-EGZBIS: expected '20260529', observed '20260530'",
+      "evidence_links": [
+        "EAZ-021",
+        "RUN-EAZ-021"
+      ]
+    },
+    {
+      "case_id": "EAZ-022",
+      "criterion_id": "CRIT-EAZ-1",
+      "result_status": "PASS",
+      "reason": "observed output matches expected value",
+      "evidence_links": [
+        "EAZ-022",
+        "RUN-EAZ-022"
+      ]
+    },
+    {
+      "case_id": "EAZ-023",
+      "criterion_id": "CRIT-EAZ-1",
+      "result_status": "PASS",
+      "reason": "observed output matches expected value",
+      "evidence_links": [
+        "EAZ-023",
+        "RUN-EAZ-023"
+      ]
+    },
+    {
+      "case_id": "EAZ-024",
+      "criterion_id": "CRIT-EAZ-1",
+      "result_status": "MISMATCH",
+      "reason": "DATUM-EGZBIS: expected '20260714', observed '20260713'",
+      "evidence_links": [
+        "EAZ-024",
+        "RUN-EAZ-024"
+      ]
+    },
+    {
+      "case_id": "EAZ-025",
+      "criterion_id": "CRIT-EAZ-1",
+      "result_status": "PASS",
+      "reason": "observed output matches expected value",
+      "evidence_links": [
+        "EAZ-025",
+        "RUN-EAZ-025"
+      ]
+    },
+    {
+      "case_id": "EAZ-026",
+      "criterion_id": "CRIT-EAZ-1",
+      "result_status": "MISMATCH",
+      "reason": "NETTO-1: expected '00312620', observed '00003126'",
+      "evidence_links": [
+        "EAZ-026",
+        "RUN-EAZ-026"
+      ]
+    },
+    {
+      "case_id": "EAZ-027",
+      "criterion_id": "CRIT-EAZ-1",
+      "result_status": "PASS",
+      "reason": "observed output matches expected value",
+      "evidence_links": [
+        "EAZ-027",
+        "RUN-EAZ-027"
+      ]
+    },
+    {
+      "case_id": "EAZ-028",
+      "criterion_id": "CRIT-EAZ-1",
+      "result_status": "MISMATCH",
+      "reason": "DATUM-AB: expected '20260301', observed '20260302'",
+      "evidence_links": [
+        "EAZ-028",
+        "RUN-EAZ-028"
+      ]
+    },
+    {
+      "case_id": "EAZ-029",
+      "criterion_id": "CRIT-EAZ-1",
+      "result_status": "MISMATCH",
+      "reason": "BRUTTO-1: expected '00190000', observed '00116814'; NETTO-1: expected '00116814', observed '00190000'",
+      "evidence_links": [
+        "EAZ-029",
+        "RUN-EAZ-029"
+      ]
+    },
+    {
+      "case_id": "EAZ-030",
+      "criterion_id": "CRIT-EAZ-1",
+      "result_status": "PASS",
+      "reason": "observed output matches expected value",
+      "evidence_links": [
+        "EAZ-030",
+        "RUN-EAZ-030"
       ]
     }
   ]

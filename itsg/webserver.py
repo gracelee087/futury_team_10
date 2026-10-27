@@ -69,7 +69,7 @@ from datetime import datetime
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
-from . import actions, chat, retrieval
+from . import actions, chat, langfuse_link, retrieval
 from .store import Store
 from .timeutil import utc_now
 
@@ -689,7 +689,7 @@ def run_seal_action(store_root: Path, action: str) -> dict:
 
 
 def build_report_pdf(store_root: Path, live: bool = False,
-                     client_name: str | None = None) -> bytes:
+                     client_name: str | None = None, lang: str = "de") -> bytes:
     """Render the formal report PDF (T10-036) and return its bytes.
 
     Deterministic content, honest degradation: ``live`` only adds the marked
@@ -720,7 +720,7 @@ def build_report_pdf(store_root: Path, live: bool = False,
         with tempfile.TemporaryDirectory() as tmp:
             out = Path(tmp) / "formal-report.pdf"
             report_pdf.generate_report_pdf(artifact, out, client_name=client_name,
-                                           summary=summary, summary_note=summary_note)
+                                           summary=summary, summary_note=summary_note, lang=lang)
             return out.read_bytes()
 
 
@@ -739,7 +739,7 @@ def chat_history(store_root: Path, session_id: str) -> list[dict]:
 
 
 def run_chat_turn(store_root: Path, index_path: Path, message: str,
-                  session_id: str) -> dict:
+                  session_id: str, lang: str = "") -> dict:
     """One SÜSIE chat turn against the store: assemble the app-state context,
     corpus hits (``retrieval.corpus_search`` over the --index file) and the
     session history, call ``chat.turn`` (gateway via the ``CHAT_GATEWAY``
@@ -757,7 +757,7 @@ def run_chat_turn(store_root: Path, index_path: Path, message: str,
             for r in chat_history(store_root, session_id)
         ]
         reply = chat.turn(message, state_context, corpus_hits, history,
-                          gateway=CHAT_GATEWAY, session_id=session_id)
+                          gateway=CHAT_GATEWAY, session_id=session_id, lang=lang)
         store = Store(store_root)
         next_id = 1 + max((_chat_number(r) for r in store.all("chat_turn")),
                           default=0)
@@ -766,6 +766,9 @@ def run_chat_turn(store_root: Path, index_path: Path, message: str,
         store.put("chat_turn", {"id": f"CHAT-{next_id + 1}", "session_id": session_id,
                                 "role": "susie", "utterance": reply.utterance,
                                 "at": utc_now(), "agent_run": reply.agent_run})
+    # Langfuse: one trace per chat turn through the privacy guard; no key or no network → nothing happens
+    langfuse_link.trace_chat(session_id, message, reply.utterance,
+                             (reply.agent_run or {}).get("result", {}).get("deterministic_command", ""))
     return {
         "ok": True,
         "utterance": reply.utterance,
@@ -871,7 +874,8 @@ class SUSIEHandler(BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(body)
         elif path == "/api/report/pdf":
-            self._report_pdf({})
+            query = urllib.parse.parse_qs(self.path.split("?", 1)[1]) if "?" in self.path else {}
+            self._report_pdf({"lang": (query.get("lang") or ["de"])[0]})
         else:
             self._static(path)
 
@@ -964,7 +968,8 @@ class SUSIEHandler(BaseHTTPRequestHandler):
             return
         try:
             pdf = build_report_pdf(self.store_root, live=bool(body.get("live", False)),
-                                   client_name=client_name)
+                                   client_name=client_name,
+                                   lang="en" if body.get("lang") == "en" else "de")
         except Exception as exc:
             self._send_json({"ok": False, "error": f"report pdf failed: {exc}"}, status=500)
             return
@@ -989,8 +994,9 @@ class SUSIEHandler(BaseHTTPRequestHandler):
                             status=400)
             return
         try:
+            lang = body.get("lang") if body.get("lang") in ("de", "en") else ""
             self._send_json(run_chat_turn(self.store_root, Path(self.index_path),
-                                          message, session_id))
+                                          message, session_id, lang))
         except Exception as exc:
             self._send_json({"ok": False, "error": f"chat failed: {exc}"}, status=500)
 

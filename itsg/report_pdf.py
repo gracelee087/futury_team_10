@@ -57,6 +57,12 @@ PAGE_W, PAGE_H = 595.28, 841.89
 M_LEFT, M_RIGHT, M_TOP, M_BOTTOM = 70.9, 56.7, 64.0, 76.0
 
 _FOOTER_DISCLOSURE = "Maschinell erzeugt von SÜSIE"
+_LANG = "de"   # set per report by generate_report_pdf(lang=...); "en" renders the English report
+
+
+def _l(de: str, en: str) -> str:
+    """German or English text for the report being rendered."""
+    return en if _LANG == "en" else de
 _FONT = "helv"
 _FONT_BOLD = "hebo"
 
@@ -178,47 +184,112 @@ def _recommended_actions(results: list[dict]) -> list[str]:
             if m:
                 field, expected, observed = m.groups()
                 label = _FIELD_HUMAN.get(field, field)
-                recs.append(
+                recs.append(_l(
                     f"Fall {case_id}: Feld \"{label}\" im Abrechnungsprogramm prüfen und "
                     f"korrigieren — erwartet {expected}, übermittelt {observed}. "
-                    f"Test danach wiederholen.")
+                    f"Test danach wiederholen.",
+                    f"Case {case_id}: check and correct field \"{field}\" in the payroll program — "
+                    f"expected {expected}, transmitted {observed}. Then repeat the test."))
             else:
                 # No field detail parsed: point at the finding, never echo the
                 # full reason here (the summary stays short; details live in 02).
-                recs.append(
+                recs.append(_l(
                     f"Fall {case_id}: Abweichung im Abrechnungsprogramm prüfen und der "
-                    f"Test wiederholen; Details im Befund (Abschnitt 02).")
+                    f"Test wiederholen; Details im Befund (Abschnitt 02).",
+                    f"Case {case_id}: check the deviation in the payroll program and repeat "
+                    f"the test; details in the finding (section 02)."))
         elif status == "NOT_EVALUATED":
             short_reason = reason if len(reason) <= 100 else reason[:97] + "…"
-            recs.append(
+            recs.append(_l(
                 f"Fall {case_id}: vollständige Eingaben bereitstellen und den Test "
-                f"erneut ausführen ({short_reason}).")
+                f"erneut ausführen ({short_reason}).",
+                f"Case {case_id}: provide complete inputs and run the test again ({short_reason})."))
     if not recs:
-        recs.append("Keine Korrekturen erforderlich. Die Freigabe bleibt an den "
-                    "menschlichen Freigabeprozess gebunden (Gate G6).")
+        recs.append(_l("Keine Korrekturen erforderlich. Die Freigabe bleibt an den "
+                       "menschlichen Freigabeprozess gebunden (Gate G6).",
+                       "No corrections needed. Release stays bound to the human release process (gate G6)."))
     return recs
+
+
+_INCOMPLETE_RE = re.compile(r"unvollst|nicht\s+überliefert|missing|fehlt", re.IGNORECASE)
+
+
+def _case_records(artifact_path: Path) -> dict:
+    """test_case records of the store next to the artifact ({} if there is none) — source of the inputs."""
+    try:
+        records = json.loads((artifact_path.parent / "records.json").read_text(encoding="utf-8"))
+        return records.get("test_case") or {}
+    except (OSError, ValueError):
+        return {}
+
+
+def _input_lines(inputs) -> list[str]:
+    """The test case's inputs as 'key: value' lines; long values are shortened, lists of periods flattened."""
+    if not isinstance(inputs, dict):
+        return [str(inputs)] if inputs else []
+    lines = []
+    for key, value in inputs.items():
+        if isinstance(value, list) and value and all(isinstance(v, dict) for v in value):
+            value = "; ".join(", ".join(f"{k}={v}" for k, v in item.items()) for item in value)
+        elif isinstance(value, (list, dict)):
+            value = json.dumps(value, ensure_ascii=False)
+        value = str(value)
+        lines.append(f"{key}: {value if len(value) <= 160 else value[:157] + '...'}")
+    return lines
+
+
+def _why(row: dict, case: dict, index: int) -> str:
+    """One short reason per status for the summary table; derived from the row and the test case only."""
+    status = row.get("result_status")
+    reason = str(row.get("reason", ""))
+    if status == "PASS":
+        return _l("Übermittelte Ausgabe entspricht dem erwarteten Wert.", "Transmitted output matches the expected value.")
+    if status == "MISMATCH":
+        m = _MISMATCH_FIELD_RE.search(reason)
+        if m:
+            field, expected, observed = m.groups()
+            return _l(f"Feld {_FIELD_HUMAN.get(field, field)}: erwartet {expected}, übermittelt {observed}.",
+                      f"Field {field}: expected {expected}, transmitted {observed}.")
+        return _l(f"Abweichung von der Erwartung - Details in Befund {index:02d} (Abschnitt 02).",
+                  f"Deviation from the expectation - details in finding {index:02d} (section 02).")
+    missing = [k for k, v in (case.get("inputs") or {}).items() if _INCOMPLETE_RE.search(str(v))]
+    parts = []
+    if missing:
+        parts.append(_l("Fehlende Eingaben: ", "Missing inputs: ") + ", ".join(missing) + ".")
+    if case and not case.get("expected"):
+        parts.append(_l("Kein Erwartungswert hinterlegt.", "No expected value on record."))
+    if not parts:
+        parts.append(reason if len(reason) <= 100 else _l(f"Details in Befund {index:02d} (Abschnitt 02).",
+                                                          f"Details in finding {index:02d} (section 02)."))
+    return " ".join(parts) + _l(" Nicht bewertet (fail closed), nie still als bestanden gezählt.",
+                                " Not evaluated (fail closed), never silently counted as passed.")
 
 
 def generate_report_pdf(artifact_path: str | Path, out_path: str | Path,
                         client_name: str | None = None, client_logo: str | Path | None = None,
                         susie_logo: str | Path | None = None, generated_at: str | None = None,
-                        summary: str | None = None, summary_note: str | None = None) -> dict:
+                        summary: str | None = None, summary_note: str | None = None,
+                        lang: str = "de") -> dict:
     """Render the artifact as the formal report PDF; returns generation metadata.
 
     ``summary`` (if given) is an AI-DRAFTED, UNREVIEWED text and is rendered as
     such; ``summary_note`` explains why a summary is absent, when it is.
     """
+    global _LANG
+    _LANG = "en" if lang == "en" else "de"
     artifact_path = Path(artifact_path)
     artifact = json.loads(artifact_path.read_text(encoding="utf-8"))
     content_hash = artifact_hash(artifact_path)
     generated_label = _now_label(generated_at)
     results = artifact.get("results") or []
+    cases = _case_records(artifact_path)
     counts: dict[str, int] = {}
     for row in results:
         counts[row.get("result_status", "?")] = counts.get(row.get("result_status", "?"), 0) + 1
 
     susie_logo = Path(susie_logo) if susie_logo else SUSIE_LOGO
-    client = _cp1252(client_name or "Synthetischer Demo-Prüfling (fabricated demo data)")
+    client = _cp1252(client_name or _l("Synthetischer Demo-Prüfling (fabricated demo data)",
+                                       "Synthetic demo test subject (fabricated demo data)"))
 
     # A measured document flow: y is the NEXT line's top, never shared across columns.
     ink, muted = (0.12, 0.15, 0.18), (0.37, 0.40, 0.43)
@@ -238,7 +309,7 @@ def generate_report_pdf(artifact_path: str | Path, out_path: str | Path,
         else:
             page.insert_text((right - 76, 49), "DEMO", fontname="hebo", fontsize=12,
                              color=muted)
-        page.insert_text((left, 36), "Prüfobjekt / Kunde", fontsize=7.5, color=muted)
+        page.insert_text((left, 36), _cp1252(_l("Prüfobjekt / Kunde", "Test subject / client")), fontsize=7.5, color=muted)
         for i, line in enumerate(_wrap(client, width - 95, 9.5, "hebo")[:2]):
             page.insert_text((left, 52 + 12 * i), line, fontname="hebo", fontsize=9.5, color=ink)
         page.draw_line((left, 78), (right, 78), color=accent, width=1.4)
@@ -274,44 +345,53 @@ def generate_report_pdf(artifact_path: str | Path, out_path: str | Path,
         gap(3)
 
     new_page()
-    text("PRÜFBERICHT  /  SYNTHETISCHE DEMODATEN", 8, "hebo", accent)
+    text(_l("PRÜFBERICHT  /  SYNTHETISCHE DEMODATEN", "REVIEW REPORT  /  SYNTHETIC DEMO DATA"), 8, "hebo", accent)
     gap(10)
-    text("Systemüberprüfungsbericht", 25, "tibo", leading=31)
+    text(_l("Systemüberprüfungsbericht", "System review report"), 25, "tibo", leading=31)
     gap(5)
-    text(f"Bericht-ID: {artifact.get('report_id', '')}", 9, color=muted)
-    text(f"Erstellt: {generated_label}", 9, color=muted)
+    text(f"{_l('Bericht-ID', 'Report ID')}: {artifact.get('report_id', '')}", 9, color=muted)
+    text(f"{_l('Erstellt', 'Created')}: {generated_label}", 9, color=muted)
     gap(18)
 
     # 00 Vorbemerkung — purpose, scope, basis (deterministic preface).
-    heading("00", "Vorbemerkung")
-    text("Dieser Bericht dokumentiert die Systemüberprüfung eines Entgeltabrechnungsprogramms "
+    heading("00", _l("Vorbemerkung", "Preface"))
+    text(_l("Dieser Bericht dokumentiert die Systemüberprüfung eines Entgeltabrechnungsprogramms "
          "im Scope der Entgeltersatzleistungen (z. B. Krankengeld, Mutterschaftsgeld). "
          "Geprüft wurde, ob die vom Programm übermittelten Datensätze mit den offiziellen "
          "Erwartungswerten der GKV-Spezifikationen übereinstimmen. Grundlage sind die im "
          "Anhang (Abschnitt D) genannten Prüfgrundlagen mit Quellenangabe und Prüfsumme; "
          "jeder Befund ist über die Belegkette bis zur Fundstelle im Originaldokument "
-         "nachvollziehbar.")
+         "nachvollziehbar.",
+            "This report documents the system review of a payroll program in the scope of income "
+            "replacement benefits (e.g. sickness benefit, maternity benefit). It checks whether the "
+            "records transmitted by the program match the official expected values of the GKV "
+            "specifications. The basis are the review sources listed in the appendix (section D) with "
+            "reference and checksum; every finding can be traced through the evidence chain to the "
+            "passage in the original document."))
     gap(4)
-    text("Alle Prüfdaten sind synthetisch (fabrizierte Demodaten). Der Bericht ist maschinell "
-         "erzeugt, trifft keine Rechts- oder Zertifizierungsaussage und ersetzt nicht die "
-         "Prüfung durch qualifiziertes Personal.", 9, color=muted)
+    text(_l("Alle Prüfdaten sind synthetisch (fabrizierte Demodaten). Der Bericht ist maschinell "
+            "erzeugt, trifft keine Rechts- oder Zertifizierungsaussage und ersetzt nicht die "
+            "Prüfung durch qualifiziertes Personal.",
+            "All test data are synthetic (fabricated demo data). The report is machine-generated, "
+            "makes no legal or certification statement and does not replace review by qualified staff."),
+         9, color=muted)
     gap(6)
 
     # 01 Executive summary — verdict, TL;DR, recommended actions (deterministic).
-    heading("01", "Zusammenfassung und Empfehlung")
+    heading("01", _l("Zusammenfassung und Empfehlung", "Summary and recommendation"))
     has_defect = counts.get("MISMATCH", 0) > 0
     unknown = sum(v for k, v in counts.items() if k not in ("PASS", "MISMATCH"))
-    verdict = ("Abweichungen festgestellt" if has_defect else
-               "Prüfung unvollständig" if unknown or not results else
-               "Keine Abweichung in den geprüften Aspekten")
+    verdict = (_l("Abweichungen festgestellt", "Deviations found") if has_defect else
+               _l("Prüfung unvollständig", "Review incomplete") if unknown or not results else
+               _l("Keine Abweichung in den geprüften Aspekten", "No deviation in the checked aspects"))
     ensure(93)
     page.draw_rect(fitz.Rect(left, y, right, y + 89), color=None, fill=(0.96, 0.96, 0.95))
     y += 12
-    text("ERGEBNISÜBERBLICK", 8, "hebo", muted, indent=12)
+    text(_l("ERGEBNISÜBERBLICK", "RESULTS AT A GLANCE"), 8, "hebo", muted, indent=12)
     text(verdict, 15, "hebo", indent=12)
     gap(4)
-    text(f"{len(results)} Prüfaspekte   /   {counts.get('PASS', 0)} PASS   /   "
-         f"{counts.get('MISMATCH', 0)} MISMATCH   /   {unknown} offen", 9, indent=12)
+    text(f"{len(results)} {_l('Prüfaspekte', 'checked aspects')}   /   {counts.get('PASS', 0)} PASS   /   "
+         f"{counts.get('MISMATCH', 0)} MISMATCH   /   {unknown} {_l('offen', 'open')}", 9, indent=12)
     y += 20
     # TL;DR — one sentence a decision-maker can act on.
     mismatch_rows = [r for r in results if r.get("result_status") == "MISMATCH"]
@@ -320,27 +400,35 @@ def generate_report_pdf(artifact_path: str | Path, out_path: str | Path,
             f"bestehen {counts.get('PASS', 0)}; {n_mm} "
             f"{'weicht' if n_mm == 1 else 'weichen'} von der offiziellen Erwartung ab, "
             f"{unknown} {'ist' if unknown == 1 else 'sind'} nicht bewertbar.")
+    if _LANG == "en":
+        tldr = (f"Most important first: {verdict}. Of {len(results)} checked aspects, "
+                f"{counts.get('PASS', 0)} pass; {n_mm} {'deviates' if n_mm == 1 else 'deviate'} from the "
+                f"official expectation, {unknown} {'is' if unknown == 1 else 'are'} not evaluable.")
     if mismatch_rows:
         first = mismatch_rows[0]
         m = _MISMATCH_FIELD_RE.search(str(first.get("reason", "")))
         # Name the focused case; echo a field label only when parsed — never
         # raw reason text (the summary must not duplicate finding content).
         if m:
-            tldr += f" Fokus: Fall {first.get('case_id', '')} ({_FIELD_HUMAN.get(m.group(1), m.group(1))})."
+            tldr += _l(f" Fokus: Fall {first.get('case_id', '')} ({_FIELD_HUMAN.get(m.group(1), m.group(1))}).",
+                       f" Focus: case {first.get('case_id', '')} ({m.group(1)}).")
         else:
-            tldr += f" Fokus: Fall {first.get('case_id', '')} — Details in Abschnitt 02."
+            tldr += _l(f" Fokus: Fall {first.get('case_id', '')} — Details in Abschnitt 02.",
+                       f" Focus: case {first.get('case_id', '')} — details in section 02.")
     gap(6)
     text("TL;DR", 8, "hebo", accent)
     text(tldr, 10.5, "hebo")
     gap(10)
-    text("Empfohlene Maßnahmen", 11, "hebo")
+    text(_l("Empfohlene Maßnahmen", "Recommended actions"), 11, "hebo")
     gap(6)
     for i, rec in enumerate(_recommended_actions(results), 1):
         text(f"{i}. {rec}", 10, indent=8)
         gap(3)
     gap(6)
-    text("Synthetische Demonstration. Keine Rechts- oder Zertifizierungsaussage. "
-         "Freigabe bleibt gesperrt.", 9, color=muted)
+    text(_l("Synthetische Demonstration. Keine Rechts- oder Zertifizierungsaussage. "
+            "Freigabe bleibt gesperrt.",
+            "Synthetic demonstration. No legal or certification statement. Release stays locked."),
+         9, color=muted)
     for label, value in artifact.get("context") or []:
         if label in ("Kategorie", "Regeltaxonomie-Tag"):
             continue  # Generator taxonomy belongs with the demo-validation appendix.
@@ -351,9 +439,11 @@ def generate_report_pdf(artifact_path: str | Path, out_path: str | Path,
         text(str(label), 8, "hebo", muted)
         text(str(value), 9.5)
 
-    heading("02", "Befunde im Detail")
-    text("Die folgenden Befunde geben die deterministischen Prüfergebnisse wieder. "
-         "PASS gilt ausschließlich für den jeweils genannten Prüfaspekt.", 9, color=muted)
+    heading("02", _l("Befunde im Detail", "Findings in detail"))
+    text(_l("Die folgenden Befunde geben die deterministischen Prüfergebnisse wieder. "
+            "PASS gilt ausschließlich für den jeweils genannten Prüfaspekt.",
+            "The following findings show the deterministic review results. "
+            "PASS applies only to the aspect named."), 9, color=muted)
     gap(12)
     findings = [r for r in results if r.get("case_id") != "Ground-Truth-Abgleich"]
     validation = [r for r in results if r.get("case_id") == "Ground-Truth-Abgleich"]
@@ -379,67 +469,109 @@ def generate_report_pdf(artifact_path: str | Path, out_path: str | Path,
         for line in _wrap(body, width, 10):
             if y + 14.5 > bottom:
                 new_page()
-                text(f"Befund {index:02d} - Fortsetzung", 9, "hebo", muted)
+                text(_l(f"Befund {index:02d} - Fortsetzung", f"Finding {index:02d} - continued"), 9, "hebo", muted)
                 gap(8)
             text(line, 10)
         links = row.get("evidence_links") or []
         if links:
             gap(6)
-            text("Belege: " + " · ".join(str(v) for v in links), 8, color=muted)
+            text(_l("Belege: ", "Evidence: ") + " · ".join(str(v) for v in links), 8, color=muted)
+        inputs = _input_lines((cases.get(row.get("case_id")) or {}).get("inputs"))
+        if inputs:
+            gap(6)
+            text(_l("EINGABEN DES TESTFALLS", "TEST CASE INPUTS"), 7.5, "hebo", muted, leading=10)
+            for line in inputs:
+                text(line, 8.5, indent=8, leading=12)
         gap(15)
 
+    # Overview: why each case is PASS / MISMATCH / NOT_EVALUATED, as a table.
+    if findings:
+        heading("02a", _l("Übersicht: warum PASS, MISMATCH oder NOT_EVALUATED",
+                          "Overview: why PASS, MISMATCH or NOT_EVALUATED"))
+        cols = [(left, 92), (left + 92, 92), (left + 184, width - 184)]   # case, status, why
+        def row_out(cells, font="helv", size=8.5, colors=None):
+            nonlocal y
+            wrapped = [_wrap(c, w - 8, size, font) for c, (_, w) in zip(cells, cols)]
+            height = max(len(w) for w in wrapped) * size * 1.4 + 8
+            ensure(height)
+            for i, (lines, (x, _)) in enumerate(zip(wrapped, cols)):
+                for k, line in enumerate(lines):
+                    page.insert_text((x + 4, y + 4 + size + k * size * 1.4), line, fontname=font,
+                                     fontsize=size, color=(colors or [ink] * 3)[i])
+            y += height
+            page.draw_line((left, y), (right, y), color=(0.82, 0.83, 0.84), width=0.5)
+        row_out([_l("Fall", "Case"), "Status", _l("Begründung / was fehlt", "Reason / what is missing")],
+                "hebo", 8, [muted] * 3)
+        for index, row in enumerate(findings, 1):
+            status = str(row.get("result_status", "NOT_EVALUATED"))
+            row_out([str(row.get("case_id", "")), status,
+                     _why(row, cases.get(row.get("case_id")) or {}, index)],
+                    colors=[ink, _status_color(status), ink])
+        gap(8)
+        text(f"{counts.get('PASS', 0)} PASS  /  {counts.get('MISMATCH', 0)} MISMATCH  /  "
+             f"{counts.get('NOT_EVALUATED', 0)} NOT_EVALUATED", 9, "hebo")
+        gap(10)
+
     if summary:
-        heading("03", "Ergänzende Zusammenfassung")
-        text("KI-Entwurf - ungeprüft", 9, "hebo", accent)
+        heading("03", _l("Ergänzende Zusammenfassung", "Additional summary"))
+        text(_l("KI-Entwurf - ungeprüft", "AI draft - not reviewed"), 9, "hebo", accent)
         gap(7)
         text(summary)
     # Technical metadata is retained separately from the findings, without inventing legal approvals.
     new_page()
-    text("DOKUMENTATION", 8, "hebo", accent)
+    text(_l("DOKUMENTATION", "DOCUMENTATION"), 8, "hebo", accent)
     gap(10)
-    text("Grundlagen und Nachvollziehbarkeit", 21, "tibo")
-    heading("A", "Prüfbericht-Kopfdaten")
+    text(_l("Grundlagen und Nachvollziehbarkeit", "Basis and traceability"), 21, "tibo")
+    heading("A", _l("Prüfbericht-Kopfdaten", "Report header data"))
     for label, value in [
-        ("Prüfbericht-ID", artifact.get("report_id", "")),
-        ("Vorlage / Version", f"{artifact.get('template_id', '')} / {artifact.get('template_version', '')}"),
-        ("Offizielles Formular", artifact.get("official_form_id") or "Keines hinterlegt; synthetische Berichtsvorlage"),
-        ("Renderer / Feldzuordnung", f"{artifact.get('renderer_version', '')} / {artifact.get('field_map_version', '')}"),
+        (_l("Prüfbericht-ID", "Report ID"), artifact.get("report_id", "")),
+        (_l("Vorlage / Version", "Template / version"), f"{artifact.get('template_id', '')} / {artifact.get('template_version', '')}"),
+        (_l("Offizielles Formular", "Official form"), artifact.get("official_form_id") or
+         _l("Keines hinterlegt; synthetische Berichtsvorlage", "None on record; synthetic report template")),
+        (_l("Renderer / Feldzuordnung", "Renderer / field map"), f"{artifact.get('renderer_version', '')} / {artifact.get('field_map_version', '')}"),
     ]:
         metadata(label, value)
-    heading("B", "Grenzen und Freigabestatus")
-    claim = "JA" if artifact.get("compliance_claim") else "NEIN"
-    text(f"Konformitätsaussage dieses Berichts: {claim}.", 10, "hebo")
+    heading("B", _l("Grenzen und Freigabestatus", "Limits and release status"))
+    claim = _l("JA", "YES") if artifact.get("compliance_claim") else _l("NEIN", "NO")
+    text(f"{_l('Konformitätsaussage dieses Berichts', 'Conformance statement of this report')}: {claim}.", 10, "hebo")
     gap(7)
-    text("Freigabe bleibt gesperrt, solange keine verifizierte offizielle Berichtsvorlage "
-         "und kein bestandener Konformitätscheck vorliegen. Dieser Bericht ist maschinell "
-         "erzeugt und trifft keine Rechts- oder Zertifizierungsaussage.", 9.5)
+    text(_l("Freigabe bleibt gesperrt, solange keine verifizierte offizielle Berichtsvorlage "
+            "und kein bestandener Konformitätscheck vorliegen. Dieser Bericht ist maschinell "
+            "erzeugt und trifft keine Rechts- oder Zertifizierungsaussage.",
+            "Release stays locked as long as there is no verified official report template and no "
+            "passed conformance check. This report is machine-generated and makes no legal or "
+            "certification statement."), 9.5)
     if artifact.get("template_warning"):
         gap(9)
-        text("Vorlagenhinweis (Originalangabe)", 8, "hebo", muted)
+        text(_l("Vorlagenhinweis (Originalangabe)", "Template note (original wording)"), 8, "hebo", muted)
         text(artifact["template_warning"], 8.5, color=muted)
     if artifact.get("compliance_claim_reason"):
         gap(7)
         text(artifact["compliance_claim_reason"], 8.5, color=muted)
     if not summary:
         gap(9)
-        text(summary_note or "Keine KI-Zusammenfassung: Diese Ausgabe wurde ausschließlich "
-             "aus deterministischen Prüfergebnissen erstellt.", 8.5, color=muted)
+        text(summary_note or _l("Keine KI-Zusammenfassung: Diese Ausgabe wurde ausschließlich "
+                                "aus deterministischen Prüfergebnissen erstellt.",
+                                "No AI summary: this output was built only from deterministic review results."),
+             8.5, color=muted)
     if validation:
-        heading("C", "Demo-Validierung")
+        heading("C", _l("Demo-Validierung", "Demo validation"))
         for row in validation:
             text(f"Ground-Truth-Abgleich / {row.get('result_status', '')}", 9, "hebo")
             text(row.get("reason", ""), 9)
-            text("Belege: " + " · ".join(str(v) for v in row.get("evidence_links") or []),
+            text(_l("Belege: ", "Evidence: ") + " · ".join(str(v) for v in row.get("evidence_links") or []),
                  8, color=muted)
         for label, value in artifact.get("context") or []:
             if label in ("Kategorie", "Regeltaxonomie-Tag"):
                 gap(6)
                 text(f"{label}: {value}", 8, color=muted)
-    heading("D" if validation else "C", "Integrität")
-    metadata("Berichtsartefakt", artifact_path.name)
-    metadata("SHA-256 des Berichtsartefakts", content_hash)
-    text("Der Hash bezeichnet die zugrunde liegende JSON-Datei. Er ist keine digitale "
-         "Signatur der PDF-Datei.", 8.5, color=muted)
+    heading("D" if validation else "C", _l("Integrität", "Integrity"))
+    metadata(_l("Berichtsartefakt", "Report artifact"), artifact_path.name)
+    metadata(_l("SHA-256 des Berichtsartefakts", "SHA-256 of the report artifact"), content_hash)
+    text(_l("Der Hash bezeichnet die zugrunde liegende JSON-Datei. Er ist keine digitale "
+            "Signatur der PDF-Datei.",
+            "The hash identifies the underlying JSON file. It is not a digital signature of the PDF."),
+         8.5, color=muted)
     gap(8)
     metadata("PDF-Generator", REPORT_PDF_VERSION)
 
@@ -453,9 +585,9 @@ def generate_report_pdf(artifact_path: str | Path, out_path: str | Path,
                 tx += 73
             except RuntimeError:
                 pass
-        p.insert_text((tx, top + 8), _FOOTER_DISCLOSURE, fontname="hebo", fontsize=8)
+        p.insert_text((tx, top + 8), _cp1252(_l(_FOOTER_DISCLOSURE, "Machine-generated by SÜSIE")), fontname="hebo", fontsize=8)
         p.insert_text((tx, top + 21), _cp1252(generated_label), fontsize=7.5, color=muted)
-        label = f"Seite {pno + 1} / {doc.page_count}"
+        label = f"{_l('Seite', 'Page')} {pno + 1} / {doc.page_count}"
         p.insert_text((right - fitz.get_text_length(label, "helv", 8), top + 8), label,
                       fontsize=8, color=muted)
         p.insert_text((left, top + 38), f"SHA-256: {content_hash}", fontsize=7, color=muted)

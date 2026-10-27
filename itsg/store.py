@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import json
 import os
+import time
 from pathlib import Path
 
 from .timeutil import utc_now
@@ -44,7 +45,16 @@ class Store:
     def _write_records(self, data: dict) -> None:
         tmp = self.records_path.with_name(self.records_path.name + ".tmp")
         tmp.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-        os.replace(tmp, self.records_path)  # atomic on POSIX: readers never see a half file
+        # atomic on POSIX: readers never see a half file. On Windows the target can be held
+        # for a moment by a reader or a sync client (OneDrive) → WinError 5; retry briefly.
+        for attempt in range(40):
+            try:
+                os.replace(tmp, self.records_path)
+                break
+            except PermissionError:
+                if attempt == 39:
+                    raise
+                time.sleep(0.05)
 
     def put(self, kind: str, record: dict) -> dict:
         """Upsert one record under ``kind`` and append an event. Returns the event."""

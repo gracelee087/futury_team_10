@@ -20,7 +20,7 @@ import json
 import re
 from dataclasses import dataclass
 
-from . import actions
+from . import actions, langfuse_link
 from .candidates import ROLE_SUSIE_ASSISTANT, new_run
 from .llm import (
     DEFAULT_ENDPOINT,
@@ -46,6 +46,8 @@ DEGRADED_UTTERANCE = (
     "Meine Verbindung zum Wissensdienst ist unterbrochen – "
     "ich kann Sie aber manuell durch die Schritte führen."
 )
+DEGRADED_UTTERANCE_EN = ("My connection to the knowledge service is interrupted – "
+                         "but I can guide you through the steps manually.")
 TASK_ID_DEFAULT = "T10-032"
 AUTHOR = "susie-assistant"
 PROVIDER = "hessian-ai-vllm-gateway"
@@ -330,8 +332,32 @@ def _status_utterance(state_context: dict, english: bool) -> tuple[str, list[dic
     return "\n".join(lines), citations
 
 
+def _langfuse_utterance(text: str, english: bool) -> str:
+    """Chat answer about the Langfuse records: datasets and the item link of a named case.
+    All-run score totals are left out on purpose: they mix early and discarded runs."""
+    info = langfuse_link.summary()
+    if info is None:
+        return ("Langfuse ist nicht verbunden (kein Schlüssel oder nicht erreichbar). Die Prüfung läuft "
+                "trotzdem lokal weiter." if not english else
+                "Langfuse is not connected (no key or not reachable). The review still runs locally.")
+    lines = ["Langfuse — test records of this review (synthetic data):" if english else
+             "Langfuse — Testaufzeichnungen dieser Prüfung (synthetische Daten):"]
+    for d in info["datasets"]:
+        n = d["items"] if d["items"] is not None else ("missing" if english else "fehlt")
+        lines.append(f"• {d.get('label_en', d['label']) if english else d['label']}: {n} {'cases' if english else 'Fälle'}"
+                     + (f" — {d['url']}" if d["url"] else ""))
+    m = re.search(r"\b(GOLD-\d+\.\d+|(?:DEC|OUT|AMB)-\d{3})\b", text, re.IGNORECASE)
+    if m:
+        url = langfuse_link.item_url(m.group(1).upper())
+        if url:
+            lines.append(f"• {m.group(1).upper()}: {url}")
+    lines.append("Each case's item holds its scenario, the expected result and every recorded run." if english else
+                 "Jeder Fall-Eintrag enthält Szenario, erwartetes Ergebnis und alle aufgezeichneten Läufe.")
+    return "\n".join(lines)
+
+
 def deterministic_turn(message: str, state_context: dict, task_id: str,
-                       session_id: str) -> "ChatReply | None":
+                       session_id: str, lang: str = "") -> "ChatReply | None":
     """Match demo-critical navigation/status commands in code; None → LLM turn.
 
     Every deterministic reply keeps the full audit envelope; action proposals
@@ -339,7 +365,7 @@ def deterministic_turn(message: str, state_context: dict, task_id: str,
     """
     text = (message or "").strip()
     low = text.lower()
-    english = _wants_english(text)
+    english = lang == "en" or (lang != "de" and _wants_english(text))   # UI language wins
 
     def _reply(utterance: str, action: dict | None = None,
                needs_confirmation: bool = False, citations: list[dict] | None = None,
@@ -416,6 +442,10 @@ def deterministic_turn(message: str, state_context: dict, task_id: str,
         citations = [{"kind": "state", "ref": src["id"]}] if src.get("id") else []
         return _reply(ut, citations=citations, command="sources")
 
+    # -- Langfuse: what the test records hold (datasets, harness scores, one case's item) ----
+    if re.search(r"\blangfuse\b", low):
+        return _reply(_langfuse_utterance(text, english), command="langfuse")
+
     # -- help & support (T10-044): onboarding, capabilities, troubleshooting -----
     # Matched BEFORE the action commands: an explanation question ("was ist der
     # Abgleich?") must be answered, never executed as a command.
@@ -487,9 +517,18 @@ def deterministic_turn(message: str, state_context: dict, task_id: str,
 
     # -- select / open a case ---------------------------------------------------
     case_match = _CASE_ID_RE.search(text.upper())
-    if case_match or re.search(r"\b(fall|case|abweichung|mismatch|fehler|deviation|abweichend\w*)\b", low):
+    known_ids = {str(c.get("id", "")).upper() for c in state_context.get("cases") or []}
+    names_case = any(tok.upper() in known_ids
+                     for tok in re.findall(r"[A-Za-z0-9][A-Za-z0-9.\-]*[A-Za-z0-9]", text))
+    if case_match or names_case or re.search(r"\b(fall|case|abweichung|mismatch|fehler|deviation|abweichend\w*)\b", low):
         case_id = f"TC-{case_match.group(1)}" if case_match else None
         cases = state_context.get("cases") or []
+        # any case id of the store named in the message (DEC-002, OUT-041, S1-001, MOUT-012, GOLD-13.1 …)
+        named = {c.get("id", "").upper(): c.get("id") for c in cases}
+        for token in re.findall(r"[A-Za-z0-9][A-Za-z0-9.\-]*[A-Za-z0-9]", text):
+            if token.upper() in named:
+                case_id = named[token.upper()]
+                break
         if case_id is None and re.search(r"(abweichung|mismatch|fehler|deviation)", low):
             for c in cases:
                 if c.get("status") == "MISMATCH":
@@ -587,7 +626,7 @@ def deterministic_turn(message: str, state_context: dict, task_id: str,
 
 def turn(message: str, state_context: dict, corpus_hits: list[dict], history: list[dict],
          task_id: str = TASK_ID_DEFAULT, gateway=None, store_path: str | None = None,
-         session_id: str = "") -> ChatReply:
+         session_id: str = "", lang: str = "") -> ChatReply:
     """One SÜSIE chat turn: gateway call + deterministic enforcement + envelope.
 
     ``gateway`` (injectable for tests, no network) is a
@@ -600,7 +639,7 @@ def turn(message: str, state_context: dict, corpus_hits: list[dict], history: li
     if gateway is None:
         token = resolve_token(store_path)
         if not token:
-            return _degraded_turn(task_id, "no LLM credentials available (env or store)")
+            return _degraded_turn(task_id, "no LLM credentials available (env or store)", lang=lang)
 
         def gateway(endpoint, model, system_prompt, messages, _token=None,
                     timeout=GATEWAY_TIMEOUT_S):  # noqa: E306
@@ -610,7 +649,7 @@ def turn(message: str, state_context: dict, corpus_hits: list[dict], history: li
     # status and reset commands never depend on the gateway being up.
     if not gateway_injected:
         deterministic = deterministic_turn(message, state_context,
-                                           task_id=task_id, session_id=session_id)
+                                           task_id=task_id, session_id=session_id, lang=lang)
         if deterministic is not None:
             return deterministic
 
@@ -624,7 +663,7 @@ def turn(message: str, state_context: dict, corpus_hits: list[dict], history: li
             # blocks the call entirely if anything personal survived. Fail closed:
             # no airlock module -> no external call.
             if Schleuse is None:
-                return _degraded_turn(task_id, "privacy airlock unavailable — external call refused (fail closed)")
+                return _degraded_turn(task_id, "privacy airlock unavailable — external call refused (fail closed)", lang=lang)
             airlock = Schleuse()
             user_content, privacy_summary = airlock.pseudonymize(user_content)
             hits = airlock.check_clean(user_content)
@@ -634,7 +673,7 @@ def turn(message: str, state_context: dict, corpus_hits: list[dict], history: li
                     task_id,
                     "privacy airlock blocked the outbound call — personal data still present "
                     f"after pseudonymization (categories: {', '.join(cats)})",
-                    privacy={"airlock": "blocked", "categories": cats})
+                    privacy={"airlock": "blocked", "categories": cats}, lang=lang)
             privacy_summary = {**privacy_summary, "airlock": "passed"}
         messages = [{"role": "user", "content": user_content}]
         model_used = MODEL_ASSISTANT
@@ -649,7 +688,7 @@ def turn(message: str, state_context: dict, corpus_hits: list[dict], history: li
                           SUSIE_SYSTEM_PROMPT, messages, "")
         reply = _parse_reply(raw)
     except (LLMError, ValueError, KeyError, TypeError) as exc:
-        return _degraded_turn(task_id, f"transport/parse failure recorded: {exc}")
+        return _degraded_turn(task_id, f"transport/parse failure recorded: {exc}", lang=lang)
 
     utterance = str(reply.get("utterance", ""))
     citations = [c for c in reply.get("citations", []) if isinstance(c, dict)]
@@ -696,10 +735,11 @@ def turn(message: str, state_context: dict, corpus_hits: list[dict], history: li
                      confidence=confidence, degraded=False, agent_run=run.to_dict())
 
 
-def _degraded_turn(task_id: str, reason: str, privacy: dict | None = None) -> ChatReply:
+def _degraded_turn(task_id: str, reason: str, privacy: dict | None = None, lang: str = "") -> ChatReply:
     """Rehearsed degraded reply — a gateway failure is recorded, never fatal."""
-    run = _envelope(task_id, DEGRADED_UTTERANCE, "unknown", True, [], [reason], privacy=privacy)
-    return ChatReply(utterance=DEGRADED_UTTERANCE, citations=[], action=None,
+    utterance = DEGRADED_UTTERANCE_EN if lang == "en" else DEGRADED_UTTERANCE
+    run = _envelope(task_id, utterance, "unknown", True, [], [reason], privacy=privacy)
+    return ChatReply(utterance=utterance, citations=[], action=None,
                      needs_confirmation=False, disclaimer=False, confidence="unknown",
                      degraded=True, agent_run=run.to_dict())
 
