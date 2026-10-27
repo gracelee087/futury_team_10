@@ -21,6 +21,14 @@ try:
 except ImportError:  # run as a plain script from inside retrieval/
     from search import Chunk, search
 
+try:
+    from privacy import schleuse
+except ImportError:  # retrieval/ is on sys.path but the repository root is not
+    import sys
+
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+    from privacy import schleuse
+
 PROVIDER = "hessian.ai"
 BASE_URL = "https://hip-gw.hessian.ai/v1"
 MODEL = "vllm/GLM-Flash:Latest"
@@ -35,8 +43,9 @@ TABLE_MAX_GAP = 4  # other words allowed between two consecutive quote words
 ENV_FILE = Path(__file__).resolve().parent.parent / ".env"
 
 log = logging.getLogger("retrieval.ask")
+log.addFilter(schleuse.LogFilter())  # logs may hold no personal data at all
 
-Status = Literal["ANSWERED", "NEEDS_REVIEW", "NOT_FOUND"]
+Status = Literal["ANSWERED", "NEEDS_REVIEW", "NOT_FOUND", "BLOCKED"]
 MatchLevel = Literal["exact", "table"]
 
 
@@ -247,8 +256,9 @@ def verify(answer: ModelAnswer, chunks: List[Chunk]) -> List[str]:
 
 
 def _audit(chunks: List[Chunk], status: str, problems: List[str], model_revision: str,
-           attempts: int = 0, json_mode: bool = False) -> dict:
+           attempts: int = 0, json_mode: bool = False, privacy: Optional[dict] = None) -> dict:
     # No question, answer text, chunk text or key: those could hold sensitive data.
+    # "privacy" holds category counts and the policy version only, never a value.
     return {
         "run_id": f"RUN-{uuid.uuid4().hex[:12]}",
         "timestamp": datetime.now(timezone.utc).isoformat(timespec="seconds"),
@@ -261,12 +271,13 @@ def _audit(chunks: List[Chunk], status: str, problems: List[str], model_revision
         "validation_error_count": len(problems),
         "attempts": attempts,
         "response_format_json_object": json_mode,
+        "privacy": privacy or {},
     }
 
 
 def _result(answer: str, status: str, citations, problems, chunks, revision="unavailable",
-            attempts: int = 0, json_mode: bool = False) -> AskResult:
-    audit = _audit(chunks, status, problems, revision, attempts, json_mode)
+            attempts: int = 0, json_mode: bool = False, privacy: Optional[dict] = None) -> AskResult:
+    audit = _audit(chunks, status, problems, revision, attempts, json_mode, privacy)
     log.info(json.dumps(audit, ensure_ascii=False))
     return AskResult(answer=answer, status=status, citations=citations, validation_errors=problems, audit=audit)
 
@@ -283,20 +294,47 @@ def _rejects_response_format(exc: Exception) -> bool:
     return getattr(exc, "status_code", None) in (400, 404, 422)
 
 
-def ask(question: str, chunks: Optional[List[Chunk]] = None, client=None) -> AskResult:
-    """Retrieve (unless chunks given), ask the model, verify, and return a checked result.
+def _blocked(reason: str, categories, privacy: dict) -> AskResult:
+    privacy = {**privacy, "blocked": True, "blocked_categories": sorted(set(categories))}
+    answer = f"BLOCKED: {reason} Nothing was sent to the model."
+    return _result(answer, "BLOCKED", [], [reason], [], privacy=privacy)
 
+
+def ask(question: str, chunks: Optional[List[Chunk]] = None, client=None) -> AskResult:
+    """Privacy airlock, retrieve (unless chunks given), ask the model, verify, and return a checked result.
+
+    The question is pseudonymized and re-checked before anything leaves this function; if personal data
+    is still found in the question or in a chunk the status is BLOCKED and no model call is made.
+    The answer shows the user's own values again (kept in memory only for this call).
     `client` is anything with the OpenAI shape `client.chat.completions.create(...)`;
     tests pass a fake. Raises MissingApiKeyError only when no client is given and no key exists.
     """
+    load_env_file()  # PRIVACY_KEY may live in the gitignored .env next to HESSIAN_API_KEY
+    try:
+        gate = schleuse.Schleuse(keep_reverse=True)
+    except schleuse.PrivacyConfigError as exc:
+        return _blocked(f"privacy key is invalid ({exc}).", [], {"policy_version": schleuse.POLICY_VERSION})
+    clean_question, summary = gate.pseudonymize(question)
+    privacy = {"policy_version": summary["policy_version"], "key_source": summary["key_source"],
+               "categories_removed": summary["categories"], "blocked": False}
+    left = gate.check_clean(clean_question)
+    if left:
+        return _blocked("personal data was still present in the question after pseudonymization.",
+                        (h.category for h in left), privacy)
+
     if chunks is None:
-        chunks = search(question)
+        chunks = search(clean_question)
+    for chunk in chunks:  # public rulebook text, but it passes the same last gate
+        found = schleuse.check_clean(chunk.title + "\n" + chunk.text, allow_specimen=True)
+        if found:
+            return _blocked(f"chunk {chunk.chunk_id} contains personal data.", (h.category for h in found), privacy)
     if client is None:
         client = make_client()
     if not chunks:
-        return _result("No matching chunks were found.", "NOT_FOUND", [], ["no chunks retrieved"], chunks)
+        return _result("No matching chunks were found.", "NOT_FOUND", [], ["no chunks retrieved"], chunks,
+                       privacy=privacy)
 
-    messages = build_messages(question, chunks)
+    messages = build_messages(clean_question, chunks)
     json_mode = True  # ask for response_format=json_object first; dropped for good if the API rejects it
     revision = "unavailable"
     parsed = None
@@ -317,7 +355,7 @@ def ask(question: str, chunks: Optional[List[Chunk]] = None, client=None) -> Ask
         except Exception as exc:  # network, timeout, auth, odd response shape: report the type only
             problems = [f"model call failed: {type(exc).__name__}"]
             return _result("The model call failed; a human must review.", "NEEDS_REVIEW", [], problems, chunks,
-                           revision, attempts, json_mode)
+                           revision, attempts, json_mode, privacy)
         try:
             parsed = _parse_model_json(content)
             break
@@ -327,11 +365,12 @@ def ask(question: str, chunks: Optional[List[Chunk]] = None, client=None) -> Ask
     if parsed is None:
         problems = [f"malformed model response ({kind}) after {attempts} attempts; rejected"]
         return _result("The model response was malformed; a human must review.", "NEEDS_REVIEW", [], problems,
-                       chunks, revision, attempts, json_mode)
+                       chunks, revision, attempts, json_mode, privacy)
 
     problems, citations = verify_citations(parsed, chunks)
     status = "NEEDS_REVIEW" if problems else parsed.status  # may only be lowered, never raised
-    return _result(parsed.answer, status, citations, problems, chunks, revision, attempts, json_mode)
+    return _result(gate.restore(parsed.answer), status, citations, problems, chunks, revision, attempts,
+                   json_mode, privacy)
 
 
 if __name__ == "__main__":

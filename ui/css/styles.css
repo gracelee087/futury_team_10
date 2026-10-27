@@ -197,6 +197,19 @@ tr.info td { color: #54606e; }
 .answer-ok { border-color: #8fcb9a; background: #f4fbf5; }
 .answer-none { border-color: #b8c2cf; background: #f4f6f9; }
 .answer-review { border-color: #e0b800; background: #fff8d6; }
+.answer-blocked { border-color: #b3261e; background: #fde8e6; }
+.answer-blocked h3 { color: #8c1d18; }
+.side-by-side { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; }
+@media (max-width: 700px) { .side-by-side { grid-template-columns: 1fr; } }
+.side-by-side pre { white-space: pre-wrap; word-break: break-word; margin: 0; }
+.side-by-side .clean { background: #f4fbf5; border: 1px solid #8fcb9a; }
+.side-by-side .orig { background: #f4f6f9; border: 1px solid #b8c2cf; }
+.light { display: inline-block; padding: 0.1rem 0.6rem; border-radius: 999px; font-weight: 700; font-size: 0.8rem; color: #fff; }
+.light-green { background: #1a7f2e; }
+.light-yellow { background: #e0b800; color: #3d3000; }
+.light-red { background: #b3261e; }
+.light-unknown { background: #6b7685; }
+table.flows td, table.flows th { vertical-align: top; }
 .answer-text, .unverified, blockquote { white-space: pre-wrap; word-break: break-word; }
 .unverified { border: 1px dashed #9aa5b3; padding: 0.4rem 0.7rem; background: #fff; color: #3a4552; }
 blockquote { margin: 0.3rem 0; padding: 0.3rem 0.8rem; border-left: 4px solid #b8c2cf; background: #f4f6f9; }

@@ -1,10 +1,10 @@
 // Team 10 demo UI: tabs, start-up (live or offline), overview and the sources tab.
 // The other tabs live in report.js, cases.js, ask.js and seal.js; offline sample screens in offline.js.
 
-const TABS = ["overview", "report", "cases", "ask", "seal", "sources"];
-const VIEW_IDS = { overview: "overview-view", report: "report-view", cases: "cases-view", ask: "ask-view", seal: "seal-view", sources: "sources-view" };
+const TABS = ["overview", "report", "cases", "ask", "seal", "sources", "privacy"];
+const VIEW_IDS = { overview: "overview-view", report: "report-view", cases: "cases-view", ask: "ask-view", seal: "seal-view", sources: "sources-view", privacy: "privacy-view" };
 const RENDERERS = { overview: () => renderOverview(), report: () => renderReport(), cases: () => renderCases(),
-  ask: () => renderAsk(), seal: () => renderSeal(), sources: () => renderSources() };
+  ask: () => renderAsk(), seal: () => renderSeal(), sources: () => renderSources(), privacy: () => renderPrivacy() };
 
 function switchTab(tab) {
   if (!TABS.includes(tab)) tab = "overview";

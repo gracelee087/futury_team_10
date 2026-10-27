@@ -17,6 +17,8 @@ COPY checker/ /app/checker/
 COPY harness/ /app/harness/
 COPY retrieval/ask.py retrieval/search.py /app/retrieval/
 COPY chunks/ /app/chunks/
+# privacy airlock (ask.py, the UI server and the Langfuse guard import it)
+COPY privacy/__init__.py privacy/schleuse.py privacy/langfuse_guard.py privacy/leak_test.py privacy/test_independent.py /app/privacy/
 COPY seal/seal_common.py /app/seal/seal_common.py
 COPY data/testcases.json data/story_cases.json data/case_correct.json /app/data/
 COPY ["ITSG Files/TEEL0-Test1-DBVO", "/app/ITSG Files/TEEL0-Test1-DBVO"]
@@ -25,6 +27,9 @@ COPY ui/index.html /app/ui/index.html
 COPY ui/css/ /app/ui/css/
 COPY ui/js/ /app/ui/js/
 COPY ui/server.py /app/ui/server.py
+
+# leak-test result made at build time (the reports volume hides anything written there); the UI also runs it on demand
+RUN python privacy/leak_test.py --json /app/privacy/leaktest-build.json > /dev/null
 
 USER app
 VOLUME /app/reports

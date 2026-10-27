@@ -62,6 +62,15 @@ function showAnswer(box, r) {
 
   if (status === "ANSWERED") {
     box.append(h("div", { class: "answer answer-ok" }, h("h3", { text: "Answer" }), h("p", { class: "answer-text", text: r.answer })));
+  } else if (status === "BLOCKED") {
+    // privacy airlock: personal data was left after pseudonymization. Its own red card, not the yellow review box.
+    const priv = (r.audit && r.audit.privacy) || {};
+    box.append(h("div", { class: "answer answer-blocked", role: "alert" },
+      h("h3", { text: "⛔ Blocked by the privacy airlock" }),
+      h("p", { text: "Your question or a retrieved passage still contained personal data after it was replaced. Nothing was sent to the model, and there is no answer." }),
+      errors.length ? h("ul", {}, errors.map((e) => h("li", { text: e }))) : null,
+      (priv.blocked_categories || []).length ? h("p", { class: "meta", text: "Categories: " + priv.blocked_categories.join(", ") }) : null,
+      h("p", { class: "meta", text: "Remove names, numbers and contact data from the question, or check the Datenschutz tab." })));
   } else if (status === "NOT_FOUND") {
     box.append(h("div", { class: "answer answer-none" }, h("h3", { text: "Not in the documents" }),
       h("p", { text: "The retrieved rulebook passages do not contain an answer to this question. No answer is shown." }),
@@ -74,7 +83,7 @@ function showAnswer(box, r) {
       h("details", {}, h("summary", { text: "Show the unverified model text" }), h("p", { class: "unverified", text: r.answer || "(no text)" }))));
   }
 
-  if (status !== "NEEDS_REVIEW" && errors.length) {
+  if (status !== "NEEDS_REVIEW" && status !== "BLOCKED" && errors.length) {
     box.append(h("h4", { text: "Validation errors" }), h("ul", { class: "errors" }, errors.map((e) => h("li", { text: e }))));
   }
   if (!errors.length) box.append(h("p", { class: "meta", text: "Validation: every check passed." }));
@@ -90,6 +99,7 @@ function showAnswer(box, r) {
       ["Attempts", a.attempts], ["Prompt contract", a.prompt_contract_version], ["Run", a.run_id],
       ["Time", a.timestamp ? shortDate(a.timestamp) : "—"], ["Passages sent", (a.input_ids || []).join(", ")],
       ["Validation errors", a.validation_error_count],
+      ["Privacy", a.privacy ? `policy ${a.privacy.policy_version || "—"}; removed ${formatValue(a.privacy.categories_removed || {})}` : "—"],
     ].map(([k, v]) => h("tr", {}, h("th", { text: k }), h("td", { text: formatValue(v) })))))));
 }
 

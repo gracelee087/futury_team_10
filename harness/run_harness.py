@@ -133,6 +133,10 @@ def main():
         load_env(ROOT / ".env")
         from langfuse import get_client
         lf = get_client()
+        # T10-007 privacy guard (Fares, needs Sohee's review): all Langfuse payloads below go through guard.safe()
+        sys.path.insert(0, str(ROOT))
+        from privacy.langfuse_guard import LangfuseGuard
+        guard = LangfuseGuard()
         try:
             have = {it.id for it in retry(lf.get_dataset, name=DATASET).items}
         except Exception:
@@ -141,9 +145,9 @@ def main():
         for c in cases:   # id = case id, so re-running does not duplicate items
             if f"{DATASET}-{c['id']}" not in have:
                 retry(lf.create_dataset_item, dataset_name=DATASET, id=f"{DATASET}-{c['id']}",
-                      input={"scenario": c["scenario"], "observed_dbvo": c["observed_dbvo"]},
-                      expected_output={"expected": c["expected"], "must_flag": c["must_flag"]},
-                      metadata={"group": c["group"], "category": c["category"]})
+                      input=guard.safe({"scenario": c["scenario"], "observed_dbvo": c["observed_dbvo"]}),
+                      expected_output=guard.safe({"expected": c["expected"], "must_flag": c["must_flag"]}),
+                      metadata=guard.safe({"group": c["group"], "category": c["category"]}))
         items = {it.id: it for it in retry(lf.get_dataset, name=DATASET).items}
 
     results = []
@@ -155,20 +159,21 @@ def main():
                 with items[f"{DATASET}-{c['id']}"].run(run_name=run_id, run_metadata={"git_sha": sha}) as span:
                     obs, findings = review(c, raw, tmp)
                     for f in findings:
-                        with lf.start_as_current_span(name=f"check {f['id']}", input={"rule": f["rule"], "source": f["source"],
-                                                      "criterion_id": f.get("criterion_id")},
-                                                      output={k: f.get(k) for k in ("expected", "actual", "status", "reason")},
+                        with lf.start_as_current_span(name=f"check {f['id']}",
+                                                      input=guard.safe({"rule": f["rule"], "source": f["source"],
+                                                                        "criterion_id": f.get("criterion_id")}),
+                                                      output=guard.safe({k: f.get(k) for k in ("expected", "actual", "status", "reason")}),
                                                       level="WARNING" if f["status"] == "MISMATCH" else "DEFAULT"):
                             pass
                     s = score(c, findings)
                     span.update_trace(name="review-case", session_id=run_id, version=sha,
                                       tags=["Team10", "harness", "Abgabegrund-41", c["group"]],
-                                      input={"case_id": c["id"], "category": c["category"]},
-                                      output={"flagged": s["flagged"], "outcome": s["outcome"]},
-                                      metadata={"case_id": c["id"], "must_flag": c["must_flag"],
-                                                "reviewer": "run_review.dbvo_findings", "data": "synthetic"})
+                                      input=guard.safe({"case_id": c["id"], "category": c["category"]}),
+                                      output=guard.safe({"flagged": s["flagged"], "outcome": s["outcome"]}),
+                                      metadata=guard.safe({"case_id": c["id"], "must_flag": c["must_flag"],
+                                                           "reviewer": "run_review.dbvo_findings", "data": "synthetic"}))
                     span.score_trace(name="case_correct", value=1 if s["ok"] else 0, data_type="BOOLEAN",
-                                     comment=s["outcome"])
+                                     comment=guard.safe(s["outcome"]))
                     if c["must_flag"]:
                         span.score_trace(name="detected", value=1 if s["ok"] else 0, data_type="BOOLEAN")
                     else:

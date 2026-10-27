@@ -7,7 +7,8 @@ sent to the browser or written to the log. Everything shown to the user comes fr
 (run_review.py, harness, retrieval, seal); a part that is missing is reported "unavailable".
 
 Environment: UI_HOST (default 0.0.0.0), UI_PORT (default 8000), HESSIAN_API_KEY,
-SEAL_URL, SEAL_VENDOR_TOKEN, SEAL_ADMIN_TOKEN. A .env file in the repository root is read first;
+SEAL_URL, SEAL_VENDOR_TOKEN, SEAL_ADMIN_TOKEN, PRIVACY_KEY (min. 16 characters), RETENTION_DAYS (default 7).
+A .env file in the repository root is read first;
 real environment variables win.
 """
 import copy
@@ -33,6 +34,7 @@ ROOT = Path(__file__).resolve().parent.parent
 UI_DIR = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT))
 from run_review import load_env  # noqa: E402  (the repo's own .env reader)
+from privacy import schleuse  # noqa: E402  (privacy airlock, T10-007)
 
 UI_VERSION = "ui-1.0"
 MAX_BODY = 64 * 1024
@@ -52,7 +54,7 @@ STATIC_TYPES = {".html": "text/html; charset=utf-8", ".js": "text/javascript; ch
                 ".ico": "image/x-icon"}
 STATIC_ROOTS = ("figures",)  # besides ui/ itself
 NEEDS_FAILURE = ("MISMATCH", "NOT EVALUATED", "BLOCKED", "NEEDS_REVIEW")
-SECRET_ENV = ("HESSIAN_API_KEY", "SEAL_SECRET", "SEAL_VENDOR_TOKEN", "SEAL_ADMIN_TOKEN", "LANGFUSE_SECRET_KEY")
+SECRET_ENV = ("HESSIAN_API_KEY", "SEAL_SECRET", "SEAL_VENDOR_TOKEN", "SEAL_ADMIN_TOKEN", "LANGFUSE_SECRET_KEY", "PRIVACY_KEY")
 CONTROL = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]")
 ID_RE = re.compile(r"^[A-Za-z0-9._-]{1,40}$")
 REPORT_ID_RE = re.compile(r"^RPT-[0-9]{8}-[0-9]{6}$")
@@ -70,6 +72,7 @@ SECURITY_HEADERS = {
 }
 
 log = logging.getLogger("ui.server")
+log.addFilter(schleuse.LogFilter())   # logs may hold no personal data at all
 
 
 class ApiError(Exception):
@@ -110,6 +113,8 @@ class Config:
         self.ask_fn = ask_fn
         self.ask_limiter = RateLimiter(ask_limit, 60, clock)
         self.demo_limiter = RateLimiter(demo_limit, 60, clock)
+        self.privacy_limiter = RateLimiter(20, 60, clock)
+        self.leak_lock = threading.Lock()
         self.review_lock = threading.Lock()   # one review / harness subprocess at a time
         self.demo_lock = threading.Lock()
         self.events_lock = threading.Lock()
@@ -519,6 +524,152 @@ def api_seal_demo(cfg, ip, body, query):
     return {"steps": steps, "runs": runs, "report_id": report.get("report", {}).get("id")}
 
 
+# ---------------------------------------------------------------- privacy (T10-007)
+
+MAX_PREVIEW = 5000
+RETENTION_DEFAULT_DAYS = 7
+RETENTION_PATTERNS = ("RPT-*.json", "harness-*.json")   # never review-events.jsonl, leaktest-latest.json or the seal ledger
+LEAKTEST_TIMEOUT = 120
+LEAKTEST_FILE = "leaktest-latest.json"
+
+
+def privacy_gate(cfg):
+    try:
+        return schleuse.Schleuse(cfg.env.get("PRIVACY_KEY") or None)
+    except schleuse.PrivacyConfigError:
+        raise ApiError(503, "The privacy key on this server is invalid (PRIVACY_KEY must have at least 16 characters).") from None
+
+
+def api_privacy_preview(cfg, ip, body, query):
+    """Show what would leave the system. The original text is never stored or logged; it is not echoed back."""
+    body = only_fields(body, ("text",))
+    text = check_text(body.get("text"), "text", MAX_PREVIEW)
+    if not cfg.privacy_limiter.allow(ip):
+        raise ApiError(429, "Too many previews. Please wait a minute and try again.")
+    gate = privacy_gate(cfg)
+    clean, summary = gate.pseudonymize(text)
+    left = gate.check_clean(clean)
+    return {"clean_text": None if left else clean,   # a text with leftovers is not shown: it still holds personal data
+            "summary": {"categories": summary["categories"], "total": summary["total"]},
+            "blocked": bool(left), "blocked_categories": sorted({hit.category for hit in left}),
+            "policy_version": schleuse.POLICY_VERSION, "key_source": gate.key_source}
+
+
+def retention_days(env):
+    try:
+        days = int(env.get("RETENTION_DAYS") or RETENTION_DEFAULT_DAYS)
+    except (TypeError, ValueError):
+        return RETENTION_DEFAULT_DAYS
+    return days if days >= 1 else RETENTION_DEFAULT_DAYS
+
+
+def purge_old_reports(reports_dir, days, now=None):
+    """Delete review reports and harness results older than `days`. Returns the deleted file names.
+
+    Only RPT-*.json and harness-*.json in the reports folder are touched. The seal ledger lives elsewhere
+    (it holds only hashes), and the decision log and the leak-test result are not matched.
+    """
+    cutoff = (time.time() if now is None else now) - days * 86400
+    deleted = []
+    for pattern in RETENTION_PATTERNS:
+        for path in Path(reports_dir).glob(pattern):
+            try:
+                if path.is_file() and path.stat().st_mtime < cutoff:
+                    path.unlink()
+                    deleted.append(path.name)
+            except OSError:
+                log.error("retention: could not delete one file")
+    if deleted:
+        log.info("retention: deleted %d old report file(s) (older than %d days)", len(deleted), days)
+    return deleted
+
+
+def start_retention(cfg, interval=86400):
+    """Purge now and then once a day, in a daemon thread."""
+    def loop():
+        while True:
+            try:
+                purge_old_reports(cfg.reports_dir, retention_days(cfg.env))
+            except Exception as exc:   # a failed purge must not stop the server
+                log.error("retention failed: %s", type(exc).__name__)
+            time.sleep(interval)
+    thread = threading.Thread(target=loop, name="retention", daemon=True)
+    thread.start()
+    return thread
+
+
+def api_privacy_flows(cfg, ip, body, query):
+    """Data-flow map built from the policy dict (privacy/schleuse.py) and this server's configuration."""
+    env = cfg.env
+    policy = schleuse.POLICY
+    try:
+        _key, key_state = schleuse.get_key(env.get("PRIVACY_KEY") or None)
+    except schleuse.PrivacyConfigError:
+        key_state = "invalid"
+    langfuse_on = bool(env.get("LANGFUSE_PUBLIC_KEY") and env.get("LANGFUSE_SECRET_KEY"))
+
+    def row(dest, label, sends, protection, location, light, note):
+        return {"id": dest, "destination": label, "mode": policy.get(dest, {}).get("mode"), "sends": sends,
+                "protection": protection, "location": location, "light": light, "note": note}
+
+    notes = {"invalid": "PRIVACY_KEY is invalid: questions are BLOCKED.",
+             "env": "Fixed privacy key from the server environment.",
+             "ephemeral": "No PRIVACY_KEY set: a random key per process is used. Tokens stay consistent inside one question."}
+    flows = [
+        row("hessian_ai", "AI model (hessian.AI)", "Your question with personal data replaced by tokens, plus public rulebook passages",
+            "Pseudonymized, then checked again; anything left blocks the call",
+            "hessian.AI, Germany, self-hosted open-weight models (as stated by the team, not verified by this page)",
+            "red" if key_state == "invalid" else ("yellow" if key_state == "ephemeral" else "green"), notes.get("ephemeral" if key_state == "ephemeral" else key_state if key_state == "invalid" else "env", "")),
+        row("langfuse", "Langfuse (tracing)", "Only listed fields (status, rule, source, expected/actual), pseudonymized",
+            "Minimized + pseudonymized + checked; a trace may be public only if every payload was clean",
+            "External service" + (f" ({env.get('LANGFUSE_HOST')})" if env.get("LANGFUSE_HOST") else "") + ", used only if keys are set",
+            "yellow" if langfuse_on else "green",
+            "Keys are set on this server: data leaves to an external service (guarded)." if langfuse_on
+            else "No Langfuse keys on this server: nothing is sent."),
+        row("seal", "ITSG seal", "Only a hash of the finished report and run IDs", "Hash only (no report text)",
+            "Private Docker network, the seal container", "green", "The seal never receives report content."),
+        row("logs", "Server logs", "Request line without query string, error types, privacy counts",
+            "No personal data (log filter on the ask and UI loggers)", "Container log on the team server", "green",
+            "The servers do not log user text. A filter scrubs what is logged anyway; free-text names without a cue word could slip through it."),
+        row("reports", "Reports folder", "Review reports and harness results (synthetic data)",
+            f"Deleted after {retention_days(env)} days (RETENTION_DAYS); the seal ledger is not touched",
+            "Docker volume on the team server", "green",
+            "Reviewer names typed into the decision log (review-events.jsonl) are not purged automatically."),
+    ]
+    return {"policy_version": schleuse.POLICY_VERSION, "retention_days": retention_days(env), "flows": flows,
+            "light_meaning": {"green": "protection active and enforced in code (or nothing is sent)",
+                              "yellow": "protected, but data leaves to an external place or the setting is weaker than intended",
+                              "red": "protection broken: calls are blocked until fixed"}}
+
+
+def api_privacy_leaktest(cfg, ip, body, query):
+    """Latest leak-test result (reports/leaktest-latest.json). Runs privacy/leak_test.py once if there is none."""
+    path = cfg.reports_dir / LEAKTEST_FILE
+    source = "stored in the reports folder"
+    if not path.exists():
+        if not cfg.leak_lock.acquire(blocking=False):
+            raise ApiError(503, "The leak test is running right now. Please try again in a minute.")
+        try:
+            if not path.exists():
+                cfg.reports_dir.mkdir(exist_ok=True)
+                try:
+                    subprocess.run([sys.executable, "privacy/leak_test.py", "--json", str(path)], cwd=cfg.root,
+                                   capture_output=True, timeout=LEAKTEST_TIMEOUT, env=child_env(), shell=False)
+                except subprocess.TimeoutExpired:
+                    raise ApiError(504, f"The leak test took longer than {LEAKTEST_TIMEOUT} seconds and was stopped.") from None
+                except OSError:
+                    raise ApiError(500, "The leak test could not be started.") from None
+                source = "run just now"
+        finally:
+            cfg.leak_lock.release()
+    if not path.exists():
+        built = cfg.root / "privacy" / "leaktest-build.json"   # copy made when the Docker image was built
+        if not built.exists():
+            raise ApiError(404, "There is no leak-test result yet.")
+        path, source = built, "made when the image was built"
+    return {"source": source, "result": read_json_file(path)}
+
+
 # ---------------------------------------------------------------- health
 
 def part_checker(cfg):
@@ -578,6 +729,9 @@ ROUTES = {
     ("GET", "/api/harness/latest"): api_harness_latest,
     ("POST", "/api/harness/run"): api_harness_run,
     ("POST", "/api/ask"): api_ask,
+    ("POST", "/api/privacy/preview"): api_privacy_preview,
+    ("GET", "/api/privacy/flows"): api_privacy_flows,
+    ("GET", "/api/privacy/leaktest"): api_privacy_leaktest,
     ("POST", "/api/seal/demo"): api_seal_demo,
     ("GET", "/api/seal/runs"): api_seal_runs,
     ("POST", "/api/review/decision"): api_decision_post,
@@ -686,7 +840,7 @@ class Handler(BaseHTTPRequestHandler):
                 if method == "POST":
                     self._check_origin()
                     body = self._read_body()
-                    if body is None and handler in (api_ask, api_decision_post):
+                    if body is None and handler in (api_ask, api_decision_post, api_privacy_preview):
                         raise ApiError(400, "The request body is missing.")
                 return self._json(200, handler(self.cfg, self.client_address[0], body, query, **kwargs))
             if method != "GET":
@@ -739,6 +893,7 @@ def main():
         print("UI_PORT must be a number.", file=sys.stderr)
         return 2
     httpd = make_server(host, port)
+    start_retention(httpd.cfg)   # delete old reports now and once a day (RETENTION_DAYS, default 7)
     print(f"Team 10 demo on http://{'localhost' if host == '0.0.0.0' else host}:{port}  (Ctrl+C to stop)")
     try:
         httpd.serve_forever()

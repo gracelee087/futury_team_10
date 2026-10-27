@@ -239,14 +239,21 @@ def main():
     if os.environ.get("LANGFUSE_PUBLIC_KEY") and os.environ.get("LANGFUSE_SECRET_KEY"):
         from langfuse import get_client
         lf = get_client()
-    span = (lambda **kw: lf.start_as_current_span(**kw)) if lf else (lambda **kw: contextlib.nullcontext())
+    # T10-007 privacy guard (Fares, needs Sohee's review): everything sent to Langfuse is minimized, pseudonymized
+    # and checked first (policy "langfuse", privacy/schleuse.py). Without Langfuse keys nothing changes.
+    guard = None
+    if lf:
+        from privacy.langfuse_guard import LangfuseGuard
+        guard = LangfuseGuard()
+    span = (lambda **kw: lf.start_as_current_span(**guard.kwargs(**kw))) if lf else (lambda **kw: contextlib.nullcontext())
 
     report_id = "RPT-" + datetime.now().strftime("%Y%m%d-%H%M%S")
     case = json.loads(Path(args.case).read_text(encoding="utf-8-sig"))
     with span(name="review-run", input={"case": args.case, "teel0": args.teel0}):
         if lf:
-            lf.update_current_trace(name="review-run", tags=["Team10", "Abgabegrund-41", "DBVO"], public=args.public,
-                                    metadata={"report_id": report_id, "test_case": case.get("source")})
+            # T10-007: the trace starts private; --public is applied at the end, only if every payload was clean
+            lf.update_current_trace(**guard.kwargs(name="review-run", tags=["Team10", "Abgabegrund-41", "DBVO"],
+                                                   metadata={"report_id": report_id, "test_case": case.get("source")}))
         with span(name="load_test_case", input=args.case, output={"scenario": case["scenario"], "messages": len(case["messages"])}):
             pass
         try:
@@ -290,7 +297,13 @@ def main():
         with span(name="report", output=report):
             pass
         if lf:
-            lf.update_current_trace(output={"overall_status": overall, "counts": counts, "robustness": rb["result"]})
+            lf.update_current_trace(**guard.kwargs(output={"overall_status": overall, "counts": counts,
+                                                           "robustness": rb["result"]}))
+            if args.public and guard.all_clean:   # T10-007: refuse a public trace unless every payload passed check_clean
+                lf.update_current_trace(public=True)
+            elif args.public:
+                print(f"--public refused: {guard.withheld} Langfuse payload(s) still looked personal and were withheld; "
+                      "the trace stays private.")
 
     if lf:
         lf.flush()
